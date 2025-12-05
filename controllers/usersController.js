@@ -1,5 +1,21 @@
 const { usersCollection } = require("../db.js");
 
+const getUsers = async (req, res) => {
+  const query = {};
+
+  try {
+    const users = await usersCollection.find(query).toArray();
+
+    res.send({
+      success: true,
+      message: "Users retrieved successfully",
+      users,
+    });
+  } catch {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 const postUser = async (req, res) => {
   const userData = req.body;
   const today = new Date().toISOString();
@@ -31,4 +47,4 @@ const postUser = async (req, res) => {
   }
 };
 
-module.exports = { postUser };
+module.exports = { postUser, getUsers };
