@@ -20,6 +20,7 @@ const postUser = async (req, res) => {
   const userData = req.body;
   const today = new Date().toISOString();
   const lastLoggedIn = today;
+  userData.role = "user";
   userData.lastLoggedIn = lastLoggedIn;
   userData.createdAt = today;
 
