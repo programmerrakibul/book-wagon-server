@@ -35,9 +35,7 @@ const getBookById = async (req, res) => {
 
   if (id.trim().length === 0) {
     return res.status(400).send({ message: "Book ID is required" });
-  }
-
-  if (id.length !== 24) {
+  } else if (id.length !== 24) {
     return res.status(400).send({ message: "Invalid Book ID" });
   }
 
@@ -79,4 +77,45 @@ const postBook = async (req, res) => {
   }
 };
 
-module.exports = { postBook, getBooks, getBookById };
+const updateBookById = async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  if (id.trim().length === 0) {
+    return res.status(400).send({ message: "Book ID is required" });
+  } else if (id.trim().length !== 24) {
+    return res.status(400).send({ message: "Invalid Book ID" });
+  }
+
+  if (!updateData || Object.keys(updateData).length === 0) {
+    return res.status(400).send({ message: "No data provided for update" });
+  }
+
+  updateData.updatedAt = new Date().toISOString();
+
+  const query = { _id: new ObjectId(id) };
+
+  try {
+    const isExist = await booksCollection.findOne(query);
+
+    if (!!isExist) {
+      const result = await booksCollection.updateOne(query, {
+        $set: updateData,
+      });
+
+      res.send({
+        success: true,
+        message: "Book data updated successfully",
+        ...result,
+      });
+    } else {
+      return res.status(404).send({ message: "Book not found" });
+    }
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { postBook, getBooks, getBookById, updateBookById };
