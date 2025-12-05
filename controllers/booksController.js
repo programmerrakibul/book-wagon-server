@@ -3,6 +3,20 @@ const { booksCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
   const query = {};
+  const { title, author, sortBy, sortOrder } = req.query;
+
+  if (title) {
+    query.title = { $regex: title, $options: "i" };
+  }
+
+  if (author) {
+    query.author = { $regex: author, $options: "i" };
+  }
+
+  if (sortBy) {
+    const order = sortOrder === "desc" ? -1 : 1;
+    query.$sort = { [sortBy]: order };
+  }
 
   try {
     const books = await booksCollection.find(query).toArray();
