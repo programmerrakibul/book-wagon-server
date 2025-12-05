@@ -8,7 +8,7 @@ const getUsers = async (req, res) => {
 
     res.send({
       success: true,
-      message: "Users retrieved successfully",
+      message: "Users data retrieved successfully",
       users,
     });
   } catch {
@@ -40,7 +40,7 @@ const postUser = async (req, res) => {
 
     res.status(201).send({
       success: true,
-      message: "User created successfully",
+      message: "User data posted successfully",
       ...result,
     });
   } catch {
