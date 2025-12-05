@@ -48,4 +48,37 @@ const postUser = async (req, res) => {
   }
 };
 
-module.exports = { postUser, getUsers };
+const updateUserRole = async (req, res) => {
+  const { email } = req.params;
+  const { role } = req.body;
+
+  if (email.trim().length === 0) {
+    return res.status(400).send({ message: "Email is required" });
+  }
+
+  if (role.trim().length === 0) {
+    return res.status(400).send({ message: "Role is required" });
+  }
+
+  const query = { email };
+
+  try {
+    const isExist = await usersCollection.findOne(query);
+
+    if (!isExist) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const result = await usersCollection.updateOne(query, { $set: { role } });
+
+    res.send({
+      success: true,
+      message: "User role updated successfully",
+      ...result,
+    });
+  } catch {
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { postUser, getUsers, updateUserRole };
