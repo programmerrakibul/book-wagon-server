@@ -52,8 +52,6 @@ const postBook = async (req, res) => {
   const today = new Date().toISOString();
   bookData.createdAt = today;
   bookData.updatedAt = today;
-  bookData.status = "pending";
-  bookData.paymentStatus = "pending";
 
   try {
     const result = await booksCollection.insertOne(bookData);
