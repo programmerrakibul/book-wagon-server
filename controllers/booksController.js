@@ -3,14 +3,13 @@ const { booksCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
   const query = {};
-  const { title, author, sortBy, sortOrder } = req.query;
+  const { search, sortBy, sortOrder } = req.query;
 
-  if (title) {
-    query.title = { $regex: title, $options: "i" };
-  }
-
-  if (author) {
-    query.author = { $regex: author, $options: "i" };
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { "author.name": { $regex: search, $options: "i" } },
+    ];
   }
 
   if (sortBy) {
