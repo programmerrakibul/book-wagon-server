@@ -5,7 +5,7 @@ const cors = require("cors");
 const { client } = require("./db.js");
 const { usersRouter } = require("./routes/usersRouter.js");
 const { booksRouter } = require("./routes/booksRouter.js");
-const { ordersRouter } = require("./routes/orderRouter.js");
+const { ordersRouter } = require("./routes/ordersRouter.js");
 
 const app = express();
 const port = process.env.PORT || 8000;

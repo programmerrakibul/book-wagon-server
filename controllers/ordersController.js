@@ -1,6 +1,30 @@
 const { ordersCollection } = require("../db.js");
 const { generateOrderID } = require("../utilities/generateOrderID.js");
 
+const getOrders = async (req, res) => {
+  const { email } = req.params;
+
+  if (!email.trim()) {
+    return res.status(400).send({ message: "Email is required" });
+  }
+
+  const query = {
+    customerEmail: email,
+  };
+
+  try {
+    const orders = await ordersCollection.find(query).toArray();
+
+    res.send({
+      success: true,
+      message: "Orders data retrieved successfully",
+      orders,
+    });
+  } catch {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 const postOrder = async (req, res) => {
   const orderData = req.body;
   const today = new Date().toISOString();
@@ -27,4 +51,4 @@ const postOrder = async (req, res) => {
   }
 };
 
-module.exports = { postOrder };
+module.exports = { postOrder, getOrders };
