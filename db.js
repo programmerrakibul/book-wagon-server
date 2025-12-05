@@ -12,5 +12,6 @@ const client = new MongoClient(uri, {
 
 const database = client.db("book_wagon");
 const usersCollection = database.collection("users");
+const booksCollection = database.collection("books");
 
-module.exports = { client, usersCollection };
+module.exports = { client, usersCollection, booksCollection };
