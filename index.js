@@ -1,1 +1,36 @@
-console.log('Hello World');
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const { client } = require("./db.js");
+
+const app = express();
+const port = process.env.PORT || 8000;
+
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+const run = async () => {
+  try {
+    await client.connect();
+
+    // Sample route
+    app.get("/", (req, res) => {
+      res.send("Welcome to the Book Wagon Server!");
+    });
+
+    await client.db("admin").command({ ping: 1 });
+
+    console.log("Connected to MongoDB");
+
+    // Start the server
+    app.listen(port, () => {
+      console.log(`Server is running on port: ${port}`);
+    });
+  } finally {
+    // await client.close();
+  }
+};
+
+run().catch(console.dir);
