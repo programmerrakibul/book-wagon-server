@@ -3,7 +3,11 @@ const { booksCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
   const query = {};
-  const { search, sortBy, sortOrder } = req.query;
+  const { search, sortBy, sortOrder, email } = req.query;
+
+  if (email) {
+    query.librarianEmail = email;
+  }
 
   if (search) {
     query.$or = [
@@ -79,7 +83,7 @@ const postBook = async (req, res) => {
 
 const updateBookById = async (req, res) => {
   const { id } = req.params;
-  const updateData = req.body;
+  const updatedData = req.body;
 
   if (id.trim().length === 0) {
     return res.status(400).send({ message: "Book ID is required" });
@@ -87,11 +91,11 @@ const updateBookById = async (req, res) => {
     return res.status(400).send({ message: "Invalid Book ID" });
   }
 
-  if (!updateData || Object.keys(updateData).length === 0) {
+  if (!updatedData || Object.keys(updatedData).length === 0) {
     return res.status(400).send({ message: "No data provided for update" });
   }
 
-  updateData.updatedAt = new Date().toISOString();
+  updatedData.updatedAt = new Date().toISOString();
 
   const query = { _id: new ObjectId(id) };
 
@@ -100,7 +104,7 @@ const updateBookById = async (req, res) => {
 
     if (!!isExist) {
       const result = await booksCollection.updateOne(query, {
-        $set: updateData,
+        $set: updatedData,
       });
 
       res.send({
