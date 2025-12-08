@@ -3,7 +3,17 @@ const { booksCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
   const query = {};
-  const { search, sortBy, sortOrder, email } = req.query;
+  let projectionField = {};
+  const {
+    search,
+    sortBy,
+    sortOrder,
+    email,
+    limit = 0,
+    skip = 0,
+    fields,
+    excludes,
+  } = req.query;
 
   if (email) {
     query.librarianEmail = email;
@@ -21,8 +31,29 @@ const getBooks = async (req, res) => {
     query.$sort = { [sortBy]: order };
   }
 
+  if (fields) {
+    fields.split(",").forEach((field) => {
+      projectionField[field.trim()] = 1;
+    });
+  }
+
+  if (excludes) {
+    excludes.split(",").forEach((field) => {
+      projectionField[field.trim()] = 0;
+    });
+  }
+
+  if (Object.keys(projectionField).length === 0) {
+    projectionField = null;
+  }
+
   try {
-    const books = await booksCollection.find(query).toArray();
+    const books = await booksCollection
+      .find(query)
+      .limit(limit)
+      .skip(skip)
+      .project(projectionField)
+      .toArray();
 
     res.send({
       success: true,
