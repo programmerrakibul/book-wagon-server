@@ -122,4 +122,42 @@ const updateBookById = async (req, res) => {
   }
 };
 
-module.exports = { postBook, getBooks, getBookById, updateBookById };
+const deleteBookById = async (req, res) => {
+  const { id } = req.params;
+
+  if (id.trim().length === 0) {
+    return res.status(400).send({ message: "Book ID is required" });
+  } else if (id.trim().length !== 24) {
+    return res.status(400).send({ message: "Invalid Book ID" });
+  }
+
+  const query = { _id: new ObjectId(id) };
+
+  try {
+    const isExist = await booksCollection.findOne(query);
+
+    if (!!isExist) {
+      const result = await booksCollection.deleteOne(query);
+
+      res.send({
+        success: true,
+        message: "Book data deleted successfully",
+        ...result,
+      });
+    } else {
+      return res.status(404).send({ message: "Book data not found" });
+    }
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  postBook,
+  getBooks,
+  getBookById,
+  updateBookById,
+  deleteBookById,
+};
