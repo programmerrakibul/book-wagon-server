@@ -50,15 +50,18 @@ const getBooks = async (req, res) => {
   try {
     const books = await booksCollection
       .find(query)
-      .limit(limit)
-      .skip(skip)
+      .limit(Number(limit))
+      .skip(Number(skip))
       .project(projectionField)
       .toArray();
+
+    const total = await booksCollection.countDocuments({});
 
     res.send({
       success: true,
       message: "Books data retrieved successfully",
       books,
+      total,
     });
   } catch {
     res.status(500).send({ message: "Internal Server Error" });
