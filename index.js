@@ -6,6 +6,7 @@ const { client } = require("./db.js");
 const { usersRouter } = require("./routes/usersRouter.js");
 const { booksRouter } = require("./routes/booksRouter.js");
 const { ordersRouter } = require("./routes/ordersRouter.js");
+const { checkoutRouter } = require("./routes/checkoutRouter.js");
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -25,6 +26,7 @@ const run = async () => {
     app.use("/api/users", usersRouter);
     app.use("/api/books", booksRouter);
     app.use("/api/orders", ordersRouter);
+    app.use("/api/checkout-session", checkoutRouter);
 
     await client.db("admin").command({ ping: 1 });
 
