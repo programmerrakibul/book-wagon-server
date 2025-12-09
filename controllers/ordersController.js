@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { ordersCollection } = require("../db.js");
 const { generateOrderID } = require("../utilities/generateOrderID.js");
 
@@ -80,4 +81,36 @@ const postOrder = async (req, res) => {
   }
 };
 
-module.exports = { postOrder, getCustomerOrders };
+const updateOrder = async (req, res) => {
+  const { orderId } = req.params;
+  const updatedData = req.body;
+
+  if (orderId.trim().length === 0) {
+    return res.status(400).send({ message: "Order ID is required" });
+  } else if (orderId.length !== 24) {
+    return res.status(400).send({ message: "Invalid Order ID" });
+  }
+
+  if (!updatedData || Object.keys(updatedData).length === 0) {
+    return res.status(400).send({ message: "No data provided for update" });
+  }
+
+  const query = { _id: new ObjectId(orderId) };
+
+  try {
+    const result = await ordersCollection.updateOne(query, {
+      $set: updatedData,
+    });
+
+    res.send({
+      success: true,
+      message: "Order data updated successfully",
+      ...result,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+module.exports = { postOrder, getCustomerOrders, updateOrder };
