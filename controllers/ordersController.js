@@ -1,26 +1,55 @@
 const { ordersCollection } = require("../db.js");
 const { generateOrderID } = require("../utilities/generateOrderID.js");
 
-const getOrders = async (req, res) => {
+const getCustomerOrders = async (req, res) => {
   const { email } = req.params;
 
   if (!email.trim()) {
     return res.status(400).send({ message: "Email is required" });
   }
 
-  const query = {
-    customerEmail: email,
-  };
+  const pipeline = [
+    {
+      $match: { customerEmail: email },
+    },
+    {
+      $addFields: {
+        objectId: { $toObjectId: "$bookId" },
+      },
+    },
+    {
+      $lookup: {
+        from: "books",
+        localField: "objectId",
+        foreignField: "_id",
+        as: "orderedBook",
+      },
+    },
+    {
+      $unwind: "$orderedBook",
+    },
+    {
+      $project: {
+        objectId: 0,
+        "orderedBook._id": 0,
+        "orderedBook.updatedAt": 0,
+        "orderedBook.status": 0,
+        "orderedBook.pageCount": 0,
+      },
+    },
+  ];
 
   try {
-    const orders = await ordersCollection.find(query).toArray();
+    const result = await ordersCollection.aggregate(pipeline).toArray();
 
     res.send({
       success: true,
       message: "Orders data retrieved successfully",
-      orders,
+      orders: result,
     });
-  } catch {
+  } catch (err) {
+    console.log(err);
+
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -51,4 +80,4 @@ const postOrder = async (req, res) => {
   }
 };
 
-module.exports = { postOrder, getOrders };
+module.exports = { postOrder, getCustomerOrders };
