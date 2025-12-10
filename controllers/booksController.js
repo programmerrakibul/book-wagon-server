@@ -3,6 +3,7 @@ const { booksCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
   const query = {};
+  const sortQuery = {};
   let projectionField = {};
   const {
     search,
@@ -28,7 +29,7 @@ const getBooks = async (req, res) => {
 
   if (sortBy) {
     const order = sortOrder === "desc" ? -1 : 1;
-    query.$sort = { [sortBy]: order };
+    sortQuery[sortBy] = order;
   }
 
   if (fields) {
@@ -52,6 +53,7 @@ const getBooks = async (req, res) => {
       .find(query)
       .limit(Number(limit))
       .skip(Number(skip))
+      .sort(sortQuery)
       .project(projectionField)
       .toArray();
 
@@ -63,7 +65,9 @@ const getBooks = async (req, res) => {
       books,
       total,
     });
-  } catch {
+  } catch (err) {
+    console.log(err);
+
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
