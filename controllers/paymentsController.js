@@ -40,6 +40,7 @@ const getInvoices = async (req, res) => {
         bookId: 0,
         objectId: 0,
         customer_email: 0,
+        librarianEmail: 0,
       },
     },
   ];

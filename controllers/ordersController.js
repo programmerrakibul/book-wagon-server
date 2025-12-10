@@ -55,6 +55,58 @@ const getCustomerOrders = async (req, res) => {
   }
 };
 
+const getLibrarianOrders = async (req, res) => {
+  const { email } = req.params;
+
+  if (!email.trim()) {
+    return res.status(400).send({ message: "Email is required" });
+  }
+
+  const pipeline = [
+    {
+      $match: { librarianEmail: email },
+    },
+    {
+      $addFields: {
+        objectId: { $toObjectId: "$bookId" },
+      },
+    },
+    {
+      $lookup: {
+        from: "books",
+        localField: "objectId",
+        foreignField: "_id",
+        as: "orderedBook",
+      },
+    },
+    {
+      $unwind: "$orderedBook",
+    },
+    {
+      $project: {
+        objectId: 0,
+        "orderedBook._id": 0,
+        "orderedBook.updatedAt": 0,
+        "orderedBook.pageCount": 0,
+      },
+    },
+  ];
+
+  try {
+    const result = await ordersCollection.aggregate(pipeline).toArray();
+
+    res.send({
+      success: true,
+      message: "Orders data retrieved successfully",
+      orders: result,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 const postOrder = async (req, res) => {
   const orderData = req.body;
   const today = new Date().toISOString();
@@ -113,4 +165,9 @@ const updateOrder = async (req, res) => {
   }
 };
 
-module.exports = { postOrder, getCustomerOrders, updateOrder };
+module.exports = {
+  postOrder,
+  getCustomerOrders,
+  updateOrder,
+  getLibrarianOrders,
+};
