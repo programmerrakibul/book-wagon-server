@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { booksCollection } = require("../db.js");
+const { booksCollection, ordersCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
   const query = { status: "published" };
@@ -26,9 +26,10 @@ const getBooks = async (req, res) => {
   }
 
   if (search) {
-    query.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { "author.name": { $regex: search, $options: "i" } },
+    query["$or"] = [
+      { bookName: { $regex: search, $options: "i" } },
+      { author: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
     ];
   }
 
@@ -180,6 +181,7 @@ const deleteBookById = async (req, res) => {
     const isExist = await booksCollection.findOne(query);
 
     if (!!isExist) {
+      await ordersCollection.deleteMany({ bookId: id });
       const result = await booksCollection.deleteOne(query);
 
       res.send({
