@@ -61,6 +61,7 @@ const retrieveCheckout = async (req, res) => {
       payment_intent: transactionId,
       metadata: { bookId, orderID },
       customer_email,
+      amount_total,
     } = session;
 
     if (paymentStatus === "paid") {
@@ -79,6 +80,7 @@ const retrieveCheckout = async (req, res) => {
           bookId,
           customer_email,
           paymentStatus,
+          price: amount_total / 100,
         };
 
         await ordersCollection.updateOne(
@@ -95,8 +97,6 @@ const retrieveCheckout = async (req, res) => {
         });
       }
     }
-
-    console.log(session);
 
     res.status(400).send({ message: "Payment failed" });
   } catch (err) {
