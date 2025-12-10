@@ -16,6 +16,28 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getUserRole = async (req, res) => {
+  const { email } = req.params;
+
+  if (email.trim().length === 0) {
+    return res.status(400).send({ message: "Email is required" });
+  }
+
+  try {
+    const user = await usersCollection.findOne({ email });
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send({ role: user.role });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
 const postUser = async (req, res) => {
   const userData = req.body;
   const today = new Date().toISOString();
@@ -81,4 +103,4 @@ const updateUserRole = async (req, res) => {
   }
 };
 
-module.exports = { postUser, getUsers, updateUserRole };
+module.exports = { postUser, getUsers, updateUserRole, getUserRole };
