@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const { booksCollection } = require("../db.js");
 
 const getBooks = async (req, res) => {
-  const query = {};
+  const query = { status: "published" };
   const sortQuery = {};
   let projectionField = {};
   const {
@@ -14,7 +14,12 @@ const getBooks = async (req, res) => {
     skip = 0,
     fields,
     excludes,
+    role,
   } = req.query;
+
+  if (role === "admin" || role === "librarian") {
+    delete query.status;
+  }
 
   if (email) {
     query.librarianEmail = email;
