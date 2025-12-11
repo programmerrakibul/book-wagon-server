@@ -5,7 +5,10 @@ const {
   removeFromWishlist,
   getWishlistBooks,
 } = require("../controllers/wishlistController.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const wishlistRouter = express.Router();
+
+wishlistRouter.use(verifyTokenID);
 
 wishlistRouter.get("/:email/books", getWishlistBooks);
 
