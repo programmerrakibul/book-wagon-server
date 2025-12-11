@@ -1,4 +1,27 @@
-const { wishlistCollection } = require("../db.js");
+const { ObjectId } = require("mongodb");
+const { wishlistCollection, booksCollection } = require("../db.js");
+
+const getWishlistBooks = async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const user = await wishlistCollection.findOne({ customerEmail: email });
+
+    const bookIds = (user?.bookIDs || []).map((id) => new ObjectId(id));
+
+    const books = await booksCollection
+      .find({ _id: { $in: bookIds } })
+      .toArray();
+
+    res.send({
+      success: true,
+      message: "Wishlist books retrieve successfully",
+      books,
+    });
+  } catch {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
 
 const addToWishlist = async (req, res) => {
   const { email } = req.params;
@@ -78,4 +101,9 @@ const removeFromWishlist = async (req, res) => {
   }
 };
 
-module.exports = { addToWishlist, checkInWishlist, removeFromWishlist };
+module.exports = {
+  getWishlistBooks,
+  addToWishlist,
+  checkInWishlist,
+  removeFromWishlist,
+};
