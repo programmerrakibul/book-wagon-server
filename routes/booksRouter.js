@@ -7,6 +7,7 @@ const {
   deleteBookById,
 } = require("../controllers/booksController.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
+const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
 
 const booksRouter = express.Router();
 
@@ -18,6 +19,6 @@ booksRouter.post("/", verifyTokenID, postBook);
 
 booksRouter.patch("/:id", verifyTokenID, updateBookById);
 
-booksRouter.delete("/:id", verifyTokenID, deleteBookById);
+booksRouter.delete("/:id", verifyTokenID,verifyAdmin, deleteBookById);
 
 module.exports = { booksRouter };
