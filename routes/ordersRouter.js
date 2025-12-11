@@ -7,14 +7,15 @@ const {
   getLibrarianOrders,
 } = require("../controllers/ordersController.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
+const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
 
 const ordersRouter = express.Router();
 
-ordersRouter.use(verifyTokenID)
+ordersRouter.use(verifyTokenID);
 
 ordersRouter.get("/customer/:email", getCustomerOrders);
 
-ordersRouter.get("/librarian/:email", getLibrarianOrders);
+ordersRouter.get("/librarian/:email", verifyLibrarian, getLibrarianOrders);
 
 ordersRouter.post("/", postOrder);
 

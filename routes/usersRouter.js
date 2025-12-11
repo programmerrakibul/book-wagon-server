@@ -10,14 +10,12 @@ const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
 
 const usersRouter = express.Router();
 
-usersRouter.use(verifyTokenID);
+usersRouter.get("/", verifyTokenID, verifyAdmin, getUsers);
 
-usersRouter.get("/", verifyAdmin, getUsers);
-
-usersRouter.get("/:email/role", getUserRole);
+usersRouter.get("/:email/role", verifyTokenID, getUserRole);
 
 usersRouter.post("/", postUser);
 
-usersRouter.put("/:email/role", verifyAdmin, updateUserRole);
+usersRouter.put("/:email/role", verifyTokenID, verifyAdmin, updateUserRole);
 
 module.exports = { usersRouter };
