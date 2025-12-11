@@ -1,7 +1,7 @@
 const express = require("express");
-const { postWishedBook } = require("../controllers/wishlistController.js");
+const { addToWishlist } = require("../controllers/wishlistController.js");
 const wishlistRouter = express.Router();
 
-wishlistRouter.post("/", postWishedBook);
+wishlistRouter.post("/:email", addToWishlist);
 
 module.exports = { wishlistRouter };

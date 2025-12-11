@@ -1,26 +1,34 @@
-const { wishlistCollection } = require("../db");
+const { wishlistCollection } = require("../db.js");
 
-const postWishedBook = async (req, res) => {
-  const book = req.body;
-  book.createdAt = new Date().toISOString();
-
+const addToWishlist = async (req, res) => {
+  const { email } = req.params;
+  const { bookId } = req.body;
+  const today = new Date().toISOString();
+  
   try {
-    const isExist = await wishlistCollection.findOne({ bookId: book.bookId });
+    const result = await wishlistCollection.updateOne(
+      { customerEmail: email },
+      {
+        $addToSet: { bookIDs: bookId },
+        $setOnInsert: {
+          createdAt: today,
+          customerEmail: email,
+        },
+        $set: { updatedAt: today },
+      },
+      { upsert: true }
+    );
 
-    if (!!isExist) {
-      return res.send({ message: "Already exist" });
-    }
-
-    const result = await wishlistCollection.insertOne(book);
-
-    res.send({
+    res.json({
       success: true,
-      message: "Book successfully added to wishlist",
+      message: "Book id added to wishlist",
       ...result,
     });
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = { postWishedBook };
+module.exports = { addToWishlist };
