@@ -5,8 +5,11 @@ const {
   updateUserRole,
   getUserRole,
 } = require("../controllers/usersController.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const usersRouter = express.Router();
+
+usersRouter.use(verifyTokenID);
 
 usersRouter.get("/", getUsers);
 

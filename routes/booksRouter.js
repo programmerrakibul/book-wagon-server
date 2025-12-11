@@ -6,6 +6,7 @@ const {
   updateBookById,
   deleteBookById,
 } = require("../controllers/booksController.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const booksRouter = express.Router();
 
@@ -13,10 +14,10 @@ booksRouter.get("/", getBooks);
 
 booksRouter.get("/:id", getBookById);
 
-booksRouter.post("/", postBook);
+booksRouter.post("/", verifyTokenID, postBook);
 
-booksRouter.patch("/:id", updateBookById);
+booksRouter.patch("/:id", verifyTokenID, updateBookById);
 
-booksRouter.delete("/:id", deleteBookById);
+booksRouter.delete("/:id", verifyTokenID, deleteBookById);
 
 module.exports = { booksRouter };
