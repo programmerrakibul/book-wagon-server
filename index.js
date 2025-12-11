@@ -8,6 +8,7 @@ const { booksRouter } = require("./routes/booksRouter.js");
 const { ordersRouter } = require("./routes/ordersRouter.js");
 const { checkoutRouter } = require("./routes/checkoutRouter.js");
 const { paymentsRouter } = require("./routes/paymentsRouter.js");
+const { wishlistRouter } = require("./routes/wishlistRouter.js");
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -29,6 +30,7 @@ const run = async () => {
     app.use("/api/orders", ordersRouter);
     app.use("/api/checkout-session", checkoutRouter);
     app.use("/api/payments", paymentsRouter);
+    app.use("/api/wishlist", wishlistRouter);
 
     await client.db("admin").command({ ping: 1 });
 
