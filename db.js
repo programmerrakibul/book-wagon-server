@@ -16,6 +16,7 @@ const booksCollection = database.collection("books");
 const ordersCollection = database.collection("orders");
 const paymentsCollection = database.collection("payments");
 const wishlistCollection = database.collection("wishlist");
+const commentsCollection = database.collection("comments");
 
 module.exports = {
   client,
@@ -24,4 +25,5 @@ module.exports = {
   ordersCollection,
   paymentsCollection,
   wishlistCollection,
+  commentsCollection,
 };
