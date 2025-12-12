@@ -40,9 +40,7 @@ const createCheckout = async (req, res) => {
     });
 
     res.send({ url: session.url });
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({ message: "Internal server error" });
   }
 };
@@ -99,9 +97,7 @@ const retrieveCheckout = async (req, res) => {
     }
 
     res.status(400).send({ message: "Payment failed" });
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({
       message: "Internal server error",
     });

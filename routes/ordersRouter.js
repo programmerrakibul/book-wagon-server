@@ -7,8 +7,8 @@ const {
   getLibrarianOrders,
   isOrdered,
 } = require("../controllers/ordersController.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const ordersRouter = express.Router();
 

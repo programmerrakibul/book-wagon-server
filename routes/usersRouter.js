@@ -5,8 +5,8 @@ const {
   updateUserRole,
   getUserRole,
 } = require("../controllers/usersController.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const usersRouter = express.Router();
 

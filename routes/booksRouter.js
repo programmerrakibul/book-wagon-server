@@ -6,9 +6,9 @@ const {
   updateBookById,
   deleteBookById,
 } = require("../controllers/booksController.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
 const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const booksRouter = express.Router();
 

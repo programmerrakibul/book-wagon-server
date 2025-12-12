@@ -5,3 +5,4 @@ dist/
 .vscode/
 encode.js
 book_wagon_admin_sdk.json
+.vercel

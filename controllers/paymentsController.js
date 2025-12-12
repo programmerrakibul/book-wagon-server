@@ -49,9 +49,7 @@ const getInvoices = async (req, res) => {
     const result = await paymentsCollection.aggregate(pipeline).toArray();
 
     res.send(result);
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({ message: "Internal server error" });
   }
 };

@@ -48,9 +48,7 @@ const getCustomerOrders = async (req, res) => {
       message: "Orders data retrieved successfully",
       orders: result,
     });
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -72,9 +70,7 @@ const isOrdered = async (req, res) => {
       result?.status === ("pending" || "shipped" || "delivered") || false;
 
     res.send(isOrdered);
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({
       message: "Internal server error",
     });
@@ -126,9 +122,7 @@ const getLibrarianOrders = async (req, res) => {
       message: "Orders data retrieved successfully",
       orders: result,
     });
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -185,8 +179,7 @@ const updateOrder = async (req, res) => {
       message: "Order data updated successfully",
       ...result,
     });
-  } catch (err) {
-    console.log(err);
+  } catch {
     res.status(500).send({ message: "Internal server error" });
   }
 };

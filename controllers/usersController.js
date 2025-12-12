@@ -31,9 +31,7 @@ const getUserRole = async (req, res) => {
     }
 
     res.send({ role: user.role });
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({ message: "Internal server error" });
   }
 };

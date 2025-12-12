@@ -71,9 +71,7 @@ const getBooks = async (req, res) => {
       books,
       total,
     });
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -159,9 +157,7 @@ const updateBookById = async (req, res) => {
     } else {
       return res.status(404).send({ message: "Book not found" });
     }
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     return res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -192,9 +188,7 @@ const deleteBookById = async (req, res) => {
     } else {
       return res.status(404).send({ message: "Book data not found" });
     }
-  } catch (err) {
-    console.log(err);
-
+  } catch {
     return res.status(500).send({ message: "Internal Server Error" });
   }
 };

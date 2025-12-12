@@ -47,9 +47,7 @@ const addToWishlist = async (req, res) => {
       message: "Book id added to wishlist",
       ...result,
     });
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     res.status(500).send({ message: "Internal server error" });
   }
 };
@@ -72,9 +70,7 @@ const checkInWishlist = async (req, res) => {
     res.send({
       inWishlist: !!user,
     });
-  } catch (error) {
-    console.log(error);
-
+  } catch {
     res.status(500).send({ message: "Internal server error" });
   }
 };
