@@ -4,9 +4,7 @@ const { commentsCollection } = require("../db.js");
 const postComment = async (req, res) => {
   const { comment, customerName, customerImage, customerEmail, bookId } =
     req.body;
-  const today = new Date().toISOString();
-  const createdAt = today;
-  const updatedAt = today;
+  const createdAt = new Date().toISOString();
 
   if (
     !comment ||
@@ -22,7 +20,7 @@ const postComment = async (req, res) => {
 
   try {
     const existingUser = await commentsCollection.findOne({
-      customerEmail,
+      bookId,
     });
 
     if (existingUser) {
@@ -31,12 +29,13 @@ const postComment = async (req, res) => {
         {
           $push: {
             comments: {
-              bookId,
+              customerEmail,
+              customerName,
+              customerImage,
               comment,
               createdAt,
             },
           },
-          $set: { updatedAt },
         }
       );
 
@@ -47,14 +46,12 @@ const postComment = async (req, res) => {
       });
     } else {
       const newComment = {
-        customerEmail,
-        customerName,
-        customerImage,
-        createdAt,
-        updatedAt,
+        bookId,
         comments: [
           {
-            bookId,
+            customerEmail,
+            customerName,
+            customerImage,
             comment,
             createdAt,
           },
@@ -69,12 +66,33 @@ const postComment = async (req, res) => {
         ...result,
       });
     }
-  } catch (error) {
-    console.error("Error adding comment:", error);
+  } catch {
     res.status(500).send({
       message: "Internal server error",
     });
   }
 };
 
-module.exports = { postComment };
+const getComments = async (req, res) => {
+  const { bookId } = req.params;
+
+  if (!bookId) {
+    return res.status(400).send({ message: "Book id required" });
+  }
+
+  const query = { bookId };
+
+  try {
+    const result = await commentsCollection.findOne(query);
+    const comments = result?.comments || [];
+
+    res.send(comments);
+  } catch {
+    res.status(500).send({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports = { postComment, getComments };
