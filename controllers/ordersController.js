@@ -55,6 +55,32 @@ const getCustomerOrders = async (req, res) => {
   }
 };
 
+const isOrdered = async (req, res) => {
+  const { bookId, customerEmail } = req.params;
+
+  if (!bookId || !customerEmail) {
+    return res
+      .status(400)
+      .send({ message: "Customer email and book id required!" });
+  }
+  const query = { bookId, customerEmail };
+
+  try {
+    const result = await ordersCollection.findOne(query);
+
+    const isOrdered =
+      result?.status === ("pending" || "shipped" || "delivered") || false;
+
+    res.send(isOrdered);
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      message: "Internal server error",
+    });
+  }
+};
+
 const getLibrarianOrders = async (req, res) => {
   const { email } = req.params;
 
@@ -170,4 +196,5 @@ module.exports = {
   getCustomerOrders,
   updateOrder,
   getLibrarianOrders,
+  isOrdered,
 };
