@@ -68,13 +68,13 @@ const getBooks = async (req, res) => {
       .project(projectionField)
       .toArray();
 
-    const total = await booksCollection.countDocuments({});
+    const total = await booksCollection.countDocuments(query);
 
     res.send({
       success: true,
       message: "Books data retrieved successfully",
-      books,
       total,
+      books,
     });
   } catch {
     res.status(500).send({ message: "Internal Server Error" });
