@@ -198,10 +198,29 @@ const deleteBookById = async (req, res) => {
   }
 };
 
+const getCategories = async (req, res) => {
+  try {
+    const result = await booksCollection.find({}).toArray();
+
+    const categories = [...new Set(result.map((item) => item.category))].map(
+      (cat, i) => ({ _id: i + 1, name: cat })
+    );
+
+    res.send({
+      success: true,
+      message: "Categories retrieved successfully",
+      categories,
+    });
+  } catch {
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   postBook,
   getBooks,
   getBookById,
   updateBookById,
   deleteBookById,
+  getCategories,
 };

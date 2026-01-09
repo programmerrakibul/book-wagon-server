@@ -5,6 +5,7 @@ const {
   getBookById,
   updateBookById,
   deleteBookById,
+  getCategories,
 } = require("../controllers/booksController.js");
 const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
 const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
@@ -13,6 +14,8 @@ const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const booksRouter = express.Router();
 
 booksRouter.get("/", getBooks);
+
+booksRouter.get("/categories", getCategories);
 
 booksRouter.get("/:id", getBookById);
 
