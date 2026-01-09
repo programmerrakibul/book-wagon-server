@@ -15,6 +15,7 @@ const getBooks = async (req, res) => {
     fields,
     excludes,
     role,
+    category,
   } = req.query;
 
   if (role === "admin" || role === "librarian") {
@@ -23,6 +24,10 @@ const getBooks = async (req, res) => {
 
   if (email) {
     query.librarianEmail = email;
+  }
+
+  if (category) {
+    query.category = category;
   }
 
   if (search) {

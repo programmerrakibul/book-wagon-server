@@ -35,8 +35,6 @@ const run = async () => {
     app.use("/api/wishlist", wishlistRouter);
     app.use("/api/comments", commentsRouter);
 
-    // await client.db("admin").command({ ping: 1 });
-
     // Start the server
     app.listen(port);
   } finally {
