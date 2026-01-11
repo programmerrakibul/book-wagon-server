@@ -11,6 +11,7 @@ const { checkoutRouter } = require("./routes/checkoutRouter.js");
 const { paymentsRouter } = require("./routes/paymentsRouter.js");
 const { wishlistRouter } = require("./routes/wishlistRouter.js");
 const { commentsRouter } = require("./routes/commentsRouter.js");
+const { dashboardRouter } = require("./routes/dashboardRoutes.js");
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -21,7 +22,7 @@ app.use(express.json());
 
 const run = async () => {
   try {
-    // await client.connect();
+    await client.connect();
 
     app.get("/", (req, res) => {
       res.send("Welcome to the Book Wagon Server!");
@@ -34,6 +35,7 @@ const run = async () => {
     app.use("/api/payments", paymentsRouter);
     app.use("/api/wishlist", wishlistRouter);
     app.use("/api/comments", commentsRouter);
+    app.use("/api/dashboard", dashboardRouter);
 
     // Start the server
     app.listen(port);
