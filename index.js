@@ -22,7 +22,7 @@ app.use(express.json());
 
 const run = async () => {
   try {
-    await client.connect();
+    // await client.connect();
 
     app.get("/", (req, res) => {
       res.send("Welcome to the Book Wagon Server!");

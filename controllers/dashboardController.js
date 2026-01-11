@@ -151,8 +151,7 @@ const getUserDashboardData = async (req, res) => {
         statusDistribution,
       },
     });
-  } catch (error) {
-    console.error("Dashboard error:", error);
+  } catch {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -232,8 +231,7 @@ const getLibrarianDashboardData = async (req, res) => {
           customerName: order.customerName || customer?.name || "Customer",
           customerEmail: order.customerEmail,
           bookName: book?.bookName || "Unknown Book",
-          bookImage:
-            book?.bookImage,
+          bookImage: book?.bookImage,
           amount: `৳ ${book?.price || 0}`,
           status: order.status,
           paymentStatus: order.paymentStatus,
@@ -355,8 +353,204 @@ const getLibrarianDashboardData = async (req, res) => {
         paymentDistribution,
       },
     });
-  } catch (error) {
-    console.error("Librarian dashboard error:", error);
+  } catch {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+const getAdminDashboardData = async (req, res) => {
+  try {
+    const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
+      booksCollection.find({}).toArray(),
+      ordersCollection.find({}).sort({ createdAt: -1 }).toArray(),
+      usersCollection.find({}).toArray(),
+      wishlistCollection.find({}).toArray(),
+    ]);
+
+    const totalBooks = allBooks.length;
+    const totalUsers = allUsers.length;
+    const totalOrders = allOrders.length;
+    const totalLibrarians = allUsers.filter(
+      (user) => user.role === "librarian"
+    ).length;
+    const totalReaders = allUsers.filter((user) => user.role === "user").length;
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const activeUsers = new Set(
+      allOrders
+        .filter((order) => new Date(order.createdAt) > thirtyDaysAgo)
+        .map((order) => order.customerEmail)
+    ).size;
+
+    const orderStatusCounts = allOrders.reduce((acc, order) => {
+      acc[order.status] = (acc[order.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const paymentStatusCounts = allOrders.reduce((acc, order) => {
+      acc[order.paymentStatus] = (acc[order.paymentStatus] || 0) + 1;
+      return acc;
+    }, {});
+
+    const recentOrders = await Promise.all(
+      allOrders.slice(0, 10).map(async (order) => {
+        const book = await booksCollection.findOne({
+          _id: new ObjectId(order.bookId),
+        });
+        const customer = await usersCollection.findOne({
+          email: order.customerEmail,
+        });
+        const librarian = await usersCollection.findOne({
+          email: order.librarianEmail,
+        });
+
+        return {
+          id: order.orderID,
+          bookId: order.bookId,
+          customerName: order.customerName || customer?.name || "Customer",
+          customerEmail: order.customerEmail,
+          librarianName: librarian?.name || "Librarian",
+          librarianEmail: order.librarianEmail,
+          bookName: book?.bookName || "Unknown Book",
+          bookImage: book?.bookImage,
+          amount: `৳ ${book?.price || 0}`,
+          status: order.status,
+          paymentStatus: order.paymentStatus,
+          date: new Date(order.createdAt).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }),
+          quantity: order.quantity || 1,
+        };
+      })
+    );
+
+    const bookSales = {};
+    allOrders.forEach((order) => {
+      const quantity = order.quantity || 1;
+      bookSales[order.bookId] = (bookSales[order.bookId] || 0) + quantity;
+    });
+
+    const sortedBookIds = Object.entries(bookSales)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([id]) => new ObjectId(id));
+
+    const topBooks = await booksCollection
+      .find({ _id: { $in: sortedBookIds } })
+      .toArray();
+
+    const formattedTopBooks = topBooks.map((book) => {
+      const sales = bookSales[book._id.toString()] || 0;
+      return {
+        title: book.bookName,
+        sales,
+        author: book.author,
+        category: book.category,
+        bookId: book._id.toString(),
+        status: book.status,
+        librarian: book.librarianEmail,
+      };
+    });
+
+    const monthlyUserData = {};
+    allUsers.forEach((user) => {
+      const date = new Date(user.createdAt);
+      const monthYear = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
+
+      if (!monthlyUserData[monthYear]) {
+        monthlyUserData[monthYear] = {
+          total: 0,
+          readers: 0,
+          librarians: 0,
+        };
+      }
+
+      monthlyUserData[monthYear].total++;
+      if (user.role === "user") {
+        monthlyUserData[monthYear].readers++;
+      } else if (user.role === "librarian") {
+        monthlyUserData[monthYear].librarians++;
+      }
+    });
+
+    const userGrowthChartData = Object.entries(monthlyUserData)
+      .map(([month, data]) => ({
+        month: month.split("-")[1],
+        monthName: new Date(month + "-01").toLocaleDateString("en-US", {
+          month: "short",
+        }),
+        totalUsers: data.total,
+        readers: data.readers,
+        librarians: data.librarians,
+      }))
+      .sort((a, b) => parseInt(a.month) - parseInt(b.month))
+      .slice(-6);
+
+    const bookStatusDistribution = allBooks.reduce((acc, book) => {
+      acc[book.status] = (acc[book.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const completedOrders = orderStatusCounts.delivered || 0;
+    const successRate =
+      totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0;
+
+    const booksPerLibrarian =
+      totalLibrarians > 0 ? Math.round(totalBooks / totalLibrarians) : 0;
+
+    const totalWishlistItems = allWishlists.reduce(
+      (sum, wishlist) => sum + (wishlist.bookIDs?.length || 0),
+      0
+    );
+    const avgWishlistPerUser =
+      totalUsers > 0 ? Math.round(totalWishlistItems / totalUsers) : 0;
+
+    const recentUsers = allUsers
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5)
+      .map((user) => ({
+        name: user.name || user.email,
+        email: user.email,
+        role: user.role,
+        joinDate: new Date(user.createdAt).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+      }));
+
+    res.send({
+      success: true,
+      data: {
+        stats: {
+          totalBooks,
+          totalUsers,
+          totalOrders,
+          activeUsers,
+          totalLibrarians,
+          totalReaders,
+          completedOrders,
+          successRate,
+          booksPerLibrarian,
+          totalWishlistItems,
+          avgWishlistPerUser,
+        },
+        recentOrders,
+        topBooks: formattedTopBooks,
+        recentUsers,
+        userGrowthChartData,
+        orderStatusDistribution: orderStatusCounts,
+        paymentStatusDistribution: paymentStatusCounts,
+        bookStatusDistribution,
+      },
+    });
+  } catch {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -364,4 +558,5 @@ const getLibrarianDashboardData = async (req, res) => {
 module.exports = {
   getUserDashboardData,
   getLibrarianDashboardData,
+  getAdminDashboardData,
 };
