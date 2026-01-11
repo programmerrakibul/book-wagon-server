@@ -36,6 +36,11 @@ const run = async () => {
     app.use("/api/wishlist", wishlistRouter);
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
+    app.use((req, res) => {
+      res.status(404).send({
+        message: "Endpoint Not Found",
+      });
+    });
 
     // Start the server
     app.listen(port);
