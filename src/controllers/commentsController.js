@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { commentsCollection } = require("../db.js");
+const { commentsCollection } = require("../config/db.js");
 
 const postComment = async (req, res) => {
   const { comment, customerName, customerImage, customerEmail, bookId } =
@@ -36,7 +36,7 @@ const postComment = async (req, res) => {
               createdAt,
             },
           },
-        }
+        },
       );
 
       return res.send({

@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { wishlistCollection, booksCollection } = require("../db.js");
+const { wishlistCollection, booksCollection } = require("../config/db.js");
 
 const getWishlistBooks = async (req, res) => {
   const { email } = req.params;
@@ -39,7 +39,7 @@ const addToWishlist = async (req, res) => {
         },
         $set: { updatedAt: today },
       },
-      { upsert: true }
+      { upsert: true },
     );
 
     res.send({
@@ -84,7 +84,7 @@ const removeFromWishlist = async (req, res) => {
       {
         $pull: { bookIDs: bookId },
         $set: { updatedAt: new Date().toISOString() },
-      }
+      },
     );
 
     res.send({

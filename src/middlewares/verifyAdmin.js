@@ -1,4 +1,4 @@
-const { usersCollection } = require("../db.js");
+const { usersCollection } = require("../config/db.js");
 
 const verifyAdmin = async (req, res, next) => {
   const email = req.decoded_email;

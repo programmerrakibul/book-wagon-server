@@ -4,7 +4,7 @@ const {
   wishlistCollection,
   booksCollection,
   usersCollection,
-} = require("../db.js");
+} = require("../config/db.js");
 
 const getUserDashboardData = async (req, res) => {
   const { email } = req.params;
@@ -34,11 +34,11 @@ const getUserDashboardData = async (req, res) => {
 
     const totalOrders = orders.length;
     const completedOrders = orders.filter(
-      (order) => order.status === "delivered"
+      (order) => order.status === "delivered",
     ).length;
     const totalBooksPurchased = orders.reduce(
       (sum, order) => sum + (order.quantity || 1),
-      0
+      0,
     );
 
     const orderIds = orders
@@ -80,14 +80,14 @@ const getUserDashboardData = async (req, res) => {
             day: "numeric",
           }),
         };
-      })
+      }),
     );
 
     const monthlyData = {};
     orders.forEach((order) => {
       const date = new Date(order.createdAt);
       const monthYear = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
+        date.getMonth() + 1,
       ).padStart(2, "0")}`;
 
       if (!monthlyData[monthYear]) {
@@ -241,7 +241,7 @@ const getLibrarianDashboardData = async (req, res) => {
             day: "numeric",
           }),
         };
-      })
+      }),
     );
 
     const bookSales = {};
@@ -275,7 +275,7 @@ const getLibrarianDashboardData = async (req, res) => {
     allOrders.forEach((order) => {
       const date = new Date(order.createdAt);
       const monthYear = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
+        date.getMonth() + 1,
       ).padStart(2, "0")}`;
 
       if (!monthlyData[monthYear]) {
@@ -313,7 +313,7 @@ const getLibrarianDashboardData = async (req, res) => {
         ? Math.round(
             ((currentMonthData.orders - previousMonthData.orders) /
               previousMonthData.orders) *
-              100
+              100,
           )
         : 0;
 
@@ -322,7 +322,7 @@ const getLibrarianDashboardData = async (req, res) => {
         ? Math.round(
             ((currentMonthData.revenue - previousMonthData.revenue) /
               previousMonthData.revenue) *
-              100
+              100,
           )
         : 0;
 
@@ -371,7 +371,7 @@ const getAdminDashboardData = async (req, res) => {
     const totalUsers = allUsers.length;
     const totalOrders = allOrders.length;
     const totalLibrarians = allUsers.filter(
-      (user) => user.role === "librarian"
+      (user) => user.role === "librarian",
     ).length;
     const totalReaders = allUsers.filter((user) => user.role === "user").length;
 
@@ -381,7 +381,7 @@ const getAdminDashboardData = async (req, res) => {
     const activeUsers = new Set(
       allOrders
         .filter((order) => new Date(order.createdAt) > thirtyDaysAgo)
-        .map((order) => order.customerEmail)
+        .map((order) => order.customerEmail),
     ).size;
 
     const orderStatusCounts = allOrders.reduce((acc, order) => {
@@ -425,7 +425,7 @@ const getAdminDashboardData = async (req, res) => {
           }),
           quantity: order.quantity || 1,
         };
-      })
+      }),
     );
 
     const bookSales = {};
@@ -460,7 +460,7 @@ const getAdminDashboardData = async (req, res) => {
     allUsers.forEach((user) => {
       const date = new Date(user.createdAt);
       const monthYear = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
+        date.getMonth() + 1,
       ).padStart(2, "0")}`;
 
       if (!monthlyUserData[monthYear]) {
@@ -506,7 +506,7 @@ const getAdminDashboardData = async (req, res) => {
 
     const totalWishlistItems = allWishlists.reduce(
       (sum, wishlist) => sum + (wishlist.bookIDs?.length || 0),
-      0
+      0,
     );
     const avgWishlistPerUser =
       totalUsers > 0 ? Math.round(totalWishlistItems / totalUsers) : 0;

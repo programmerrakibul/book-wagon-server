@@ -1,4 +1,4 @@
-const { usersCollection } = require("../db.js");
+const { usersCollection } = require("../config/db.js");
 
 const getUsers = async (req, res) => {
   const query = {};
@@ -50,7 +50,7 @@ const postUser = async (req, res) => {
     if (!!isExist) {
       await usersCollection.updateOne(
         { email: userData.email },
-        { $set: { lastLoggedIn } }
+        { $set: { lastLoggedIn } },
       );
 
       return res.send({ message: "User with this email already exists" });

@@ -2,6 +2,10 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 
 const uri = process.env.MONGODB_URI;
 
+if (!uri?.trim()) {
+  throw new Error("MONGODB_URI is not defined in environment variables");
+}
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,

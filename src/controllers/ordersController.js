@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { ordersCollection } = require("../db.js");
+const { ordersCollection } = require("../config/db.js");
 const { generateOrderID } = require("../utilities/generateOrderID.js");
 
 const getCustomerOrders = async (req, res) => {

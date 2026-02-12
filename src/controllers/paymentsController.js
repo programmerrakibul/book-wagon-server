@@ -1,4 +1,4 @@
-const { paymentsCollection } = require("../db.js");
+const { paymentsCollection } = require("../config/db.js");
 
 const getInvoices = async (req, res) => {
   const { email } = req.params;

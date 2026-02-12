@@ -1,6 +1,11 @@
-const { paymentsCollection, ordersCollection } = require("../db.js");
+const { stripe } = require("../config/stripe.js");
+const { paymentsCollection, ordersCollection } = require("../config/db.js");
 
-const stripe = require("stripe")(process.env.PAYMENT_GATEWAY_SECRET_KEY);
+const clientUrl = process.env.SITE_DOMAIN;
+
+if (!clientUrl?.trim()) {
+  throw new Error("SITE_DOMAIN is not defined in the environment variables");
+}
 
 const createCheckout = async (req, res) => {
   const paymentInfo = req.body;
@@ -35,8 +40,8 @@ const createCheckout = async (req, res) => {
         orderID,
       },
       mode: "payment",
-      success_url: `${process.env.SITE_DOMAIN}/dashboard/my-orders?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.SITE_DOMAIN}/dashboard/my-orders`,
+      success_url: `${clientUrl}/dashboard/my-orders?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${clientUrl}/dashboard/my-orders`,
     });
 
     res.send({ url: session.url });
@@ -85,7 +90,7 @@ const retrieveCheckout = async (req, res) => {
           { orderID },
           {
             $set: { paymentStatus },
-          }
+          },
         );
         await paymentsCollection.insertOne(paymentInfo);
 

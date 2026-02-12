@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { booksCollection, ordersCollection } = require("../db.js");
+const { booksCollection, ordersCollection } = require("../config/db.js");
 
 const getBooks = async (req, res) => {
   const query = { status: "published" };
@@ -203,7 +203,7 @@ const getCategories = async (req, res) => {
     const result = await booksCollection.find({}).toArray();
 
     const categories = [...new Set(result.map((item) => item.category))].map(
-      (cat, i) => ({ _id: i + 1, name: cat })
+      (cat, i) => ({ _id: i + 1, name: cat }),
     );
 
     res.send({
