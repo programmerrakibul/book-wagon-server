@@ -25,7 +25,7 @@ const run = async () => {
     // await client.connect();
 
     app.get("/", (req, res) => {
-      res.send("Welcome to the Book Wagon Server!");
+      res.send({ success: true, message: "Welcome to the Book Wagon Server!" });
     });
 
     app.use("/api/users", usersRouter);
@@ -36,8 +36,10 @@ const run = async () => {
     app.use("/api/wishlist", wishlistRouter);
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
+    
     app.use((req, res) => {
       res.status(404).send({
+        success: false,
         message: "Endpoint Not Found",
       });
     });
