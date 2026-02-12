@@ -1,4 +1,7 @@
 const express = require("express");
+const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
+const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const {
   postBook,
   getBooks,
@@ -7,9 +10,6 @@ const {
   deleteBookById,
   getCategories,
 } = require("../controllers/booksController.js");
-const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
-const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const booksRouter = express.Router();
 

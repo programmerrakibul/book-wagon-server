@@ -1,12 +1,12 @@
 const express = require("express");
+const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const {
   postUser,
   getUsers,
   updateUserRole,
   getUserRole,
 } = require("../controllers/usersController.js");
-const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const usersRouter = express.Router();
 

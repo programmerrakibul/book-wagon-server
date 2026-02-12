@@ -1,4 +1,4 @@
-const { paymentsCollection, ordersCollection } = require("../db");
+const { paymentsCollection, ordersCollection } = require("../db.js");
 
 const stripe = require("stripe")(process.env.PAYMENT_GATEWAY_SECRET_KEY);
 

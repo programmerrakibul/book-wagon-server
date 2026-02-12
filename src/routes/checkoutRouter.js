@@ -1,9 +1,10 @@
 const express = require("express");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const {
   createCheckout,
   retrieveCheckout,
 } = require("../controllers/checkoutController.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
+
 const checkoutRouter = express.Router();
 
 checkoutRouter.use(verifyTokenID);

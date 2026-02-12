@@ -1,11 +1,11 @@
 const express = require("express");
+const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const {
   addToWishlist,
   checkInWishlist,
   removeFromWishlist,
   getWishlistBooks,
 } = require("../controllers/wishlistController.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 
 const wishlistRouter = express.Router();
 
