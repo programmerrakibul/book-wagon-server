@@ -36,7 +36,7 @@ const run = async () => {
     app.use("/api/wishlist", wishlistRouter);
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
-    
+
     app.use((req, res) => {
       res.status(404).send({
         success: false,
@@ -46,9 +46,9 @@ const run = async () => {
 
     // Start the server
     app.listen(port);
-  } finally {
-    // await client.close();
+  } catch {
+    process.exit(2);
   }
 };
 
-run().catch(console.dir);
+run();

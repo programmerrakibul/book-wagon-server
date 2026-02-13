@@ -53,7 +53,7 @@ const createCheckout = async (req, res) => {
 const retrieveCheckout = async (req, res) => {
   const { session_id } = req.params;
 
-  if (session_id.trim() === "") {
+  if (!session_id?.trim()) {
     return res.status(400).send({ message: "Invalid session ID" });
   }
 
