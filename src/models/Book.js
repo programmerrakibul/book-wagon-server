@@ -49,13 +49,15 @@ const bookSchema = new mongoose.Schema(
           "Horror",
           "Other",
         ],
-        message: "{VALUE} is not a valid category",
+        message:
+          "{VALUE} is not a valid category! Must be one of Fiction, Non-Fiction, Science, History, Biography, Self-Help, Technology, Business, Romance, Mystery, Fantasy, Horror, or Other",
       },
     },
     subcategory: {
       type: String,
       trim: true,
       maxlength: [100, "Subcategory cannot exceed 100 characters"],
+      default: "General",
     },
     publicationYear: {
       type: Number,
@@ -86,7 +88,8 @@ const bookSchema = new mongoose.Schema(
       trim: true,
       enum: {
         values: ["Hardcover", "Paperback", "eBook", "Audiobook"],
-        message: "{VALUE} is not a valid format",
+        message:
+          "{VALUE} is not a valid format! Must be one of Hardcover, Paperback, eBook, or Audiobook",
       },
     },
     quantity: {
@@ -151,14 +154,12 @@ const bookSchema = new mongoose.Schema(
 );
 
 bookSchema.pre("save", function () {
-  if (this.isModified("price")) {
-    this.price = parseFloat(this.price.toFixed(2));
-  }
-
   const currentYear = new Date().getFullYear();
   if (this.publicationYear > currentYear) {
     throw new Error("Publication year cannot be in the future");
   }
+
+  this.updatedAt = new Date().toISOString();
 });
 
 const Book = mongoose.model("Book", bookSchema);

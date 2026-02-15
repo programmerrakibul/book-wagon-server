@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-const { client } = require("./config/db.js");
+const { connectDB } = require("./config/db.js");
 const { usersRouter } = require("./routes/usersRouter.js");
 const { booksRouter } = require("./routes/booksRouter.js");
 const { ordersRouter } = require("./routes/ordersRouter.js");
@@ -22,7 +22,7 @@ app.use(express.json());
 
 const run = async () => {
   try {
-    // await client.connect();
+    await connectDB();
 
     app.get("/", (req, res) => {
       res.send({ success: true, message: "Welcome to the Book Wagon Server!" });
@@ -45,9 +45,10 @@ const run = async () => {
     });
 
     // Start the server
-    app.listen(port);
-  } catch {
-    process.exit(2);
+    app.listen(port, () => console.log("Server is running on port " + port));
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
   }
 };
 

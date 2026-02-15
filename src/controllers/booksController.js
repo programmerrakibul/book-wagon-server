@@ -1,16 +1,17 @@
 const { ObjectId } = require("mongodb");
 const { booksCollection, ordersCollection } = require("../config/db.js");
+const { Book } = require("../models/Book.js");
 
 const getBooks = async (req, res) => {
   const query = { status: "published" };
-  const sortQuery = {};
+  let sortQuery = { createdAt: -1 };
   let projectionField = {};
   const {
     search,
     sortBy,
     sortOrder,
     email,
-    limit = 0,
+    limit = 10,
     skip = 0,
     fields,
     excludes,
@@ -38,9 +39,9 @@ const getBooks = async (req, res) => {
     ];
   }
 
-  if (sortBy) {
-    const order = sortOrder === "desc" ? -1 : 1;
-    sortQuery[sortBy] = order;
+  if (sortBy?.trim()) {
+    const order = sortOrder?.trim() === "desc" ? -1 : 1;
+    sortQuery[sortBy?.trim()] = order;
   }
 
   if (fields) {
@@ -59,44 +60,51 @@ const getBooks = async (req, res) => {
     projectionField = null;
   }
 
-  try {
-    const books = await booksCollection
-      .find(query)
-      .limit(Number(limit))
-      .skip(Number(skip))
-      .sort(sortQuery)
-      .project(projectionField)
-      .toArray();
+  const options = {
+    limit: JSON.parse(limit),
+    skip: JSON.parse(skip),
+    sort: sortQuery,
+  };
 
-    const total = await booksCollection.countDocuments(query);
+  try {
+    const books = await Book.find(query, projectionField, options);
 
     res.send({
       success: true,
       message: "Books data retrieved successfully",
-      total,
+      total: books.length || 0,
       books,
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const getBookById = async (req, res) => {
   const { id } = req.params;
 
-  if (id.trim().length === 0) {
-    return res.status(400).send({ message: "Book ID is required" });
-  } else if (id.length !== 24) {
-    return res.status(400).send({ message: "Invalid Book ID" });
+  if (!id?.trim()) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Book ID is required" });
+  } else if (id?.length !== 24) {
+    return res.status(400).send({ success: false, message: "Invalid Book ID" });
   }
 
-  const query = { _id: new ObjectId(id) };
-
   try {
-    const book = await booksCollection.findOne(query);
+    const book = await Book.findById(id);
+
+    console.log({ book });
 
     if (!book) {
-      return res.status(404).send({ message: "Book not found" });
+      return res
+        .status(404)
+        .send({ success: false, message: "Book not found" });
     }
 
     res.send({
@@ -104,27 +112,40 @@ const getBookById = async (req, res) => {
       message: "Book data retrieved successfully",
       book,
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const postBook = async (req, res) => {
-  const bookData = req.body;
-  const today = new Date().toISOString();
-  bookData.createdAt = today;
-  bookData.updatedAt = today;
-
   try {
-    const result = await booksCollection.insertOne(bookData);
+    const bookData = req.body;
+
+    if (Object.keys(bookData || {}).length === 0) {
+      return res.status(400).send({
+        success: false,
+        message: "Book data is required to post",
+      });
+    }
+
+    await Book.create(bookData);
 
     res.status(201).send({
       success: true,
       message: "Book data posted successfully",
-      ...result,
     });
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
@@ -132,75 +153,85 @@ const updateBookById = async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
 
-  if (id.trim().length === 0) {
+  if (!id?.trim()) {
     return res.status(400).send({ message: "Book ID is required" });
-  } else if (id.trim().length !== 24) {
+  } else if (id?.trim().length !== 24) {
     return res.status(400).send({ message: "Invalid Book ID" });
   }
 
-  if (!updatedData || Object.keys(updatedData).length === 0) {
-    return res.status(400).send({ message: "No data provided for update" });
+  if (Object.keys(updatedData || {}).length === 0) {
+    return res
+      .status(400)
+      .send({ success: false, message: "No data provided for update" });
   }
 
-  updatedData.updatedAt = new Date().toISOString();
-
-  const query = { _id: new ObjectId(id) };
-
   try {
-    const isExist = await booksCollection.findOne(query);
+    const isExist = await Book.findById(id);
 
-    if (!!isExist) {
-      const result = await booksCollection.updateOne(query, {
-        $set: updatedData,
-      });
-
-      res.send({
-        success: true,
-        message: "Book data updated successfully",
-        ...result,
-      });
-    } else {
-      return res.status(404).send({ message: "Book not found" });
+    if (!isExist) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Book not found" });
     }
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+
+    await Book.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
+
+    res.send({
+      success: true,
+      message: "Book data updated successfully",
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const deleteBookById = async (req, res) => {
   const { id } = req.params;
 
-  if (id.trim().length === 0) {
-    return res.status(400).send({ message: "Book ID is required" });
-  } else if (id.trim().length !== 24) {
-    return res.status(400).send({ message: "Invalid Book ID" });
+  if (!id?.trim()) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Book ID is required" });
+  } else if (id?.trim().length !== 24) {
+    return res.status(400).send({ success: false, message: "Invalid Book ID" });
   }
 
-  const query = { _id: new ObjectId(id) };
-
   try {
-    const isExist = await booksCollection.findOne(query);
+    const isExist = await Book.findById(id);
 
-    if (!!isExist) {
-      await ordersCollection.deleteMany({ bookId: id });
-      const result = await booksCollection.deleteOne(query);
-
-      res.send({
-        success: true,
-        message: "Book data deleted successfully",
-        ...result,
-      });
-    } else {
-      return res.status(404).send({ message: "Book data not found" });
+    if (!isExist) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Book data not found" });
     }
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+
+    await ordersCollection.deleteMany({ bookId: id });
+    await Book.findByIdAndDelete(id);
+
+    res.send({
+      success: true,
+      message: "Book data deleted successfully",
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const getCategories = async (req, res) => {
   try {
-    const result = await booksCollection.find({}).toArray();
+    const result = await Book.find({}).select("category -_id");
 
     const categories = [...new Set(result.map((item) => item.category))].map(
       (cat, i) => ({ _id: i + 1, name: cat }),
@@ -208,11 +239,13 @@ const getCategories = async (req, res) => {
 
     res.send({
       success: true,
-      message: "Categories retrieved successfully",
+      message: "Categories data retrieved successfully",
       categories,
     });
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({ message: err.message || "Internal Server Error" });
   }
 };
 
