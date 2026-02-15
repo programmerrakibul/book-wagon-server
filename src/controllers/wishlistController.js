@@ -1,25 +1,37 @@
-const { ObjectId } = require("mongodb");
-const { wishlistCollection, booksCollection } = require("../config/db.js");
+const { wishlistCollection } = require("../config/db.js");
+const { Book } = require("../models/Book.js");
 
 const getWishlistBooks = async (req, res) => {
   const { email } = req.params;
 
+  if (!email?.trim()) {
+    return res.status(400).send({
+      success: false,
+      message: "Email is required",
+    });
+  }
+
   try {
     const user = await wishlistCollection.findOne({ customerEmail: email });
 
-    const bookIds = (user?.bookIDs || []).map((id) => new ObjectId(id));
+    const bookIds = (user?.bookIDs || []).map((id) =>
+      mongoose.Types.ObjectId(id),
+    );
 
-    const books = await booksCollection
-      .find({ _id: { $in: bookIds } })
-      .toArray();
+    const books = await Book.find({ _id: { $in: bookIds } });
 
     res.send({
       success: true,
-      message: "Wishlist books retrieve successfully",
+      message: "Wishlist books data retrieve successfully",
       books,
     });
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 
