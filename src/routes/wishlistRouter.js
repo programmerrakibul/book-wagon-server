@@ -6,6 +6,7 @@ const {
   removeFromWishlist,
   getWishlistBooks,
 } = require("../controllers/wishlistController.js");
+const { idValidator } = require("../middlewares/IdValidator.js");
 
 const wishlistRouter = express.Router();
 
@@ -13,10 +14,10 @@ wishlistRouter.use(verifyTokenID);
 
 wishlistRouter.get("/:email/books", getWishlistBooks);
 
-wishlistRouter.get("/:email/check/:bookId", checkInWishlist);
+wishlistRouter.get("/:email/check/:id", idValidator, checkInWishlist);
 
 wishlistRouter.post("/:email/add", addToWishlist);
 
-wishlistRouter.delete("/:email/remove/:bookId", removeFromWishlist);
+wishlistRouter.delete("/:email/remove/:id", idValidator, removeFromWishlist);
 
 module.exports = { wishlistRouter };

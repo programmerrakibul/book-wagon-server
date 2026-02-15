@@ -154,20 +154,15 @@ const postOrder = async (req, res) => {
 };
 
 const updateOrder = async (req, res) => {
-  const { orderId } = req.params;
   const updatedData = req.body;
 
-  if (orderId.trim().length === 0) {
-    return res.status(400).send({ message: "Order ID is required" });
-  } else if (orderId.length !== 24) {
-    return res.status(400).send({ message: "Invalid Order ID" });
+  if (Object.keys(updatedData || {}).length === 0) {
+    return res
+      .status(400)
+      .send({ success: false, message: "No data provided for update" });
   }
 
-  if (!updatedData || Object.keys(updatedData).length === 0) {
-    return res.status(400).send({ message: "No data provided for update" });
-  }
-
-  const query = { _id: new ObjectId(orderId) };
+  const query = { _id: new ObjectId(req.params.id) };
 
   try {
     const result = await ordersCollection.updateOne(query, {
@@ -179,8 +174,15 @@ const updateOrder = async (req, res) => {
       message: "Order data updated successfully",
       ...result,
     });
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+  } catch (err) {
+    console.log(err);
+
+    res
+      .status(500)
+      .send({
+        success: false,
+        message: err.message || "Internal server error",
+      });
   }
 };
 

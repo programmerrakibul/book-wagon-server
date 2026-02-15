@@ -1,5 +1,4 @@
-const { ObjectId } = require("mongodb");
-const { booksCollection, ordersCollection } = require("../config/db.js");
+const { ordersCollection } = require("../config/db.js");
 const { Book } = require("../models/Book.js");
 
 const getBooks = async (req, res) => {
@@ -86,20 +85,8 @@ const getBooks = async (req, res) => {
 };
 
 const getBookById = async (req, res) => {
-  const { id } = req.params;
-
-  if (!id?.trim()) {
-    return res
-      .status(400)
-      .send({ success: false, message: "Book ID is required" });
-  } else if (id?.length !== 24) {
-    return res.status(400).send({ success: false, message: "Invalid Book ID" });
-  }
-
   try {
-    const book = await Book.findById(id);
-
-    console.log({ book });
+    const book = await Book.findById(req.params.id);
 
     if (!book) {
       return res
@@ -153,12 +140,6 @@ const updateBookById = async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
 
-  if (!id?.trim()) {
-    return res.status(400).send({ message: "Book ID is required" });
-  } else if (id?.trim().length !== 24) {
-    return res.status(400).send({ message: "Invalid Book ID" });
-  }
-
   if (Object.keys(updatedData || {}).length === 0) {
     return res
       .status(400)
@@ -194,14 +175,6 @@ const updateBookById = async (req, res) => {
 
 const deleteBookById = async (req, res) => {
   const { id } = req.params;
-
-  if (!id?.trim()) {
-    return res
-      .status(400)
-      .send({ success: false, message: "Book ID is required" });
-  } else if (id?.trim().length !== 24) {
-    return res.status(400).send({ success: false, message: "Invalid Book ID" });
-  }
 
   try {
     const isExist = await Book.findById(id);

@@ -53,15 +53,17 @@ const addToWishlist = async (req, res) => {
 };
 
 const checkInWishlist = async (req, res) => {
-  const { email, bookId } = req.params;
+  const { email, id } = req.params;
 
-  if (!email || !bookId) {
-    return res.status(400).send({ message: "Email and Book ID required" });
+  if (!email?.trim()) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
   }
 
   const query = {
     customerEmail: email,
-    bookIDs: bookId,
+    bookIDs: id,
   };
 
   try {
@@ -70,19 +72,30 @@ const checkInWishlist = async (req, res) => {
     res.send({
       inWishlist: !!user,
     });
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 
 const removeFromWishlist = async (req, res) => {
-  const { email, bookId } = req.params;
+  const { email, id } = req.params;
+
+  if (!email?.trim()) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
+  }
 
   try {
     const result = await wishlistCollection.updateOne(
       { customerEmail: email },
       {
-        $pull: { bookIDs: bookId },
+        $pull: { bookIDs: id },
         $set: { updatedAt: new Date().toISOString() },
       },
     );
@@ -92,8 +105,13 @@ const removeFromWishlist = async (req, res) => {
       message: "Book removed from wishlist",
       ...result,
     });
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 

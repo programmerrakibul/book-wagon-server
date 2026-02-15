@@ -10,6 +10,7 @@ const {
   deleteBookById,
   getCategories,
 } = require("../controllers/booksController.js");
+const { idValidator } = require("../middlewares/IdValidator.js");
 
 const booksRouter = express.Router();
 
@@ -17,12 +18,18 @@ booksRouter.get("/", getBooks);
 
 booksRouter.get("/categories", getCategories);
 
-booksRouter.get("/:id", getBookById);
+booksRouter.get("/:id", idValidator, getBookById);
 
 booksRouter.post("/", verifyTokenID, verifyLibrarian, postBook);
 
-booksRouter.patch("/:id", verifyTokenID, updateBookById);
+booksRouter.patch("/:id", idValidator, verifyTokenID, updateBookById);
 
-booksRouter.delete("/:id", verifyTokenID, verifyAdmin, deleteBookById);
+booksRouter.delete(
+  "/:id",
+  idValidator,
+  verifyTokenID,
+  verifyAdmin,
+  deleteBookById,
+);
 
 module.exports = { booksRouter };

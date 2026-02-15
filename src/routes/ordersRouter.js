@@ -8,6 +8,7 @@ const {
   getLibrarianOrders,
   isOrdered,
 } = require("../controllers/ordersController.js");
+const { idValidator } = require("../middlewares/IdValidator.js");
 
 const ordersRouter = express.Router();
 
@@ -21,6 +22,6 @@ ordersRouter.get("/librarian/:email", verifyLibrarian, getLibrarianOrders);
 
 ordersRouter.post("/", postOrder);
 
-ordersRouter.put("/:orderId", updateOrder);
+ordersRouter.put("/:id", idValidator, updateOrder);
 
 module.exports = { ordersRouter };
