@@ -1,8 +1,8 @@
 const { ObjectId } = require("mongodb");
+const { Book } = require("../models/Book.js");
 const {
   ordersCollection,
   wishlistCollection,
-  booksCollection,
   usersCollection,
 } = require("../config/db.js");
 
@@ -26,10 +26,7 @@ const getUserDashboardData = async (req, res) => {
     const wishlistBookIds = wishlistBooks.map((id) => new ObjectId(id));
     const wishlistBooksData =
       wishlistBookIds.length > 0
-        ? await booksCollection
-            .find({ _id: { $in: wishlistBookIds } })
-            .limit(5)
-            .toArray()
+        ? await Book.find({ _id: { $in: wishlistBookIds } }).limit(5)
         : [];
 
     const totalOrders = orders.length;
@@ -45,9 +42,7 @@ const getUserDashboardData = async (req, res) => {
       .filter((order) => order.paymentStatus === "paid")
       .map((order) => new ObjectId(order.bookId));
     const orderBooks =
-      orderIds.length > 0
-        ? await booksCollection.find({ _id: { $in: orderIds } }).toArray()
-        : [];
+      orderIds.length > 0 ? await Book.find({ _id: { $in: orderIds } }) : [];
 
     const bookPriceMap = {};
     orderBooks.forEach((book) => {
@@ -65,14 +60,13 @@ const getUserDashboardData = async (req, res) => {
 
     const recentOrders = await Promise.all(
       orders.slice(0, 5).map(async (order) => {
-        const book = await booksCollection.findOne({
-          _id: new ObjectId(order.bookId),
-        });
+        const book = await Book.findById(order.bookId);
+
         return {
           id: order.orderID,
-          bookName: book?.bookName || "Unknown Book",
+          bookName: book?.bookName,
           bookImage: book?.bookImage,
-          amount: `৳ ${book?.price || 0}`,
+          amount: `৳ ${book?.price}`,
           paymentStatus: order.paymentStatus,
           date: new Date(order.createdAt).toLocaleDateString("en-US", {
             year: "numeric",
@@ -169,9 +163,7 @@ const getLibrarianDashboardData = async (req, res) => {
       .sort({ createdAt: -1 })
       .toArray();
 
-    const myBooks = await booksCollection
-      .find({ librarianEmail: email })
-      .toArray();
+    const myBooks = await Book.find({ librarianEmail: email });
 
     const totalOrders = allOrders.length;
     const myBooksCount = myBooks.length;
@@ -179,9 +171,7 @@ const getLibrarianDashboardData = async (req, res) => {
     const orderBookIds = [
       ...new Set(allOrders.map((order) => new ObjectId(order.bookId))),
     ];
-    const orderBooks = await booksCollection
-      .find({ _id: { $in: orderBookIds } })
-      .toArray();
+    const orderBooks = await Book.find({ _id: { $in: orderBookIds } });
 
     const bookPriceMap = {};
     orderBooks.forEach((book) => {
@@ -219,9 +209,7 @@ const getLibrarianDashboardData = async (req, res) => {
 
     const recentOrders = await Promise.all(
       allOrders.slice(0, 8).map(async (order) => {
-        const book = await booksCollection.findOne({
-          _id: new ObjectId(order.bookId),
-        });
+        const book = await Book.findById(order.bookId);
         const customer = await usersCollection.findOne({
           email: order.customerEmail,
         });
@@ -255,9 +243,7 @@ const getLibrarianDashboardData = async (req, res) => {
       .slice(0, 5)
       .map(([id]) => new ObjectId(id));
 
-    const topBooks = await booksCollection
-      .find({ _id: { $in: sortedBookIds } })
-      .toArray();
+    const topBooks = await Book.find({ _id: { $in: sortedBookIds } });
 
     const myTopBooks = topBooks.map((book) => {
       const sales = bookSales[book._id.toString()] || 0;
@@ -361,7 +347,7 @@ const getLibrarianDashboardData = async (req, res) => {
 const getAdminDashboardData = async (req, res) => {
   try {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
-      booksCollection.find({}).toArray(),
+      Book.find({}),
       ordersCollection.find({}).sort({ createdAt: -1 }).toArray(),
       usersCollection.find({}).toArray(),
       wishlistCollection.find({}).toArray(),
@@ -396,9 +382,7 @@ const getAdminDashboardData = async (req, res) => {
 
     const recentOrders = await Promise.all(
       allOrders.slice(0, 10).map(async (order) => {
-        const book = await booksCollection.findOne({
-          _id: new ObjectId(order.bookId),
-        });
+        const book = await Book.findById(order.bookId);
         const customer = await usersCollection.findOne({
           email: order.customerEmail,
         });
@@ -439,9 +423,7 @@ const getAdminDashboardData = async (req, res) => {
       .slice(0, 5)
       .map(([id]) => new ObjectId(id));
 
-    const topBooks = await booksCollection
-      .find({ _id: { $in: sortedBookIds } })
-      .toArray();
+    const topBooks = await Book.find({ _id: { $in: sortedBookIds } });
 
     const formattedTopBooks = topBooks.map((book) => {
       const sales = bookSales[book._id.toString()] || 0;

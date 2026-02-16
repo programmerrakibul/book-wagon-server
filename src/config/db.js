@@ -27,11 +27,9 @@ const client = new MongoClient(uri, {
 
 const database = client.db("book_wagon");
 const usersCollection = database.collection("users");
-const booksCollection = database.collection("books");
 const ordersCollection = database.collection("orders");
 const paymentsCollection = database.collection("payments");
 const wishlistCollection = database.collection("wishlist");
-const commentsCollection = database.collection("comments");
 
 const connectDB = async () => {
   try {
@@ -52,9 +50,7 @@ const connectDB = async () => {
 module.exports = {
   connectDB,
   usersCollection,
-  booksCollection,
   ordersCollection,
   paymentsCollection,
   wishlistCollection,
-  commentsCollection,
 };
