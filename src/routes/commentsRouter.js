@@ -4,9 +4,10 @@ const {
   getComments,
 } = require("../controllers/commentsController.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
+const { idValidator } = require("../middlewares/IdValidator.js");
 const commentsRouter = express.Router();
 
-commentsRouter.get("/:bookId", getComments);
+commentsRouter.get("/:id", idValidator, getComments);
 
 commentsRouter.post("/", verifyTokenID, postComment);
 

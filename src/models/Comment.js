@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
 
-const today = new Date().toISOString();
-
 const commentSchema = new mongoose.Schema(
   {
     bookId: {
       type: mongoose.Schema.Types.ObjectId,
       required: [true, "Book ID is required"],
       ref: "Book",
+      unique: true,
       validate: {
         validator: function (v) {
           return mongoose.Types.ObjectId.isValid(v);
@@ -58,11 +57,11 @@ const commentSchema = new mongoose.Schema(
         },
         createdAt: {
           type: Date,
-          default: today,
+          default: Date.now,
         },
         updatedAt: {
           type: Date,
-          default: today,
+          default: Date.now,
         },
       },
     ],
@@ -72,8 +71,23 @@ const commentSchema = new mongoose.Schema(
   },
 );
 
+commentSchema.statics.addByBookId = async function (bookId, commentData) {
+  try {
+    let commentDoc = await this.findOne({ bookId });
+
+    if (!commentDoc) {
+      commentDoc = new this({ bookId, comments: [] });
+    }
+
+    commentDoc.comments.push(commentData);
+    return await commentDoc.save();
+  } catch (error) {
+    throw error;
+  }
+};
+
 commentSchema.pre("save", function () {
-  this.updatedAt = today;
+  this.updatedAt = Date.now;
 });
 
 const Comment = mongoose.model("Comment", commentSchema);
