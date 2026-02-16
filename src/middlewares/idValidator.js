@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const idValidator = (req, res, next) => {
   const id = req.params.id?.trim();
 
@@ -5,7 +7,7 @@ const idValidator = (req, res, next) => {
     return res.status(400).send({ success: false, message: "ID is required" });
   }
 
-  if (typeof id !== "string" || id.length !== 24) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({ success: false, message: "Invalid ID" });
   }
 
