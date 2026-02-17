@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-const today = new Date().toISOString();
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -50,7 +48,7 @@ const userSchema = new mongoose.Schema(
     },
     lastLoggedIn: {
       type: Date,
-      default: today,
+      default: Date.now,
     },
   },
   {
@@ -58,9 +56,50 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+userSchema.statics.getRole = async function (email) {
+  try {
+    const user = await this.findOne({ email });
+
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    return user.role;
+  } catch (error) {
+    throw error;
+  }
+};
+
+userSchema.statics.toggleRole = async function (email, newRole) {
+  try {
+    if (!["user", "librarian", "admin"].includes(newRole)) {
+      throw new Error(
+        "Invalid role! Role must be either 'user', 'librarian', or 'admin'.",
+      );
+    }
+
+    const isExist = await this.findOne({ email });
+
+    if (!isExist) {
+      throw new Error("User not found!");
+    }
+
+    const result = await this.findByIdAndUpdate(
+      isExist._id,
+      { role: newRole },
+      { new: true },
+    );
+
+    return result.toObject();
+  } catch (error) {
+    throw error;
+  }
+};
+
 userSchema.pre("save", function () {
-  this.updatedAt = today;
-  this.lastLoggedIn = today;
+  if (this.isNew) {
+    this.updatedAt = Date.now;
+  }
 });
 
 const User = mongoose.model("User", userSchema);

@@ -1,103 +1,125 @@
-const { usersCollection } = require("../config/db.js");
+const { User } = require("../models/User.js");
 
 const getUsers = async (req, res) => {
-  const query = {};
-
   try {
-    const users = await usersCollection.find(query).toArray();
+    const users = await User.find({}).sort({ createdAt: -1 });
 
     res.send({
       success: true,
       message: "Users data retrieved successfully",
+      total: users.length || 0,
       users,
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const getUserRole = async (req, res) => {
-  const { email } = req.params;
-
-  if (email.trim().length === 0) {
-    return res.status(400).send({ message: "Email is required" });
-  }
-
   try {
-    const user = await usersCollection.findOne({ email });
+    const email = req.params.email?.trim()?.toLowerCase();
 
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
+    if (email.length === 0) {
+      return res
+        .status(400)
+        .send({ success: false, message: "Email is required" });
     }
 
-    res.send({ role: user.role });
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+    const role = await User.getRole(email);
+
+    res.send({
+      success: true,
+      message: "User role retrieved successfully",
+      role,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(err.statusCode || 500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 
 const postUser = async (req, res) => {
   const userData = req.body;
-  const today = new Date().toISOString();
-  const lastLoggedIn = today;
-  userData.role = "user";
-  userData.lastLoggedIn = lastLoggedIn;
-  userData.createdAt = today;
 
   try {
-    const isExist = await usersCollection.findOne({ email: userData.email });
-
-    if (!!isExist) {
-      await usersCollection.updateOne(
-        { email: userData.email },
-        { $set: { lastLoggedIn } },
-      );
-
-      return res.send({ message: "User with this email already exists" });
+    if (Object.keys(userData || {}).length === 0) {
+      return res.status(400).send({
+        success: false,
+        message: "User data is required in request body",
+      });
     }
 
-    const result = await usersCollection.insertOne(userData);
+    const isExist = await User.findOne({ email: userData.email });
+
+    if (!!isExist) {
+      await User.findByIdAndUpdate(
+        isExist._id,
+        { lastLoggedIn: Date.now() },
+        { new: false },
+      );
+
+      return res.send({
+        success: true,
+        message: "User with this email already exists",
+      });
+    }
+
+    await User.create(userData);
 
     res.status(201).send({
       success: true,
       message: "User data posted successfully",
-      ...result,
     });
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const updateUserRole = async (req, res) => {
-  const { email } = req.params;
-  const { role } = req.body;
+  const email = req.params.email?.trim()?.toLowerCase();
+  const role = req.body?.role?.trim()?.toLowerCase();
 
-  if (email.trim().length === 0) {
-    return res.status(400).send({ message: "Email is required" });
+  if (!email) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
   }
 
-  if (role.trim().length === 0) {
-    return res.status(400).send({ message: "Role is required" });
+  if (!role) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Role is required" });
   }
-
-  const query = { email };
 
   try {
-    const isExist = await usersCollection.findOne(query);
-
-    if (!isExist) {
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    const result = await usersCollection.updateOne(query, { $set: { role } });
+    const result = await User.toggleRole(email, role);
 
     res.send({
       success: true,
       message: "User role updated successfully",
-      ...result,
+      result,
     });
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 

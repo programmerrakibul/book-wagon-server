@@ -159,7 +159,7 @@ bookSchema.pre("save", function () {
     throw new Error("Publication year cannot be in the future");
   }
 
-  this.updatedAt = new Date().toISOString();
+  this.updatedAt = Date.now;
 });
 
 const Book = mongoose.model("Book", bookSchema);

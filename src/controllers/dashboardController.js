@@ -1,10 +1,7 @@
 const { ObjectId } = require("mongodb");
 const { Book } = require("../models/Book.js");
-const {
-  ordersCollection,
-  wishlistCollection,
-  usersCollection,
-} = require("../config/db.js");
+const { ordersCollection, wishlistCollection } = require("../config/db.js");
+const { User } = require("../models/User.js");
 
 const getUserDashboardData = async (req, res) => {
   const { email } = req.params;
@@ -210,7 +207,7 @@ const getLibrarianDashboardData = async (req, res) => {
     const recentOrders = await Promise.all(
       allOrders.slice(0, 8).map(async (order) => {
         const book = await Book.findById(order.bookId);
-        const customer = await usersCollection.findOne({
+        const customer = await User.findOne({
           email: order.customerEmail,
         });
 
@@ -349,7 +346,7 @@ const getAdminDashboardData = async (req, res) => {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
       Book.find({}),
       ordersCollection.find({}).sort({ createdAt: -1 }).toArray(),
-      usersCollection.find({}).toArray(),
+      User.find({}),
       wishlistCollection.find({}).toArray(),
     ]);
 
@@ -383,10 +380,10 @@ const getAdminDashboardData = async (req, res) => {
     const recentOrders = await Promise.all(
       allOrders.slice(0, 10).map(async (order) => {
         const book = await Book.findById(order.bookId);
-        const customer = await usersCollection.findOne({
+        const customer = await User.findOne({
           email: order.customerEmail,
         });
-        const librarian = await usersCollection.findOne({
+        const librarian = await User.findOne({
           email: order.librarianEmail,
         });
 
