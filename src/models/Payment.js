@@ -63,7 +63,7 @@ const paymentSchema = new mongoose.Schema(
 );
 
 paymentSchema.pre("save", async function () {
-  this.updatedAt = new Date().toISOString();
+  this.updatedAt = Date.now;
 });
 
 const Payment = mongoose.model("Payment", paymentSchema);

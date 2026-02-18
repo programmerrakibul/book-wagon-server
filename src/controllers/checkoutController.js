@@ -1,6 +1,6 @@
 const { stripe } = require("../config/stripe.js");
-const { paymentsCollection } = require("../config/db.js");
 const { Order } = require("../models/Order.js");
+const { Payment } = require("../models/Payment.js");
 
 const clientUrl = process.env.SITE_DOMAIN;
 
@@ -11,9 +11,10 @@ if (!clientUrl?.trim()) {
 const createCheckout = async (req, res) => {
   const paymentInfo = req.body;
 
-  if (!paymentInfo || Object.keys(paymentInfo).length === 0) {
+  if (Object.keys(paymentInfo || {}).length === 0) {
     return res.status(400).send({
-      message: "Payment info required",
+      success: false,
+      message: "Payment info is required",
     });
   }
 
@@ -45,17 +46,24 @@ const createCheckout = async (req, res) => {
       cancel_url: `${clientUrl}/dashboard/my-orders`,
     });
 
-    res.send({ url: session.url });
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+    res.send({ success: true, url: session.url });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 
 const retrieveCheckout = async (req, res) => {
-  const { session_id } = req.params;
+  const session_id = req.params.session_id?.trim();
 
-  if (!session_id?.trim()) {
-    return res.status(400).send({ message: "Invalid session ID" });
+  if (!session_id) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Invalid session ID" });
   }
 
   try {
@@ -69,18 +77,14 @@ const retrieveCheckout = async (req, res) => {
     } = session;
 
     if (paymentStatus === "paid") {
-      const isExist = await paymentsCollection.findOne({ orderID });
+      const isExist = await Payment.findOne({ orderID });
 
       if (!!isExist) {
-        return res.send({
-          orderID,
-          transactionId,
-        });
+        return res.send({ success: true, orderID, transactionId });
       } else {
         const paymentInfo = {
           orderID,
           transactionId,
-          createdAt: new Date().toISOString(),
           bookId,
           customer_email,
           paymentStatus,
@@ -96,19 +100,19 @@ const retrieveCheckout = async (req, res) => {
             new: true,
           },
         );
-        await paymentsCollection.insertOne(paymentInfo);
+        await Payment.create(paymentInfo);
 
-        return res.send({
-          orderID,
-          transactionId,
-        });
+        return res.send({ success: true, orderID, transactionId });
       }
     }
 
-    res.status(400).send({ message: "Payment failed" });
-  } catch {
+    res.status(400).send({ success: false, message: "Payment failed" });
+  } catch (err) {
+    console.log(err);
+
     res.status(500).send({
-      message: "Internal server error",
+      success: false,
+      message: err.message || "Internal server error",
     });
   }
 };

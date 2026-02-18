@@ -1,10 +1,12 @@
-const { paymentsCollection } = require("../config/db.js");
+const { Payment } = require("../models/Payment.js");
 
 const getInvoices = async (req, res) => {
-  const { email } = req.params;
+  const email = req.params.email?.trim()?.toLowerCase();
 
-  if (email.trim() === "") {
-    return res.status(400).send({ message: "Email is required" });
+  if (!email) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
   }
 
   const pipeline = [
@@ -46,11 +48,16 @@ const getInvoices = async (req, res) => {
   ];
 
   try {
-    const result = await paymentsCollection.aggregate(pipeline).toArray();
+    const result = await Payment.aggregate(pipeline);
 
     res.send(result);
-  } catch {
-    res.status(500).send({ message: "Internal server error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 

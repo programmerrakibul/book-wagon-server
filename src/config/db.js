@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { MongoClient, ServerApiVersion } = require("mongodb");
 
 const uri = process.env.MONGODB_URI;
 const DB_NAME = process.env.DB_NAME || "book_wagon";
@@ -17,17 +16,6 @@ if (!uri?.trim()) {
   throw new Error("MONGODB_URI is not defined in environment variables");
 }
 
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-const database = client.db("book_wagon");
-const paymentsCollection = database.collection("payments");
-
 const connectDB = async () => {
   try {
     // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
@@ -44,7 +32,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = {
-  connectDB,
-  paymentsCollection,
-};
+module.exports = { connectDB };
