@@ -57,10 +57,10 @@ const getLibrarianOrders = async (req, res) => {
 };
 
 const isOrdered = async (req, res) => {
-  const { bookId, customerEmail } = req.params;
+  const { id, customerEmail } = req.params;
 
   try {
-    const result = await Order.isOrdered(bookId, customerEmail);
+    const result = await Order.isOrdered(id, customerEmail);
 
     res.send(result);
   } catch (err) {

@@ -1,5 +1,5 @@
 const express = require("express");
-const { idValidator } = require("../middlewares/IdValidator.js");
+const { validateId } = require("../middlewares/validateId.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
 const {
@@ -14,7 +14,7 @@ const ordersRouter = express.Router();
 
 ordersRouter.use(verifyTokenID);
 
-ordersRouter.get("/:bookId/user/:customerEmail", isOrdered);
+ordersRouter.get("/:id/user/:customerEmail", validateId, isOrdered);
 
 ordersRouter.get("/customer/:email", getCustomerOrders);
 
@@ -22,6 +22,6 @@ ordersRouter.get("/librarian/:email", verifyLibrarian, getLibrarianOrders);
 
 ordersRouter.post("/", postOrder);
 
-ordersRouter.put("/:id", idValidator, updateOrder);
+ordersRouter.put("/:id", validateId, updateOrder);
 
 module.exports = { ordersRouter };

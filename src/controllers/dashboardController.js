@@ -147,7 +147,7 @@ const getUserDashboardData = async (req, res) => {
 };
 
 const getLibrarianDashboardData = async (req, res) => {
-  const { email } = req.params;
+  const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email.trim()) {
     return res.status(400).send({ message: "Email is required" });

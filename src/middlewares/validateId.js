@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const idValidator = (req, res, next) => {
+const validateId = (req, res, next) => {
   const id = req.params.id?.trim();
 
   if (!id) {
@@ -15,4 +15,4 @@ const idValidator = (req, res, next) => {
   next();
 };
 
-module.exports = { idValidator };
+module.exports = { validateId };
