@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { randomUUID } = require("crypto");
 
 const orderSchema = new mongoose.Schema(
   {
@@ -58,9 +59,8 @@ const orderSchema = new mongoose.Schema(
     },
     orderID: {
       type: String,
-      required: [true, "Order ID is required"],
       unique: true,
-      trim: true,
+      default: `BW-${randomUUID().replace(/-/g, "").slice(0, 12)}`,
     },
     status: {
       type: String,
@@ -80,8 +80,9 @@ const orderSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
       enum: {
-        values: ["paid", "unpaid"],
-        message: "{VALUE} is not a valid payment status. Must be: paid, unpaid",
+        values: ["paid", "unpaid", "failed", "refunded"],
+        message:
+          "{VALUE} is not a valid payment status. Must be: paid, unpaid, failed, refunded",
       },
       default: "unpaid",
     },
@@ -91,8 +92,66 @@ const orderSchema = new mongoose.Schema(
   },
 );
 
+orderSchema.statics.getOrdersByEmail = async function (email) {
+  try {
+    const pipeline = [
+      {
+        $match: { $or: [{ customerEmail: email }, { librarianEmail: email }] },
+      },
+      {
+        $addFields: {
+          objectId: { $toObjectId: "$bookId" },
+        },
+      },
+      {
+        $lookup: {
+          from: "books",
+          localField: "objectId",
+          foreignField: "_id",
+          as: "orderedBook",
+        },
+      },
+      {
+        $unwind: "$orderedBook",
+      },
+      {
+        $project: {
+          objectId: 0,
+          "orderedBook._id": 0,
+          "orderedBook.updatedAt": 0,
+          "orderedBook.status": 0,
+          "orderedBook.pageCount": 0,
+        },
+      },
+    ];
+
+    return await this.aggregate(pipeline);
+  } catch (error) {
+    throw error;
+  }
+};
+
+orderSchema.statics.isOrdered = async function (bookId, customerEmail) {
+  try {
+    const result = await this.findOne({ bookId, customerEmail });
+
+    switch (result?.status) {
+      case "pending":
+      case "shipped":
+      case "delivered":
+        return true;
+      case "cancelled":
+        return false;
+      default:
+        return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 orderSchema.pre("save", function () {
-  this.updatedAt = new Date().toISOString();
+  this.updatedAt = Date.now;
 });
 
 const Order = mongoose.model("Order", orderSchema);

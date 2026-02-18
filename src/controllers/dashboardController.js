@@ -1,7 +1,8 @@
 const { ObjectId } = require("mongodb");
 const { Book } = require("../models/Book.js");
-const { ordersCollection, wishlistCollection } = require("../config/db.js");
+const { wishlistCollection } = require("../config/db.js");
 const { User } = require("../models/User.js");
+const { Order } = require("../models/Order.js");
 
 const getUserDashboardData = async (req, res) => {
   const { email } = req.params;
@@ -11,11 +12,9 @@ const getUserDashboardData = async (req, res) => {
   }
 
   try {
-    const orders = await ordersCollection
-      .find({ customerEmail: email })
+    const orders = await Order.find({ customerEmail: email })
       .sort({ createdAt: -1 })
-      .limit(10)
-      .toArray();
+      .limit(10);
 
     const wishlist = await wishlistCollection.findOne({ customerEmail: email });
     const wishlistBooks = wishlist?.bookIDs || [];
@@ -155,10 +154,9 @@ const getLibrarianDashboardData = async (req, res) => {
   }
 
   try {
-    const allOrders = await ordersCollection
-      .find({ librarianEmail: email })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const allOrders = await Order.find({ librarianEmail: email }).sort({
+      createdAt: -1,
+    });
 
     const myBooks = await Book.find({ librarianEmail: email });
 
@@ -345,7 +343,7 @@ const getAdminDashboardData = async (req, res) => {
   try {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
       Book.find({}),
-      ordersCollection.find({}).sort({ createdAt: -1 }).toArray(),
+      Order.find({}).sort({ createdAt: -1 }),
       User.find({}),
       wishlistCollection.find({}).toArray(),
     ]);

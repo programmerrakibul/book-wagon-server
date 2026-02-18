@@ -1,5 +1,5 @@
-const { ordersCollection } = require("../config/db.js");
 const { Book } = require("../models/Book.js");
+const { User } = require("../models/User.js");
 
 const getBooks = async (req, res) => {
   const query = { status: "published" };
@@ -185,7 +185,7 @@ const deleteBookById = async (req, res) => {
         .send({ success: false, message: "Book data not found" });
     }
 
-    await ordersCollection.deleteMany({ bookId: id });
+    await User.deleteMany({ bookId: id });
     await Book.findByIdAndDelete(id);
 
     res.send({

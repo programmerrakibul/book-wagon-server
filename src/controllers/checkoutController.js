@@ -1,5 +1,6 @@
 const { stripe } = require("../config/stripe.js");
-const { paymentsCollection, ordersCollection } = require("../config/db.js");
+const { paymentsCollection } = require("../config/db.js");
+const { Order } = require("../models/Order.js");
 
 const clientUrl = process.env.SITE_DOMAIN;
 
@@ -86,10 +87,13 @@ const retrieveCheckout = async (req, res) => {
           price: amount_total / 100,
         };
 
-        await ordersCollection.updateOne(
+        await Order.findOneAndUpdate(
           { orderID },
           {
-            $set: { paymentStatus },
+            paymentStatus,
+          },
+          {
+            new: true,
           },
         );
         await paymentsCollection.insertOne(paymentInfo);

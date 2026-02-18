@@ -1,160 +1,107 @@
-const { ObjectId } = require("mongodb");
-const { ordersCollection } = require("../config/db.js");
-const { generateOrderID } = require("../utilities/generateOrderID.js");
+const { Order } = require("../models/Order.js");
 
 const getCustomerOrders = async (req, res) => {
-  const { email } = req.params;
-
-  if (!email.trim()) {
-    return res.status(400).send({ message: "Email is required" });
-  }
-
-  const pipeline = [
-    {
-      $match: { customerEmail: email },
-    },
-    {
-      $addFields: {
-        objectId: { $toObjectId: "$bookId" },
-      },
-    },
-    {
-      $lookup: {
-        from: "books",
-        localField: "objectId",
-        foreignField: "_id",
-        as: "orderedBook",
-      },
-    },
-    {
-      $unwind: "$orderedBook",
-    },
-    {
-      $project: {
-        objectId: 0,
-        "orderedBook._id": 0,
-        "orderedBook.updatedAt": 0,
-        "orderedBook.status": 0,
-        "orderedBook.pageCount": 0,
-      },
-    },
-  ];
-
   try {
-    const result = await ordersCollection.aggregate(pipeline).toArray();
+    const email = req.params.email?.trim()?.toLowerCase();
+
+    if (!email) {
+      return res
+        .status(400)
+        .send({ success: false, message: "Email is required" });
+    }
+
+    const result = await Order.getOrdersByEmail(email);
 
     res.send({
       success: true,
       message: "Orders data retrieved successfully",
+      total: result.length || 0,
       orders: result,
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+const getLibrarianOrders = async (req, res) => {
+  const email = req.params.email?.trim()?.toLowerCase();
+
+  if (!email) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
+  }
+
+  try {
+    const result = await Order.getOrdersByEmail(email);
+
+    res.send({
+      success: true,
+      message: "Orders data retrieved successfully",
+      total: result.length || 0,
+      orders: result,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const isOrdered = async (req, res) => {
   const { bookId, customerEmail } = req.params;
 
-  if (!bookId || !customerEmail) {
-    return res
-      .status(400)
-      .send({ message: "Customer email and book id required!" });
-  }
-  const query = { bookId, customerEmail };
-
   try {
-    const result = await ordersCollection.findOne(query);
+    const result = await Order.isOrdered(bookId, customerEmail);
 
-    const isOrdered =
-      result?.status === ("pending" || "shipped" || "delivered") || false;
+    res.send(result);
+  } catch (err) {
+    console.log(err);
 
-    res.send(isOrdered);
-  } catch {
     res.status(500).send({
-      message: "Internal server error",
+      success: false,
+      message: err.message || "Internal server error",
     });
-  }
-};
-
-const getLibrarianOrders = async (req, res) => {
-  const { email } = req.params;
-
-  if (!email.trim()) {
-    return res.status(400).send({ message: "Email is required" });
-  }
-
-  const pipeline = [
-    {
-      $match: { librarianEmail: email },
-    },
-    {
-      $addFields: {
-        objectId: { $toObjectId: "$bookId" },
-      },
-    },
-    {
-      $lookup: {
-        from: "books",
-        localField: "objectId",
-        foreignField: "_id",
-        as: "orderedBook",
-      },
-    },
-    {
-      $unwind: "$orderedBook",
-    },
-    {
-      $project: {
-        objectId: 0,
-        "orderedBook._id": 0,
-        "orderedBook.updatedAt": 0,
-        "orderedBook.pageCount": 0,
-      },
-    },
-  ];
-
-  try {
-    const result = await ordersCollection.aggregate(pipeline).toArray();
-
-    res.send({
-      success: true,
-      message: "Orders data retrieved successfully",
-      orders: result,
-    });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
   }
 };
 
 const postOrder = async (req, res) => {
-  const orderData = req.body;
-  const today = new Date().toISOString();
-  const orderID = generateOrderID();
-
-  if (typeof orderData !== "object") {
-    return res.status(400).send({ message: "Order data is required" });
-  }
-
-  orderData.orderID = orderID;
-  orderData.createdAt = today;
-  orderData.status = "pending";
-  orderData.paymentStatus = "unpaid";
-
   try {
-    const result = await ordersCollection.insertOne(orderData);
+    const orderData = req.body;
+
+    if (Object.keys(orderData || {}).length === 0) {
+      return res
+        .status(400)
+        .send({ success: false, message: "Order data is required" });
+    }
+
+    await Order.create(orderData);
+
     res.status(201).send({
       success: true,
       message: "Order data posted successfully",
-      ...result,
     });
-  } catch {
-    return res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
   }
 };
 
 const updateOrder = async (req, res) => {
   const updatedData = req.body;
+  const { id } = req.params;
 
   if (Object.keys(updatedData || {}).length === 0) {
     return res
@@ -162,27 +109,31 @@ const updateOrder = async (req, res) => {
       .send({ success: false, message: "No data provided for update" });
   }
 
-  const query = { _id: new ObjectId(req.params.id) };
-
   try {
-    const result = await ordersCollection.updateOne(query, {
-      $set: updatedData,
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).send({
+        success: false,
+        message: "Order data not found!",
+      });
+    }
+
+    await Order.findByIdAndUpdate(id, updatedData, {
+      new: true,
     });
 
     res.send({
       success: true,
       message: "Order data updated successfully",
-      ...result,
     });
   } catch (err) {
     console.log(err);
 
-    res
-      .status(500)
-      .send({
-        success: false,
-        message: err.message || "Internal server error",
-      });
+    res.status(500).send({
+      success: false,
+      message: err.message || "Internal server error",
+    });
   }
 };
 

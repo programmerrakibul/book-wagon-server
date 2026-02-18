@@ -1,6 +1,7 @@
 const express = require("express");
-const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
+const { idValidator } = require("../middlewares/IdValidator.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
+const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
 const {
   postOrder,
   getCustomerOrders,
@@ -8,7 +9,6 @@ const {
   getLibrarianOrders,
   isOrdered,
 } = require("../controllers/ordersController.js");
-const { idValidator } = require("../middlewares/IdValidator.js");
 
 const ordersRouter = express.Router();
 
