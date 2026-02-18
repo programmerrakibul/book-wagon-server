@@ -1,8 +1,8 @@
 const { ObjectId } = require("mongodb");
 const { Book } = require("../models/Book.js");
-const { wishlistCollection } = require("../config/db.js");
 const { User } = require("../models/User.js");
 const { Order } = require("../models/Order.js");
+const { Favorite } = require("../models/Favorite.js");
 
 const getUserDashboardData = async (req, res) => {
   const { email } = req.params;
@@ -16,7 +16,7 @@ const getUserDashboardData = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(10);
 
-    const wishlist = await wishlistCollection.findOne({ customerEmail: email });
+    const wishlist = await Favorite.findOne({ customerEmail: email });
     const wishlistBooks = wishlist?.bookIDs || [];
 
     const wishlistBookIds = wishlistBooks.map((id) => new ObjectId(id));
@@ -345,7 +345,7 @@ const getAdminDashboardData = async (req, res) => {
       Book.find({}),
       Order.find({}).sort({ createdAt: -1 }),
       User.find({}),
-      wishlistCollection.find({}).toArray(),
+      Favorite.find({}),
     ]);
 
     const totalBooks = allBooks.length;

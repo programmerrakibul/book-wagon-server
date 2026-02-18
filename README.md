@@ -157,7 +157,7 @@ book-wagon-server/
 │   ├── ordersRouter.js
 │   ├── paymentsRouter.js
 │   ├── usersRouter.js
-│   └── wishlistRouter.js
+│   └── favoritesRouter.js
 ├── utilities/           # Helper functions
 │   └── generateOrderID.js
 ├── db.js               # Database connection

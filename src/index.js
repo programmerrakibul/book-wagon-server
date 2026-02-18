@@ -9,7 +9,7 @@ const { booksRouter } = require("./routes/booksRouter.js");
 const { ordersRouter } = require("./routes/ordersRouter.js");
 const { checkoutRouter } = require("./routes/checkoutRouter.js");
 const { paymentsRouter } = require("./routes/paymentsRouter.js");
-const { wishlistRouter } = require("./routes/wishlistRouter.js");
+const { favoritesRouter } = require("./routes/favoritesRouter.js");
 const { commentsRouter } = require("./routes/commentsRouter.js");
 const { dashboardRouter } = require("./routes/dashboardRoutes.js");
 
@@ -33,7 +33,7 @@ const run = async () => {
     app.use("/api/orders", ordersRouter);
     app.use("/api/checkout-session", checkoutRouter);
     app.use("/api/payments", paymentsRouter);
-    app.use("/api/wishlist", wishlistRouter);
+    app.use("/api/wishlist", favoritesRouter);
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
 

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Book } = require("./Book");
 
 const favoriteSchema = new mongoose.Schema(
   {
@@ -34,8 +35,57 @@ const favoriteSchema = new mongoose.Schema(
   },
 );
 
+favoriteSchema.statics.getFavoriteBooks = async function (customerEmail) {
+  try {
+    const favDoc = await this.findOne({ customerEmail });
+    const bookIds = favDoc?.bookIDs || [];
+    const favBooks = await Book.find({ _id: { $in: bookIds } }).sort({
+      createdAt: -1,
+    });
+
+    return favBooks || [];
+  } catch (error) {
+    throw error;
+  }
+};
+
+favoriteSchema.statics.addToFavorite = async function (customerEmail, bookId) {
+  try {
+    let favDoc = await this.findOne({ customerEmail });
+
+    if (!favDoc) {
+      favDoc = new this({ customerEmail, bookIDs: [] });
+    }
+
+    favDoc.bookIDs.addToSet(bookId);
+    return await favDoc.save();
+  } catch (error) {
+    throw error;
+  }
+};
+
+favoriteSchema.statics.removeFromFavorite = async function (
+  customerEmail,
+  bookId,
+) {
+  try {
+    const result = await this.findOneAndUpdate(
+      { customerEmail },
+      {
+        $pull: {
+          bookIDs: bookId,
+        },
+      },
+    );
+
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 favoriteSchema.pre("save", async function () {
-  this.updatedAt = new Date().toISOString();
+  this.updatedAt = Date.now;
 });
 
 const Favorite = mongoose.model("Favorite", favoriteSchema);
