@@ -5,10 +5,12 @@ const { Order } = require("../models/Order.js");
 const { Favorite } = require("../models/Favorite.js");
 
 const getUserDashboardData = async (req, res) => {
-  const { email } = req.params;
+  const email = req.params.email?.trim()?.toLowerCase();
 
-  if (!email.trim()) {
-    return res.status(400).send({ message: "Email is required" });
+  if (!email) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
   }
 
   try {
@@ -149,8 +151,10 @@ const getUserDashboardData = async (req, res) => {
 const getLibrarianDashboardData = async (req, res) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
-  if (!email.trim()) {
-    return res.status(400).send({ message: "Email is required" });
+  if (!email) {
+    return res
+      .status(400)
+      .send({ success: false, message: "Email is required" });
   }
 
   try {

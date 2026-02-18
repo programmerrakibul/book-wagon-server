@@ -17,7 +17,7 @@ dashboardRouter.get("/user/:email", getUserDashboardData);
 dashboardRouter.get(
   "/librarian/:email",
   verifyLibrarian,
-  getLibrarianDashboardData
+  getLibrarianDashboardData,
 );
 
 dashboardRouter.get("/admin/:email", verifyAdmin, getAdminDashboardData);
