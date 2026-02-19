@@ -299,8 +299,6 @@ book-wagon-server/
 │   │   ├── ordersRouter.js
 │   │   ├── paymentsRouter.js
 │   │   └── usersRouter.js
-│   ├── utilities/
-│   │   └── generateOrderID.js       # Order ID generator
 │   └── index.js                     # Application entry point
 ├── .env                             # Environment variables
 ├── .gitignore
