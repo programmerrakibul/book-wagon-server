@@ -1,201 +1,386 @@
-# Book Wagon Server
+# 📚 Book Wagon Server
 
-Backend API server for the Book Wagon application - an online bookstore platform
-with user authentication, book management, orders, payments, and wishlist
-functionality.
+A comprehensive RESTful API backend for the Book Wagon platform - an online
+bookstore management system with role-based access control, payment processing,
+and real-time dashboard analytics.
+
+## Overview
+
+Book Wagon Server provides a complete backend solution for managing an online
+bookstore with three distinct user roles (Admin, Librarian, User), secure
+authentication via Firebase, integrated Stripe payment processing, and
+comprehensive order management capabilities.
 
 ## Tech Stack
 
-- **Node.js** with Express.js
-- **MongoDB** for database
-- **Firebase Admin** for authentication
-- **Stripe** for payment processing
-- **CORS** enabled for cross-origin requests
+- **Runtime**: Node.js with Express.js 5.x
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: Firebase Admin SDK
+- **Payment Gateway**: Stripe API
+- **Deployment**: Vercel (serverless)
+- **Security**: CORS, Firebase ID Token verification
 
-## Features
+## Key Features
 
-- User authentication and authorization (Admin, Librarian roles)
-- Book catalog management
-- Shopping cart and checkout
-- Order management
-- Payment processing with Stripe
-- Wishlist functionality
-- Comments and reviews system
+- Role-based access control (Admin, Librarian, User)
+- Firebase authentication with JWT token verification
+- Complete book catalog management with categories and search
+- Stripe checkout integration
+- Order lifecycle management (pending → shipped → delivered)
+- Wishlist/favorites functionality
+- Book comments and reviews system
+- Real-time dashboard analytics for all user roles
+- Payment invoice generation and tracking
+- Comprehensive data validation and error handling
 
 ## Prerequisites
 
+Before running this project, ensure you have:
+
 - Node.js (v14 or higher)
-- MongoDB database
-- Firebase project with Admin SDK
-- Stripe account for payment processing
+- MongoDB database (local or Atlas)
+- Firebase project with Admin SDK credentials
+- Stripe account with API keys
+- npm or yarn package manager
 
 ## Installation
 
-1. Clone the repository:
+1. Clone the repository
 
 ```bash
 git clone https://github.com/programmerrakibul/book-wagon-server.git
 cd book-wagon-server
 ```
 
-2. Install dependencies:
+2. Install dependencies
 
 ```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory with the following variables:
+3. Configure environment variables
+
+Create a `.env` file in the root directory:
 
 ```env
-MONGODB_URI=your_mongodb_connection_string
-PAYMENT_GATEWAY_SECRET_KEY=your_stripe_secret_key
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=book-wagon
+PAYMENT_GATEWAY_SECRET_KEY=sk_test_your_stripe_secret_key
 SITE_DOMAIN=http://localhost:5173
-FIREBASE_SERVICE_KEY=your_firebase_service_account_json
+FIREBASE_SERVICE_KEY=base64_encoded_firebase_service_account_json
 PORT=8000
 ```
 
 ## Environment Variables
 
-| Variable                     | Description                                                  |
-| ---------------------------- | ------------------------------------------------------------ |
-| `MONGODB_URI`                | MongoDB connection string                                    |
-| `PAYMENT_GATEWAY_SECRET_KEY` | Stripe secret key for payment processing                     |
-| `SITE_DOMAIN`                | Frontend application URL (for CORS)                          |
-| `FIREBASE_SERVICE_KEY`       | Firebase Admin SDK service account credentials (JSON string) |
-| `PORT`                       | Server port (default: 8000)                                  |
+| Variable                     | Description                                  | Required           |
+| ---------------------------- | -------------------------------------------- | ------------------ |
+| `MONGODB_URI`                | MongoDB connection string with credentials   | Yes                |
+| `PAYMENT_GATEWAY_SECRET_KEY` | Stripe secret key for payment processing     | Yes                |
+| `SITE_DOMAIN`                | Frontend application URL for redirects       | Yes                |
+| `STRIPE_WEBHOOK_SECRET`      | Stripe webhook signing secret                | Yes                |
+| `FIREBASE_SERVICE_KEY`       | Base64-encoded Firebase service account JSON | Yes                |
+| `PORT`                       | Server port number                           | No (default: 8000) |
 
-## Running the Server
+## Running the Application
 
-### Development mode (with auto-reload):
+Development mode with auto-reload:
 
 ```bash
 npm run dev
 ```
 
-### Production mode:
+Production mode:
 
 ```bash
 npm start
 ```
 
-The server will start on `http://localhost:8000` (or the port specified in your
-`.env` file).
+The server will be available at `http://localhost:8000`
 
-## API Endpoints
+## API Documentation
 
 ### Base URL
 
-```
-http://localhost:8000
-```
-
-### Routes
-
-#### Users
-
-- `POST /api/users` - Create/register user
-- `GET /api/users` - Get all users (Admin only)
-- `GET /api/users/:id` - Get user by ID
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
-
-#### Books
-
-- `GET /api/books` - Get all books
-- `GET /api/books/:id` - Get book by ID
-- `POST /api/books` - Add new book (Librarian)
-- `PUT /api/books/:id` - Update book (Admin/Librarian)
-- `DELETE /api/books/:id` - Delete book (Admin)
-
-#### Orders
-
-- `GET /api/orders` - Get all orders
-- `GET /api/orders/:id` - Get order by ID
-- `POST /api/orders` - Create new order
-- `PUT /api/orders/:id` - Update order status
-
-#### Checkout
-
-- `POST /api/checkout-session` - Create Stripe checkout session
-
-#### Payments
-
-- `GET /api/payments` - Get payment history
-- `POST /api/payments` - Process payment
-
-#### Wishlist
-
-- `GET /api/wishlist/:userId` - Get user's wishlist
-- `POST /api/wishlist` - Add item to wishlist
-- `DELETE /api/wishlist/:id` - Remove item from wishlist
-
-#### Comments
-
-- `GET /api/comments/:bookId` - Get comments for a book
-- `POST /api/comments` - Add comment
-
-## Project Structure
-
-```
-book-wagon-server/
-├── controllers/          # Request handlers
-│   ├── booksController.js
-│   ├── checkoutController.js
-│   ├── commentsController.js
-│   ├── ordersController.js
-│   ├── paymentsController.js
-│   ├── usersController.js
-│   └── wishlistController.js
-├── middlewares/          # Authentication & authorization
-│   ├── verifyAdmin.js
-│   ├── verifyLibrarian.js
-│   └── verifyTokenID.js
-├── routes/              # API route definitions
-│   ├── booksRouter.js
-│   ├── checkoutRouter.js
-│   ├── commentsRouter.js
-│   ├── ordersRouter.js
-│   ├── paymentsRouter.js
-│   ├── usersRouter.js
-│   └── favoritesRouter.js
-├── utilities/           # Helper functions
-│   └── generateOrderID.js
-├── db.js               # Database connection
-├── index.js            # Server entry point
-├── .env                # Environment variables
-└── package.json        # Dependencies
+```text
+http://localhost:8000/
 ```
 
-## Authentication
+### Authentication
 
-The API uses Firebase Authentication with custom middleware for role-based
-access control:
+All protected routes require a Firebase ID token in the Authorization header:
 
-- **verifyTokenID**: Validates Firebase ID tokens
-- **verifyAdmin**: Ensures user has admin privileges
-- **verifyLibrarian**: Ensures user has librarian privileges
-
-Include the Firebase ID token in the `Authorization` header:
-
-```
+```http
 Authorization: Bearer <firebase-id-token>
 ```
 
+### Endpoints
+
+#### Users
+
+| Method | Endpoint             | Auth | Role  | Description                            |
+| ------ | -------------------- | ---- | ----- | -------------------------------------- |
+| POST   | `/users`             | No   | -     | Register new user or update last login |
+| GET    | `/users`             | Yes  | Admin | Get all users                          |
+| GET    | `/users/:email/role` | Yes  | Any   | Get user role by email                 |
+| PUT    | `/users/:email/role` | Yes  | Admin | Update user role                       |
+
+#### Books
+
+| Method | Endpoint            | Auth | Role            | Description                                                      |
+| ------ | ------------------- | ---- | --------------- | ---------------------------------------------------------------- |
+| GET    | `/books`            | No   | -               | Get all published books (supports filtering, search, pagination) |
+| GET    | `/books/categories` | No   | -               | Get all book categories                                          |
+| GET    | `/books/:id`        | No   | -               | Get book details by ID                                           |
+| POST   | `/books`            | Yes  | Librarian       | Add new book                                                     |
+| PATCH  | `/books/:id`        | Yes  | Librarian/Admin | Update book details                                              |
+| DELETE | `/books/:id`        | Yes  | Admin           | Delete book                                                      |
+
+Query parameters for GET `/books`:
+
+- `search` - Search by book name, author, or category
+- `category` - Filter by category
+- `email` - Filter by librarian email
+- `role` - Show unpublished books for admin/librarian
+- `sortBy` - Sort field (e.g., price, createdAt)
+- `sortOrder` - asc or desc
+- `limit` - Number of results (default: 10)
+- `skip` - Pagination offset (default: 0)
+- `fields` - Comma-separated fields to include
+- `excludes` - Comma-separated fields to exclude
+
+#### Orders
+
+| Method | Endpoint                          | Auth | Role      | Description                      |
+| ------ | --------------------------------- | ---- | --------- | -------------------------------- |
+| POST   | `/orders`                         | Yes  | Any       | Create new order                 |
+| GET    | `/orders/customer/:email`         | Yes  | User      | Get customer orders              |
+| GET    | `/orders/librarian/:email`        | Yes  | Librarian | Get librarian's book orders      |
+| GET    | `/orders/:id/user/:customerEmail` | Yes  | Any       | Check if book is ordered by user |
+| PUT    | `/orders/:id`                     | Yes  | Any       | Update order status              |
+
+#### Checkout & Payments
+
+| Method | Endpoint                                 | Auth | Role | Description                                   |
+| ------ | ---------------------------------------- | ---- | ---- | --------------------------------------------- |
+| POST   | `/checkout-session/create`               | Yes  | Any  | Create Stripe checkout session                |
+| GET    | `/checkout-session/retrieve/:session_id` | Yes  | Any  | Retrieve checkout session and process payment |
+| GET    | `/payments/:email`                       | Yes  | Any  | Get payment invoices by email                 |
+
+#### Wishlist
+
+| Method | Endpoint                      | Auth | Role | Description                  |
+| ------ | ----------------------------- | ---- | ---- | ---------------------------- |
+| GET    | `/wishlist/:email/books`      | Yes  | Any  | Get user's wishlist books    |
+| GET    | `/wishlist/:email/check/:id`  | Yes  | Any  | Check if book is in wishlist |
+| POST   | `/wishlist/:email/add`        | Yes  | Any  | Add book to wishlist         |
+| DELETE | `/wishlist/:email/remove/:id` | Yes  | Any  | Remove book from wishlist    |
+
+#### Comments
+
+| Method | Endpoint        | Auth | Role | Description             |
+| ------ | --------------- | ---- | ---- | ----------------------- |
+| GET    | `/comments/:id` | No   | -    | Get comments for a book |
+| POST   | `/comments`     | Yes  | Any  | Add comment to a book   |
+
+#### Dashboard
+
+| Method | Endpoint                      | Auth | Role      | Description                       |
+| ------ | ----------------------------- | ---- | --------- | --------------------------------- |
+| GET    | `/dashboard/user/:email`      | Yes  | User      | Get user dashboard analytics      |
+| GET    | `/dashboard/librarian/:email` | Yes  | Librarian | Get librarian dashboard analytics |
+| GET    | `/dashboard/admin/:email`     | Yes  | Admin     | Get admin dashboard analytics     |
+
+## Data Models
+
+### User Schema
+
+```javascript
+{
+  name: String,           // 3-50 characters
+  email: String,          // Unique, validated
+  photoURL: String,       // Valid URL
+  role: String,           // 'admin', 'librarian', 'user'
+  lastLoggedIn: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Book Schema
+
+```javascript
+{
+  bookName: String,       // 3-200 characters
+  author: String,         // 5-100 characters
+  bookImage: String,      // Valid URL
+  category: String,       // Enum: Fiction, Non-Fiction, Science, etc.
+  subcategory: String,
+  publicationYear: Number,
+  pageCount: Number,
+  format: String,         // Hardcover, Paperback, eBook, Audiobook
+  quantity: Number,
+  price: Number,          // 0-999999.99
+  status: String,         // 'published', 'unpublished'
+  description: String,    // 10-5000 characters
+  librarianEmail: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Order Schema
+
+```javascript
+{
+  bookId: ObjectId,
+  librarianEmail: String,
+  customerName: String,
+  customerEmail: String,
+  phone: String,
+  address: String,
+  orderID: String,        // Auto-generated: BW-xxxxxxxxxxxx
+  status: String,         // pending, shipped, delivered, cancelled
+  paymentStatus: String,  // paid, unpaid, failed, refunded
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### Payment Schema
+
+```javascript
+{
+  orderID: String,
+  transactionId: String,
+  bookId: ObjectId,
+  customer_email: String,
+  paymentStatus: String,  // paid, unpaid, pending, failed, refunded
+  price: Number,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+## Project Structure
+
+```text
+book-wagon-server/
+├── src/
+│   ├── config/
+│   │   ├── db.js                    # MongoDB connection
+│   │   └── stripe.js                # Stripe configuration
+│   ├── controllers/
+│   │   ├── booksController.js       # Book CRUD operations
+│   │   ├── checkoutController.js    # Stripe checkout logic
+│   │   ├── commentsController.js    # Comment management
+│   │   ├── dashboardController.js   # Analytics for all roles
+│   │   ├── favoritesController.js   # Wishlist operations
+│   │   ├── ordersController.js      # Order management
+│   │   ├── paymentsController.js    # Payment tracking
+│   │   └── usersController.js       # User management
+│   ├── middlewares/
+│   │   ├── validateId.js            # MongoDB ObjectId validation
+│   │   ├── verifyAdmin.js           # Admin role verification
+│   │   ├── verifyLibrarian.js       # Librarian role verification
+│   │   └── verifyTokenID.js         # Firebase token verification
+│   ├── models/
+│   │   ├── Book.js                  # Book schema & methods
+│   │   ├── Comment.js               # Comment schema & methods
+│   │   ├── Favorite.js              # Wishlist schema & methods
+│   │   ├── Order.js                 # Order schema & methods
+│   │   ├── Payment.js               # Payment schema & methods
+│   │   └── User.js                  # User schema & methods
+│   ├── routes/
+│   │   ├── booksRouter.js
+│   │   ├── checkoutRouter.js
+│   │   ├── commentsRouter.js
+│   │   ├── dashboardRoutes.js
+│   │   ├── favoritesRouter.js
+│   │   ├── ordersRouter.js
+│   │   ├── paymentsRouter.js
+│   │   └── usersRouter.js
+│   ├── utilities/
+│   │   └── generateOrderID.js       # Order ID generator
+│   └── index.js                     # Application entry point
+├── .env                             # Environment variables
+├── .gitignore
+├── package.json
+├── vercel.json                      # Vercel deployment config
+└── README.md
+```
+
+## Security Features
+
+- Firebase Admin SDK for secure authentication
+- Role-based access control middleware
+- MongoDB ObjectId validation
+- Input sanitization and validation
+- CORS configuration
+- Environment variable protection
+- Secure payment processing with Stripe
+
+## Error Handling
+
+The API returns consistent error responses:
+
+```json
+{
+  "success": false,
+  "message": "Error description"
+}
+```
+
+Common HTTP status codes:
+
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `500` - Internal Server Error
+
 ## Deployment
 
-The project is configured for deployment on Vercel (see `vercel.json`).
+This project is configured for Vercel deployment:
 
-To deploy:
+1. Install Vercel CLI
+
+```bash
+npm install -g vercel
+```
+
+2. Deploy to production
 
 ```bash
 vercel --prod
 ```
 
-Make sure to set all environment variables in your Vercel project settings.
+3. Configure environment variables in Vercel dashboard
+
+The `vercel.json` configuration handles serverless deployment automatically.
+
+## Development Guidelines
+
+- All routes use async/await for asynchronous operations
+- Mongoose schemas include comprehensive validation
+- Controllers handle errors with try-catch blocks
+- Middleware chain: authentication → authorization → validation → controller
+- Database queries use Mongoose methods and aggregation pipelines
+- Static methods on models for complex business logic
+
+## License
+
+This project is licensed under the ISC License.
 
 ## Author
 
-**Md. Rakibul Islam**
+Md. Rakibul Islam
 
 - GitHub: [@programmerrakibul](https://github.com/programmerrakibul)
-- Email: rakibul00206@gmail.com
+- Email: <rakibul00206@gmail.com>
+
+## Support
+
+For issues, questions, or contributions, please open an issue on the GitHub
+repository.
