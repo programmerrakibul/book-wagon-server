@@ -77,7 +77,6 @@ PORT=8000
 | `MONGODB_URI`                | MongoDB connection string with credentials   | Yes                |
 | `PAYMENT_GATEWAY_SECRET_KEY` | Stripe secret key for payment processing     | Yes                |
 | `SITE_DOMAIN`                | Frontend application URL for redirects       | Yes                |
-| `STRIPE_WEBHOOK_SECRET`      | Stripe webhook signing secret                | Yes                |
 | `FIREBASE_SERVICE_KEY`       | Base64-encoded Firebase service account JSON | Yes                |
 | `PORT`                       | Server port number                           | No (default: 8000) |
 
