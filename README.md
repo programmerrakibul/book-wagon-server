@@ -63,7 +63,7 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?appName=book-wagon
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/?appName=<appName>
 PAYMENT_GATEWAY_SECRET_KEY=sk_test_your_stripe_secret_key
 SITE_DOMAIN=http://localhost:5173
 FIREBASE_SERVICE_KEY=base64_encoded_firebase_service_account_json
