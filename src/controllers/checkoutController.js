@@ -1,12 +1,9 @@
+const { envConfig } = require("../config/env.js");
 const { stripe } = require("../config/stripe.js");
 const { Order } = require("../models/Order.js");
 const { Payment } = require("../models/Payment.js");
 
-const clientUrl = process.env.SITE_DOMAIN;
-
-if (!clientUrl?.trim()) {
-  throw new Error("SITE_DOMAIN is not defined in the environment variables");
-}
+const clientUrl = envConfig.CLIENT_URL;
 
 const createCheckout = async (req, res) => {
   const paymentInfo = req.body;

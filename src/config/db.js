@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+const { envConfig } = require("./env");
 
-const uri = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME || "book_wagon";
+const uri = envConfig.MONGODB_URI;
+const DB_NAME = envConfig.DB_NAME;
 
 const clientOptions = {
   dbName: DB_NAME,
@@ -12,7 +13,7 @@ const clientOptions = {
   },
 };
 
-if (!uri?.trim()) {
+if (!uri) {
   throw new Error("MONGODB_URI is not defined in environment variables");
 }
 

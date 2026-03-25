@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express");
 const cors = require("cors");
 
@@ -12,9 +10,10 @@ const { paymentsRouter } = require("./routes/paymentsRouter.js");
 const { favoritesRouter } = require("./routes/favoritesRouter.js");
 const { commentsRouter } = require("./routes/commentsRouter.js");
 const { dashboardRouter } = require("./routes/dashboardRoutes.js");
+const { envConfig } = require("./config/env.js");
 
 const app = express();
-const port = process.env.PORT || 8000;
+const port = envConfig.PORT;
 
 // Middlewares
 app.use(cors());

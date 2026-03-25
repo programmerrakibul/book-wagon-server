@@ -1,8 +1,9 @@
 const Stripe = require("stripe");
+const { envConfig } = require("./env");
 
-const stripeSecretKey = process.env.PAYMENT_GATEWAY_SECRET_KEY;
+const stripeSecretKey = envConfig.PAYMENT_GATEWAY_SECRET_KEY;
 
-if (!stripeSecretKey?.trim()) {
+if (!stripeSecretKey) {
   throw new Error(
     "PAYMENT_GATEWAY_SECRET_KEY is not defined in environment variables",
   );

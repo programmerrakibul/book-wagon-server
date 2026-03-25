@@ -1,9 +1,15 @@
 const admin = require("firebase-admin");
+const { envConfig } = require("../config/env");
 
-const decoded = Buffer.from(
-  process.env.FIREBASE_SERVICE_KEY,
-  "base64",
-).toString("utf8");
+const serviceKey = envConfig.FIREBASE_SERVICE_KEY;
+
+if (!serviceKey) {
+  throw new Error(
+    "FIREBASE_SERVICE_KEY is not defined in environment variables",
+  );
+}
+
+const decoded = Buffer.from(serviceKey, "base64").toString("utf8");
 
 const serviceAccount = JSON.parse(decoded);
 
