@@ -10,7 +10,6 @@ if (!serviceKey) {
 }
 
 const decoded = Buffer.from(serviceKey, "base64").toString("utf8");
-
 const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
@@ -18,31 +17,19 @@ admin.initializeApp({
 });
 
 const verifyTokenID = async (req, res, next) => {
-  const { authorization } = req.headers;
-
-  const token = authorization?.split(" ")[1];
-
-  if (!token) {
-    return res
-      .status(401)
-      .send({ success: false, message: "Unauthorized access" });
-  }
-
   try {
+    const token = req.headers["authorization"]?.substring(7);
+
+    if (!token) throw new Error("Unauthorized access");
+
     const decoded = await admin.auth().verifyIdToken(token);
 
-    if (!decoded) {
-      return res
-        .status(401)
-        .send({ success: false, message: "Unauthorized access" });
-    }
+    if (!decoded) throw new Error("Unauthorized access");
 
     req.decoded_email = decoded.email;
     next();
   } catch {
-    return res
-      .status(401)
-      .send({ success: false, message: "Unauthorized access" });
+    res.status(401).send({ success: false, message: "Unauthorized access" });
   }
 };
 

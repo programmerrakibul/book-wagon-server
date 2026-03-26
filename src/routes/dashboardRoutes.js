@@ -5,8 +5,7 @@ const {
   getAdminDashboardData,
 } = require("../controllers/dashboardController.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
-const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
-const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
+const { authorize } = require("../middlewares/authorize.js");
 
 const dashboardRouter = express.Router();
 
@@ -16,10 +15,10 @@ dashboardRouter.get("/user/:email", getUserDashboardData);
 
 dashboardRouter.get(
   "/librarian/:email",
-  verifyLibrarian,
+  authorize("librarian"),
   getLibrarianDashboardData,
 );
 
-dashboardRouter.get("/admin/:email", verifyAdmin, getAdminDashboardData);
+dashboardRouter.get("/admin/:email", authorize("admin"), getAdminDashboardData);
 
 module.exports = { dashboardRouter };

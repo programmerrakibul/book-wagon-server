@@ -1,5 +1,4 @@
 const express = require("express");
-const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const {
   postUser,
@@ -7,15 +6,21 @@ const {
   updateUserRole,
   getUserRole,
 } = require("../controllers/usersController.js");
+const { authorize } = require("../middlewares/authorize.js");
 
 const usersRouter = express.Router();
 
-usersRouter.get("/", verifyTokenID, verifyAdmin, getUsers);
+usersRouter.get("/", verifyTokenID, authorize("admin"), getUsers);
 
 usersRouter.get("/:email/role", verifyTokenID, getUserRole);
 
 usersRouter.post("/", postUser);
 
-usersRouter.put("/:email/role", verifyTokenID, verifyAdmin, updateUserRole);
+usersRouter.put(
+  "/:email/role",
+  verifyTokenID,
+  authorize("admin"),
+  updateUserRole,
+);
 
 module.exports = { usersRouter };

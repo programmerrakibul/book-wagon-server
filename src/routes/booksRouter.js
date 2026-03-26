@@ -1,6 +1,4 @@
 const express = require("express");
-const { verifyAdmin } = require("../middlewares/verifyAdmin.js");
-const { verifyLibrarian } = require("../middlewares/verifyLibrarian.js");
 const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
 const { validateId } = require("../middlewares/validateId.js");
 const {
@@ -11,6 +9,7 @@ const {
   deleteBookById,
   getCategories,
 } = require("../controllers/booksController.js");
+const { authorize } = require("../middlewares/authorize.js");
 
 const booksRouter = express.Router();
 
@@ -20,7 +19,7 @@ booksRouter.get("/categories", getCategories);
 
 booksRouter.get("/:id", validateId, getBookById);
 
-booksRouter.post("/", verifyTokenID, verifyLibrarian, postBook);
+booksRouter.post("/", verifyTokenID, authorize("librarian"), postBook);
 
 booksRouter.patch("/:id", validateId, verifyTokenID, updateBookById);
 
@@ -28,7 +27,7 @@ booksRouter.delete(
   "/:id",
   validateId,
   verifyTokenID,
-  verifyAdmin,
+  authorize("admin"),
   deleteBookById,
 );
 
