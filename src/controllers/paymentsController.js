@@ -1,6 +1,6 @@
 const { Payment } = require("../models/Payment.js");
 
-const getInvoices = async (req, res) => {
+const getInvoices = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -52,12 +52,7 @@ const getInvoices = async (req, res) => {
 
     res.send(result);
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 

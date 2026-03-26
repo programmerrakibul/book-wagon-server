@@ -1,6 +1,6 @@
 const { Order } = require("../models/Order.js");
 
-const getCustomerOrders = async (req, res) => {
+const getCustomerOrders = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
 
@@ -19,16 +19,11 @@ const getCustomerOrders = async (req, res) => {
       orders: result,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const getLibrarianOrders = async (req, res) => {
+const getLibrarianOrders = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -47,16 +42,11 @@ const getLibrarianOrders = async (req, res) => {
       orders: result,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const isOrdered = async (req, res) => {
+const isOrdered = async (req, res, next) => {
   const { id, customerEmail } = req.params;
 
   try {
@@ -64,16 +54,11 @@ const isOrdered = async (req, res) => {
 
     res.send(result);
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const postOrder = async (req, res) => {
+const postOrder = async (req, res, next) => {
   try {
     const orderData = req.body;
 
@@ -90,16 +75,11 @@ const postOrder = async (req, res) => {
       message: "Order data posted successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const updateOrder = async (req, res) => {
+const updateOrder = async (req, res, next) => {
   const updatedData = req.body;
   const { id } = req.params;
 
@@ -128,12 +108,7 @@ const updateOrder = async (req, res) => {
       message: "Order data updated successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 

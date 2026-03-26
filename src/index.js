@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const { connectDB } = require("./config/db.js");
+const { envConfig } = require("./config/env.js");
 const { usersRouter } = require("./routes/usersRouter.js");
 const { booksRouter } = require("./routes/booksRouter.js");
 const { ordersRouter } = require("./routes/ordersRouter.js");
@@ -10,7 +11,7 @@ const { paymentsRouter } = require("./routes/paymentsRouter.js");
 const { favoritesRouter } = require("./routes/favoritesRouter.js");
 const { commentsRouter } = require("./routes/commentsRouter.js");
 const { dashboardRouter } = require("./routes/dashboardRoutes.js");
-const { envConfig } = require("./config/env.js");
+const { globalErrorHandler } = require("./middlewares/globalErrorHandler.js");
 
 const app = express();
 const port = envConfig.PORT;
@@ -42,6 +43,8 @@ const run = async () => {
         message: "Endpoint Not Found",
       });
     });
+
+    app.use(globalErrorHandler);
 
     // Start the server
     app.listen(port, () => console.log("Server is running on port " + port));

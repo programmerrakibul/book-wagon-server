@@ -5,7 +5,7 @@ const { Payment } = require("../models/Payment.js");
 
 const clientUrl = envConfig.CLIENT_URL;
 
-const createCheckout = async (req, res) => {
+const createCheckout = async (req, res, next) => {
   const paymentInfo = req.body;
 
   if (Object.keys(paymentInfo || {}).length === 0) {
@@ -45,16 +45,11 @@ const createCheckout = async (req, res) => {
 
     res.send({ success: true, url: session.url });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const retrieveCheckout = async (req, res) => {
+const retrieveCheckout = async (req, res, next) => {
   const session_id = req.params.session_id?.trim();
 
   if (!session_id) {
@@ -105,12 +100,7 @@ const retrieveCheckout = async (req, res) => {
 
     res.status(400).send({ success: false, message: "Payment failed" });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 

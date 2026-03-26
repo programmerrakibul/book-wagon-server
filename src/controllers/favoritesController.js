@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Favorite } = require("../models/Favorite.js");
 
-const getFavoriteBooks = async (req, res) => {
+const getFavoriteBooks = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
 
@@ -21,16 +21,11 @@ const getFavoriteBooks = async (req, res) => {
       books,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const addToFavorite = async (req, res) => {
+const addToFavorite = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
     const bookId = req.body?.bookId?.trim();
@@ -49,16 +44,11 @@ const addToFavorite = async (req, res) => {
       message: "Book id added to favorites successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const checkInFavorites = async (req, res) => {
+const checkInFavorites = async (req, res, next) => {
   try {
     const { email, id } = req.params;
 
@@ -80,16 +70,11 @@ const checkInFavorites = async (req, res) => {
       inWishlist: Boolean(user),
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const removeFromFavorites = async (req, res) => {
+const removeFromFavorites = async (req, res, next) => {
   try {
     const { email, id } = req.params;
 
@@ -106,12 +91,7 @@ const removeFromFavorites = async (req, res) => {
       message: "Book removed from favorites successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 

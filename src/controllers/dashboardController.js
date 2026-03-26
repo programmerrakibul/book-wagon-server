@@ -4,7 +4,7 @@ const { User } = require("../models/User.js");
 const { Order } = require("../models/Order.js");
 const { Favorite } = require("../models/Favorite.js");
 
-const getUserDashboardData = async (req, res) => {
+const getUserDashboardData = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -143,12 +143,12 @@ const getUserDashboardData = async (req, res) => {
         statusDistribution,
       },
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    next(err);
   }
 };
 
-const getLibrarianDashboardData = async (req, res) => {
+const getLibrarianDashboardData = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -338,12 +338,12 @@ const getLibrarianDashboardData = async (req, res) => {
         paymentDistribution,
       },
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    next(err);
   }
 };
 
-const getAdminDashboardData = async (req, res) => {
+const getAdminDashboardData = async (req, res, next) => {
   try {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
       Book.find({}),
@@ -531,8 +531,8 @@ const getAdminDashboardData = async (req, res) => {
         bookStatusDistribution,
       },
     });
-  } catch {
-    res.status(500).send({ message: "Internal Server Error" });
+  } catch (err) {
+    next(err);
   }
 };
 

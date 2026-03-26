@@ -1,7 +1,7 @@
 const { Book } = require("../models/Book.js");
 const { User } = require("../models/User.js");
 
-const getBooks = async (req, res) => {
+const getBooks = async (req, res, next) => {
   const query = { status: "published" };
   let sortQuery = { createdAt: -1 };
   let projectionField = {};
@@ -75,16 +75,11 @@ const getBooks = async (req, res) => {
       books,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const getBookById = async (req, res) => {
+const getBookById = async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.id);
 
@@ -100,16 +95,11 @@ const getBookById = async (req, res) => {
       book,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const postBook = async (req, res) => {
+const postBook = async (req, res, next) => {
   try {
     const bookData = req.body;
 
@@ -127,16 +117,11 @@ const postBook = async (req, res) => {
       message: "Book data posted successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const updateBookById = async (req, res) => {
+const updateBookById = async (req, res, next) => {
   const { id } = req.params;
   const updatedData = req.body;
 
@@ -164,16 +149,11 @@ const updateBookById = async (req, res) => {
       message: "Book data updated successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const deleteBookById = async (req, res) => {
+const deleteBookById = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -193,16 +173,11 @@ const deleteBookById = async (req, res) => {
       message: "Book data deleted successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const getCategories = async (req, res) => {
+const getCategories = async (req, res, next) => {
   try {
     const result = await Book.find({}).select("category -_id");
 
@@ -216,9 +191,7 @@ const getCategories = async (req, res) => {
       categories,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({ message: err.message || "Internal Server Error" });
+    next(err);
   }
 };
 

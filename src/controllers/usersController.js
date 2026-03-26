@@ -1,6 +1,6 @@
 const { User } = require("../models/User.js");
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
 
@@ -11,16 +11,11 @@ const getUsers = async (req, res) => {
       users,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const getUserRole = async (req, res) => {
+const getUserRole = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
 
@@ -38,16 +33,11 @@ const getUserRole = async (req, res) => {
       role,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(err.statusCode || 500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const postUser = async (req, res) => {
+const postUser = async (req, res, next) => {
   const userData = req.body;
 
   try {
@@ -80,16 +70,11 @@ const postUser = async (req, res) => {
       message: "User data posted successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 
-const updateUserRole = async (req, res) => {
+const updateUserRole = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
   const role = req.body?.role?.trim()?.toLowerCase();
 
@@ -114,12 +99,7 @@ const updateUserRole = async (req, res) => {
       result,
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal Server Error",
-    });
+    next(err);
   }
 };
 

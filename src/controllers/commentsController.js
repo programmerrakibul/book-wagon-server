@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Comment } = require("../models/Comment.js");
 
-const postComment = async (req, res) => {
+const postComment = async (req, res, next) => {
   try {
     const { bookId, ...commentData } = req.body || {};
 
@@ -19,16 +19,11 @@ const postComment = async (req, res) => {
       message: "Comment posted successfully",
     });
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
-const getComments = async (req, res) => {
+const getComments = async (req, res, next) => {
   const { id } = req.params;
 
   const query = { bookId: id };
@@ -38,12 +33,7 @@ const getComments = async (req, res) => {
 
     res.send(comments);
   } catch (err) {
-    console.log(err);
-
-    res.status(500).send({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    next(err);
   }
 };
 
