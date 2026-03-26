@@ -1,16 +1,8 @@
-import mongoose from "mongoose";
 import { Comment } from "../models/Comment.js";
 
 export const postComment = async (req, res, next) => {
   try {
-    const { bookId, ...commentData } = req.body || {};
-
-    if (!bookId?.trim() || !mongoose.Types.ObjectId.isValid(bookId)) {
-      return res.status(400).send({
-        success: false,
-        message: "Valid book id is required",
-      });
-    }
+    const { bookId, ...commentData } = req.body;
 
     await Comment.addByBookId(bookId, commentData);
 
