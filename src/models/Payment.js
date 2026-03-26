@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -62,10 +62,4 @@ const paymentSchema = new mongoose.Schema(
   },
 );
 
-paymentSchema.pre("save", async function () {
-  this.updatedAt = Date.now;
-});
-
-const Payment = mongoose.model("Payment", paymentSchema);
-
-module.exports = { Payment };
+export const Payment = mongoose.model("Payment", paymentSchema);

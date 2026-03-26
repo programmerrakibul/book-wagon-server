@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const validateId = (req, res, next) => {
+export const validateId = (req, res, next) => {
   const id = req.params.id?.trim();
 
   if (!id) {
@@ -14,5 +14,3 @@ const validateId = (req, res, next) => {
   req.params.id = id;
   next();
 };
-
-module.exports = { validateId };

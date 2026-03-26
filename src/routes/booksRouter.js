@@ -1,17 +1,17 @@
-const express = require("express");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
-const { validateId } = require("../middlewares/validateId.js");
-const {
+import express from "express";
+import { verifyTokenID } from "../middlewares/verifyTokenID.js";
+import { validateId } from "../middlewares/validateId.js";
+import {
   postBook,
   getBooks,
   getBookById,
   updateBookById,
   deleteBookById,
   getCategories,
-} = require("../controllers/booksController.js");
-const { authorize } = require("../middlewares/authorize.js");
+} from "../controllers/booksController.js";
+import { authorize } from "../middlewares/authorize.js";
 
-const booksRouter = express.Router();
+export const booksRouter = express.Router();
 
 booksRouter.get("/", getBooks);
 
@@ -30,5 +30,3 @@ booksRouter.delete(
   authorize("admin"),
   deleteBookById,
 );
-
-module.exports = { booksRouter };

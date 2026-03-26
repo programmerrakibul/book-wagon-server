@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { randomUUID } = require("crypto");
+import mongoose from "mongoose";
+import { nanoid } from "nanoid";
 
 const orderSchema = new mongoose.Schema(
   {
@@ -60,7 +60,7 @@ const orderSchema = new mongoose.Schema(
     orderID: {
       type: String,
       unique: true,
-      default: `BW-${randomUUID().replace(/-/g, "").slice(0, 12)}`,
+      default: `BW-${nanoid().replace(/[-_]/g, "")}`,
     },
     status: {
       type: String,
@@ -150,10 +150,4 @@ orderSchema.statics.isOrdered = async function (bookId, customerEmail) {
   }
 };
 
-orderSchema.pre("save", function () {
-  this.updatedAt = Date.now;
-});
-
-const Order = mongoose.model("Order", orderSchema);
-
-module.exports = { Order };
+export const Order = mongoose.model("Order", orderSchema);

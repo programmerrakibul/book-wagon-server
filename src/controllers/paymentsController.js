@@ -1,6 +1,6 @@
-const { Payment } = require("../models/Payment.js");
+import { Payment } from "../models/Payment.js";
 
-const getInvoices = async (req, res, next) => {
+export const getInvoices = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -55,5 +55,3 @@ const getInvoices = async (req, res, next) => {
     next(err);
   }
 };
-
-module.exports = { getInvoices };

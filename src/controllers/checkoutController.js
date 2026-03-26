@@ -1,11 +1,11 @@
-const { envConfig } = require("../config/env.js");
-const { stripe } = require("../config/stripe.js");
-const { Order } = require("../models/Order.js");
-const { Payment } = require("../models/Payment.js");
+import { envConfig } from "../config/envConfig.js";
+import { stripe } from "../config/stripe.js";
+import { Order } from "../models/Order.js";
+import { Payment } from "../models/Payment.js";
 
 const clientUrl = envConfig.CLIENT_URL;
 
-const createCheckout = async (req, res, next) => {
+export const createCheckout = async (req, res, next) => {
   const paymentInfo = req.body;
 
   if (Object.keys(paymentInfo || {}).length === 0) {
@@ -49,7 +49,7 @@ const createCheckout = async (req, res, next) => {
   }
 };
 
-const retrieveCheckout = async (req, res, next) => {
+export const retrieveCheckout = async (req, res, next) => {
   const session_id = req.params.session_id?.trim();
 
   if (!session_id) {
@@ -103,5 +103,3 @@ const retrieveCheckout = async (req, res, next) => {
     next(err);
   }
 };
-
-module.exports = { createCheckout, retrieveCheckout };

@@ -1,10 +1,10 @@
-const { ObjectId } = require("mongodb");
-const { Book } = require("../models/Book.js");
-const { User } = require("../models/User.js");
-const { Order } = require("../models/Order.js");
-const { Favorite } = require("../models/Favorite.js");
+import { ObjectId } from "mongodb";
+import { Book } from "../models/Book.js";
+import { User } from "../models/User.js";
+import { Order } from "../models/Order.js";
+import { Favorite } from "../models/Favorite.js";
 
-const getUserDashboardData = async (req, res, next) => {
+export const getUserDashboardData = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -148,7 +148,7 @@ const getUserDashboardData = async (req, res, next) => {
   }
 };
 
-const getLibrarianDashboardData = async (req, res, next) => {
+export const getLibrarianDashboardData = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -343,7 +343,7 @@ const getLibrarianDashboardData = async (req, res, next) => {
   }
 };
 
-const getAdminDashboardData = async (req, res, next) => {
+export const getAdminDashboardData = async (req, res, next) => {
   try {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
       Book.find({}),
@@ -534,10 +534,4 @@ const getAdminDashboardData = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-module.exports = {
-  getUserDashboardData,
-  getLibrarianDashboardData,
-  getAdminDashboardData,
 };

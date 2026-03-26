@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { Book } = require("./Book");
+import mongoose from "mongoose";
+import { Book } from "./Book.js";
 
 const favoriteSchema = new mongoose.Schema(
   {
@@ -84,10 +84,4 @@ favoriteSchema.statics.removeFromFavorite = async function (
   }
 };
 
-favoriteSchema.pre("save", async function () {
-  this.updatedAt = Date.now;
-});
-
-const Favorite = mongoose.model("Favorite", favoriteSchema);
-
-module.exports = { Favorite };
+export const Favorite = mongoose.model("Favorite", favoriteSchema);

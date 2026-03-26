@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -96,12 +96,4 @@ userSchema.statics.toggleRole = async function (email, newRole) {
   }
 };
 
-userSchema.pre("save", function () {
-  if (this.isNew) {
-    this.updatedAt = Date.now;
-  }
-});
-
-const User = mongoose.model("User", userSchema);
-
-module.exports = { User };
+export const User = mongoose.model("User", userSchema);

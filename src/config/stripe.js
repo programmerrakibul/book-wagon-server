@@ -1,5 +1,5 @@
-const Stripe = require("stripe");
-const { envConfig } = require("./env");
+import Stripe from "stripe";
+import { envConfig } from "./envConfig.js";
 
 const stripeSecretKey = envConfig.PAYMENT_GATEWAY_SECRET_KEY;
 
@@ -9,6 +9,4 @@ if (!stripeSecretKey) {
   );
 }
 
-const stripe = new Stripe(stripeSecretKey);
-
-module.exports = { stripe };
+export const stripe = new Stripe(stripeSecretKey);

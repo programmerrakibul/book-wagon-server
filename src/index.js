@@ -1,28 +1,27 @@
-const express = require("express");
-const cors = require("cors");
-
-const { connectDB } = require("./config/db.js");
-const { envConfig } = require("./config/env.js");
-const { usersRouter } = require("./routes/usersRouter.js");
-const { booksRouter } = require("./routes/booksRouter.js");
-const { ordersRouter } = require("./routes/ordersRouter.js");
-const { checkoutRouter } = require("./routes/checkoutRouter.js");
-const { paymentsRouter } = require("./routes/paymentsRouter.js");
-const { favoritesRouter } = require("./routes/favoritesRouter.js");
-const { commentsRouter } = require("./routes/commentsRouter.js");
-const { dashboardRouter } = require("./routes/dashboardRoutes.js");
-const { globalErrorHandler } = require("./middlewares/globalErrorHandler.js");
+import cors from "cors";
+import express, { json } from "express";
+import { dbConnect } from "./config/dbConnect.js";
+import { envConfig } from "./config/envConfig.js";
+import { booksRouter } from "./routes/booksRouter.js";
+import { usersRouter } from "./routes/usersRouter.js";
+import { ordersRouter } from "./routes/ordersRouter.js";
+import { commentsRouter } from "./routes/commentsRouter.js";
+import { paymentsRouter } from "./routes/paymentsRouter.js";
+import { checkoutRouter } from "./routes/checkoutRouter.js";
+import { dashboardRouter } from "./routes/dashboardRoutes.js";
+import { favoritesRouter } from "./routes/favoritesRouter.js";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 
 const app = express();
 const port = envConfig.PORT;
 
 // Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(json());
 
 const run = async () => {
   try {
-    await connectDB();
+    await dbConnect();
 
     app.get("/", (req, res) => {
       res.send({ success: true, message: "Welcome to the Book Wagon Server!" });

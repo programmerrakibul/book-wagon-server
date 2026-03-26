@@ -1,16 +1,16 @@
-const express = require("express");
-const { validateId } = require("../middlewares/validateId.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
-const {
+import express from "express";
+import { validateId } from "../middlewares/validateId.js";
+import { verifyTokenID } from "../middlewares/verifyTokenID.js";
+import {
   postOrder,
   getCustomerOrders,
   updateOrder,
   getLibrarianOrders,
   isOrdered,
-} = require("../controllers/ordersController.js");
-const { authorize } = require("../middlewares/authorize.js");
+} from "../controllers/ordersController.js";
+import { authorize } from "../middlewares/authorize.js";
 
-const ordersRouter = express.Router();
+export const ordersRouter = express.Router();
 
 ordersRouter.use(verifyTokenID);
 
@@ -27,5 +27,3 @@ ordersRouter.get(
 ordersRouter.post("/", postOrder);
 
 ordersRouter.put("/:id", validateId, updateOrder);
-
-module.exports = { ordersRouter };

@@ -1,7 +1,7 @@
-const { Book } = require("../models/Book.js");
-const { User } = require("../models/User.js");
+import { Book } from "../models/Book.js";
+import { User } from "../models/User.js";
 
-const getBooks = async (req, res, next) => {
+export const getBooks = async (req, res, next) => {
   const query = { status: "published" };
   let sortQuery = { createdAt: -1 };
   let projectionField = {};
@@ -79,7 +79,7 @@ const getBooks = async (req, res, next) => {
   }
 };
 
-const getBookById = async (req, res, next) => {
+export const getBookById = async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.id);
 
@@ -99,7 +99,7 @@ const getBookById = async (req, res, next) => {
   }
 };
 
-const postBook = async (req, res, next) => {
+export const postBook = async (req, res, next) => {
   try {
     const bookData = req.body;
 
@@ -121,7 +121,7 @@ const postBook = async (req, res, next) => {
   }
 };
 
-const updateBookById = async (req, res, next) => {
+export const updateBookById = async (req, res, next) => {
   const { id } = req.params;
   const updatedData = req.body;
 
@@ -153,7 +153,7 @@ const updateBookById = async (req, res, next) => {
   }
 };
 
-const deleteBookById = async (req, res, next) => {
+export const deleteBookById = async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -177,7 +177,7 @@ const deleteBookById = async (req, res, next) => {
   }
 };
 
-const getCategories = async (req, res, next) => {
+export const getCategories = async (req, res, next) => {
   try {
     const result = await Book.find({}).select("category -_id");
 
@@ -193,13 +193,4 @@ const getCategories = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-module.exports = {
-  postBook,
-  getBooks,
-  getBookById,
-  updateBookById,
-  deleteBookById,
-  getCategories,
 };

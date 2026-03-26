@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema(
   {
@@ -158,10 +158,6 @@ bookSchema.pre("save", function () {
   if (this.publicationYear > currentYear) {
     throw new Error("Publication year cannot be in the future");
   }
-
-  this.updatedAt = Date.now;
 });
 
-const Book = mongoose.model("Book", bookSchema);
-
-module.exports = { Book };
+export const Book = mongoose.model("Book", bookSchema);

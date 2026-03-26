@@ -1,6 +1,6 @@
-const { User } = require("../models/User");
+import { User } from "../models/User.js";
 
-const authorize = (...roles) => {
+export const authorize = (...roles) => {
   return async (req, res, next) => {
     try {
       const email = req.decoded_email;
@@ -18,5 +18,3 @@ const authorize = (...roles) => {
     }
   };
 };
-
-module.exports = { authorize };

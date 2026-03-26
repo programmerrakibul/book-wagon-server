@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema(
   {
@@ -86,10 +86,4 @@ commentSchema.statics.addByBookId = async function (bookId, commentData) {
   }
 };
 
-commentSchema.pre("save", function () {
-  this.updatedAt = Date.now;
-});
-
-const Comment = mongoose.model("Comment", commentSchema);
-
-module.exports = { Comment };
+export const Comment = mongoose.model("Comment", commentSchema);

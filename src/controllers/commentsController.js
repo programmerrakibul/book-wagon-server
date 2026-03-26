@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-const { Comment } = require("../models/Comment.js");
+import mongoose from "mongoose";
+import { Comment } from "../models/Comment.js";
 
-const postComment = async (req, res, next) => {
+export const postComment = async (req, res, next) => {
   try {
     const { bookId, ...commentData } = req.body || {};
 
@@ -23,7 +23,7 @@ const postComment = async (req, res, next) => {
   }
 };
 
-const getComments = async (req, res, next) => {
+export const getComments = async (req, res, next) => {
   const { id } = req.params;
 
   const query = { bookId: id };
@@ -36,5 +36,3 @@ const getComments = async (req, res, next) => {
     next(err);
   }
 };
-
-module.exports = { postComment, getComments };

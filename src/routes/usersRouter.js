@@ -1,14 +1,14 @@
-const express = require("express");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
-const {
+import express from "express";
+import { verifyTokenID } from "../middlewares/verifyTokenID.js";
+import {
   postUser,
   getUsers,
   updateUserRole,
   getUserRole,
-} = require("../controllers/usersController.js");
-const { authorize } = require("../middlewares/authorize.js");
+} from "../controllers/usersController.js";
+import { authorize } from "../middlewares/authorize.js";
 
-const usersRouter = express.Router();
+export const usersRouter = express.Router();
 
 usersRouter.get("/", verifyTokenID, authorize("admin"), getUsers);
 
@@ -22,5 +22,3 @@ usersRouter.put(
   authorize("admin"),
   updateUserRole,
 );
-
-module.exports = { usersRouter };

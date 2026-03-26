@@ -1,6 +1,6 @@
-const { User } = require("../models/User.js");
+import { User } from "../models/User.js";
 
-const getUsers = async (req, res, next) => {
+export const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
 
@@ -15,7 +15,7 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-const getUserRole = async (req, res, next) => {
+export const getUserRole = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
 
@@ -37,7 +37,7 @@ const getUserRole = async (req, res, next) => {
   }
 };
 
-const postUser = async (req, res, next) => {
+export const postUser = async (req, res, next) => {
   const userData = req.body;
 
   try {
@@ -74,7 +74,7 @@ const postUser = async (req, res, next) => {
   }
 };
 
-const updateUserRole = async (req, res, next) => {
+export const updateUserRole = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
   const role = req.body?.role?.trim()?.toLowerCase();
 
@@ -102,5 +102,3 @@ const updateUserRole = async (req, res, next) => {
     next(err);
   }
 };
-
-module.exports = { postUser, getUsers, updateUserRole, getUserRole };

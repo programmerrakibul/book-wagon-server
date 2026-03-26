@@ -1,13 +1,13 @@
-const express = require("express");
-const {
+import express from "express";
+import {
   getUserDashboardData,
   getLibrarianDashboardData,
   getAdminDashboardData,
-} = require("../controllers/dashboardController.js");
-const { verifyTokenID } = require("../middlewares/verifyTokenID.js");
-const { authorize } = require("../middlewares/authorize.js");
+} from "../controllers/dashboardController.js";
+import { verifyTokenID } from "../middlewares/verifyTokenID.js";
+import { authorize } from "../middlewares/authorize.js";
 
-const dashboardRouter = express.Router();
+export const dashboardRouter = express.Router();
 
 dashboardRouter.use(verifyTokenID);
 
@@ -20,5 +20,3 @@ dashboardRouter.get(
 );
 
 dashboardRouter.get("/admin/:email", authorize("admin"), getAdminDashboardData);
-
-module.exports = { dashboardRouter };

@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
-const { Favorite } = require("../models/Favorite.js");
+import mongoose from "mongoose";
+import { Favorite } from "../models/Favorite.js";
 
-const getFavoriteBooks = async (req, res, next) => {
+export const getFavoriteBooks = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
 
@@ -25,7 +25,7 @@ const getFavoriteBooks = async (req, res, next) => {
   }
 };
 
-const addToFavorite = async (req, res, next) => {
+export const addToFavorite = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
     const bookId = req.body?.bookId?.trim();
@@ -48,7 +48,7 @@ const addToFavorite = async (req, res, next) => {
   }
 };
 
-const checkInFavorites = async (req, res, next) => {
+export const checkInFavorites = async (req, res, next) => {
   try {
     const { email, id } = req.params;
 
@@ -74,7 +74,7 @@ const checkInFavorites = async (req, res, next) => {
   }
 };
 
-const removeFromFavorites = async (req, res, next) => {
+export const removeFromFavorites = async (req, res, next) => {
   try {
     const { email, id } = req.params;
 
@@ -93,11 +93,4 @@ const removeFromFavorites = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-module.exports = {
-  getFavoriteBooks,
-  addToFavorite,
-  checkInFavorites,
-  removeFromFavorites,
 };

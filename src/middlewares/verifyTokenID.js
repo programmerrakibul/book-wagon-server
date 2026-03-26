@@ -1,5 +1,5 @@
-const admin = require("firebase-admin");
-const { envConfig } = require("../config/env");
+import admin from "firebase-admin";
+import { envConfig } from "../config/envConfig.js";
 
 const serviceKey = envConfig.FIREBASE_SERVICE_KEY;
 
@@ -16,7 +16,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const verifyTokenID = async (req, res, next) => {
+export const verifyTokenID = async (req, res, next) => {
   try {
     const token = req.headers["authorization"]?.substring(7);
 
@@ -32,5 +32,3 @@ const verifyTokenID = async (req, res, next) => {
     res.status(401).send({ success: false, message: "Unauthorized access" });
   }
 };
-
-module.exports = { verifyTokenID };

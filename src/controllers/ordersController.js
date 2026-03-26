@@ -1,6 +1,6 @@
-const { Order } = require("../models/Order.js");
+import { Order } from "../models/Order.js";
 
-const getCustomerOrders = async (req, res, next) => {
+export const getCustomerOrders = async (req, res, next) => {
   try {
     const email = req.params.email?.trim()?.toLowerCase();
 
@@ -23,7 +23,7 @@ const getCustomerOrders = async (req, res, next) => {
   }
 };
 
-const getLibrarianOrders = async (req, res, next) => {
+export const getLibrarianOrders = async (req, res, next) => {
   const email = req.params.email?.trim()?.toLowerCase();
 
   if (!email) {
@@ -46,7 +46,7 @@ const getLibrarianOrders = async (req, res, next) => {
   }
 };
 
-const isOrdered = async (req, res, next) => {
+export const isOrdered = async (req, res, next) => {
   const { id, customerEmail } = req.params;
 
   try {
@@ -58,7 +58,7 @@ const isOrdered = async (req, res, next) => {
   }
 };
 
-const postOrder = async (req, res, next) => {
+export const postOrder = async (req, res, next) => {
   try {
     const orderData = req.body;
 
@@ -79,7 +79,7 @@ const postOrder = async (req, res, next) => {
   }
 };
 
-const updateOrder = async (req, res, next) => {
+export const updateOrder = async (req, res, next) => {
   const updatedData = req.body;
   const { id } = req.params;
 
@@ -110,12 +110,4 @@ const updateOrder = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-};
-
-module.exports = {
-  postOrder,
-  getCustomerOrders,
-  updateOrder,
-  getLibrarianOrders,
-  isOrdered,
 };
