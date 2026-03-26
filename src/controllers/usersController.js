@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import { userSchema } from "../validators/userValidator.js";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -38,24 +39,13 @@ export const getUserRole = async (req, res, next) => {
 };
 
 export const postUser = async (req, res, next) => {
-  const userData = req.body;
-
   try {
-    if (Object.keys(userData || {}).length === 0) {
-      return res.status(400).send({
-        success: false,
-        message: "User data is required in request body",
-      });
-    }
+    const userData = userSchema.parse(req.body);
 
     const isExist = await User.findOne({ email: userData.email });
 
     if (!!isExist) {
-      await User.findByIdAndUpdate(
-        isExist._id,
-        { lastLoggedIn: Date.now() },
-        { new: false },
-      );
+      await User.findByIdAndUpdate(isExist._id, { lastLoggedIn: Date.now() });
 
       return res.send({
         success: true,

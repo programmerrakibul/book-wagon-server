@@ -1,49 +1,30 @@
-import mongoose from "mongoose";
+import { model, Schema } from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: true,
       trim: true,
-      minlength: [3, "Name must be at least 3 characters long"],
-      maxlength: [50, "Name cannot exceed 50 characters"],
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: true,
       unique: true,
       trim: true,
       lowercase: true,
-      validate: {
-        validator: function (v) {
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-        },
-        message: "Please provide a valid email address",
-      },
     },
     photoURL: {
       type: String,
       trim: true,
-      required: [true, "Photo URL is required"],
-      validate: {
-        validator: function (v) {
-          return /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(
-            v,
-          );
-        },
-        message: "Please provide a valid photo URL",
-      },
+      required: true,
     },
     role: {
       type: String,
-      required: [true, "Role is required"],
+      required: true,
       trim: true,
       lowercase: true,
-      enum: {
-        values: ["admin", "librarian", "user"],
-        message: "{VALUE} is not a valid role",
-      },
+      enum: ["admin", "librarian", "user"],
       default: "user",
     },
     lastLoggedIn: {
@@ -96,4 +77,4 @@ userSchema.statics.toggleRole = async function (email, newRole) {
   }
 };
 
-export const User = mongoose.model("User", userSchema);
+export const User = model("User", userSchema);
