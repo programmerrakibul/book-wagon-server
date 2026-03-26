@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import { verifyTokenID } from "../middlewares/verifyTokenID.js";
 import { validateId } from "../middlewares/validateId.js";
 import {
@@ -10,8 +10,10 @@ import {
   getCategories,
 } from "../controllers/booksController.js";
 import { authorize } from "../middlewares/authorize.js";
+import { validateData } from "../middlewares/validateData.js";
+import { bookSchema } from "../validators/bookValidator.js";
 
-export const booksRouter = express.Router();
+export const booksRouter = Router();
 
 booksRouter.get("/", getBooks);
 
@@ -19,7 +21,13 @@ booksRouter.get("/categories", getCategories);
 
 booksRouter.get("/:id", validateId, getBookById);
 
-booksRouter.post("/", verifyTokenID, authorize("librarian"), postBook);
+booksRouter.post(
+  "/",
+  verifyTokenID,
+  authorize("librarian"),
+  validateData(bookSchema),
+  postBook,
+);
 
 booksRouter.patch("/:id", validateId, verifyTokenID, updateBookById);
 

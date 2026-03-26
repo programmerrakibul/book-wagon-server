@@ -40,7 +40,7 @@ export const getUserRole = async (req, res, next) => {
 
 export const postUser = async (req, res, next) => {
   try {
-    const userData = userSchema.parse(req.body);
+    const userData = req.body;
 
     const isExist = await User.findOne({ email: userData.email });
 

@@ -101,16 +101,7 @@ export const getBookById = async (req, res, next) => {
 
 export const postBook = async (req, res, next) => {
   try {
-    const bookData = req.body;
-
-    if (Object.keys(bookData || {}).length === 0) {
-      return res.status(400).send({
-        success: false,
-        message: "Book data is required to post",
-      });
-    }
-
-    await Book.create(bookData);
+    await Book.create(req.body);
 
     res.status(201).send({
       success: true,
