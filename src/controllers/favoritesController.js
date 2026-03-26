@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { Favorite } from "../models/Favorite.js";
 
 export const getFavoriteBooks = async (req, res, next) => {
@@ -27,15 +26,8 @@ export const getFavoriteBooks = async (req, res, next) => {
 
 export const addToFavorite = async (req, res, next) => {
   try {
-    const email = req.params.email?.trim()?.toLowerCase();
-    const bookId = req.body?.bookId?.trim();
-
-    if (!mongoose.Types.ObjectId.isValid(bookId)) {
-      return res.status(400).send({
-        success: false,
-        message: "Invalid book id",
-      });
-    }
+    const email = req.decoded_email;
+    const { bookId } = req.body;
 
     await Favorite.addToFavorite(email, bookId);
 
