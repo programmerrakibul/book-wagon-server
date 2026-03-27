@@ -1,5 +1,15 @@
 import z from "zod";
 
+const roleSchema = z
+  .enum(["user", "librarian", "admin"], {
+    error: (iss) => {
+      return iss.input === undefined
+        ? "Role is required!"
+        : "Role must be either 'user', 'librarian', or 'admin'.";
+    },
+  })
+  .transform((role) => role.toLowerCase());
+
 export const userSchema = z.object(
   {
     name: z
@@ -30,16 +40,11 @@ export const userSchema = z.object(
         },
       })
       .transform((url) => url.toLowerCase()),
-    role: z
-      .enum(["user", "librarian", "admin"], {
-        error: (iss) => {
-          return iss.input === undefined
-            ? "Role is required!"
-            : "Role must be either 'user', 'librarian', or 'admin'.";
-        },
-      })
-      .transform((role) => role.toLowerCase())
-      .default("user"),
+    role: roleSchema.default("user"),
   },
   "User data is required in the request body!",
 );
+
+export const toggleRoleSchema = z.object({
+  role: roleSchema,
+});

@@ -8,7 +8,7 @@ import {
 } from "../controllers/usersController.js";
 import { authorize } from "../middlewares/authorize.js";
 import { validateData } from "../middlewares/validateData.js";
-import { userSchema } from "../validators/userValidator.js";
+import { userSchema, toggleRoleSchema } from "../validators/userValidator.js";
 
 export const usersRouter = express.Router();
 
@@ -22,5 +22,6 @@ usersRouter.put(
   "/:email/role",
   verifyTokenID,
   authorize("admin"),
+  validateData(toggleRoleSchema),
   updateUserRole,
 );

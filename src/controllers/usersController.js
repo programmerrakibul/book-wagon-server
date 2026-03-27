@@ -1,5 +1,4 @@
 import { User } from "../models/User.js";
-import { userSchema } from "../validators/userValidator.js";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -65,27 +64,15 @@ export const postUser = async (req, res, next) => {
 };
 
 export const updateUserRole = async (req, res, next) => {
-  const email = req.params.email?.trim()?.toLowerCase();
-  const role = req.body?.role?.trim()?.toLowerCase();
-
-  if (!email) {
-    return res
-      .status(400)
-      .send({ success: false, message: "Email is required" });
-  }
-
-  if (!role) {
-    return res
-      .status(400)
-      .send({ success: false, message: "Role is required" });
-  }
-
   try {
+    const email = req.decoded_email;
+    const { role } = req.body;
+
     const result = await User.toggleRole(email, role);
 
     res.send({
       success: true,
-      message: "User role updated successfully",
+      message: "User role updated successfully!",
       result,
     });
   } catch (err) {
