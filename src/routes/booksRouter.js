@@ -11,7 +11,10 @@ import {
 } from "../controllers/booksController.js";
 import { authorize } from "../middlewares/authorize.js";
 import { validateData } from "../middlewares/validateData.js";
-import { bookSchema } from "../validators/bookValidator.js";
+import {
+  createBookSchema,
+  updateBookSchema,
+} from "../validators/bookValidator.js";
 
 export const booksRouter = Router();
 
@@ -25,11 +28,18 @@ booksRouter.post(
   "/",
   verifyTokenID,
   authorize("librarian"),
-  validateData(bookSchema),
+  validateData(createBookSchema),
   postBook,
 );
 
-booksRouter.patch("/:id", validateId, verifyTokenID, updateBookById);
+booksRouter.patch(
+  "/:id",
+  validateId,
+  verifyTokenID,
+  authorize("admin", "librarian"),
+  validateData(updateBookSchema),
+  updateBookById,
+);
 
 booksRouter.delete(
   "/:id",

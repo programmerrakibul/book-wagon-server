@@ -101,7 +101,9 @@ export const getBookById = async (req, res, next) => {
 
 export const postBook = async (req, res, next) => {
   try {
-    await Book.create(req.body);
+    console.log(req.body);
+
+    // await Book.create(req.body);
 
     res.status(201).send({
       success: true,
@@ -113,22 +115,14 @@ export const postBook = async (req, res, next) => {
 };
 
 export const updateBookById = async (req, res, next) => {
-  const { id } = req.params;
-  const updatedData = req.body;
-
-  if (Object.keys(updatedData || {}).length === 0) {
-    return res
-      .status(400)
-      .send({ success: false, message: "No data provided for update" });
-  }
-
   try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
     const isExist = await Book.findById(id);
 
     if (!isExist) {
-      return res
-        .status(404)
-        .send({ success: false, message: "Book not found" });
+      throw new Error("Book not found!");
     }
 
     await Book.findByIdAndUpdate(id, updatedData, {

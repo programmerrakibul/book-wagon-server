@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const bookSchema = z.object(
+const baseBookSchema = z.object(
   {
     bookName: z
       .string({
@@ -56,12 +56,11 @@ export const bookSchema = z.object(
     subcategory: z
       .string("Please provide a valid subcategory!")
       .min(3, "Subcategory must be at least 3 characters long")
-      .max(100, "Subcategory cannot exceed 100 characters")
-      .default("General"),
+      .max(100, "Subcategory cannot exceed 100 characters"),
     publicationYear: z.coerce
       .number({
         error: (iss) => {
-          return iss.input === undefined
+          return iss.input === undefined || iss.received === "NaN"
             ? "Publication year is required!"
             : "Please provide a valid publication year!";
         },
@@ -74,7 +73,7 @@ export const bookSchema = z.object(
     pageCount: z.coerce
       .number({
         error: (iss) => {
-          return iss.input === undefined
+          return iss.input === undefined || iss.received === "NaN"
             ? "Page count is required!"
             : "Please provide a valid page count!";
         },
@@ -91,34 +90,31 @@ export const bookSchema = z.object(
     quantity: z.coerce
       .number({
         error: (iss) => {
-          return iss.input === undefined
+          return iss.input === undefined || iss.received === "NaN"
             ? "Quantity is required!"
             : "Please provide a valid quantity!";
         },
       })
       .min(1, "Quantity must be at least 1")
-      .max(9999, "Quantity cannot exceed 9999")
-      .default(1),
+      .max(9999, "Quantity cannot exceed 9999"),
     price: z.coerce
       .number({
         error: (iss) => {
-          return iss.input === undefined
+          return iss.input === undefined || iss.received === "NaN"
             ? "Price is required!"
             : "Please provide a valid price!";
         },
       })
-      .min(0, "Price cannot be negative")
-      .max(999999.99, "Price is too high")
+      .min(1, "Price must be positive!")
+      .max(999999.99, "Price is too high!")
       .transform((price) => parseFloat(price).toFixed(2)),
-    status: z
-      .enum(["published", "unpublished"], {
-        error: (iss) => {
-          return iss.input === undefined
-            ? "Status is required!"
-            : `${iss.input} is not a valid status. Please provide a valid status!`;
-        },
-      })
-      .default("unpublished"),
+    status: z.enum(["published", "unpublished"], {
+      error: (iss) => {
+        return iss.input === undefined
+          ? "Status is required!"
+          : `${iss.input} is not a valid status. Please provide a valid status!`;
+      },
+    }),
     description: z
       .string({
         error: (iss) => {
@@ -139,3 +135,11 @@ export const bookSchema = z.object(
   },
   "Book data is required in the request body!",
 );
+
+export const createBookSchema = baseBookSchema.extend({
+  subcategory: baseBookSchema.shape.subcategory.default("General"),
+  quantity: baseBookSchema.shape.quantity.default(1),
+  status: baseBookSchema.shape.status.default("unpublished"),
+});
+
+export const updateBookSchema = baseBookSchema.partial();

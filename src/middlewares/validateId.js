@@ -1,12 +1,10 @@
-import mongoose from "mongoose";
+import { objectIdSchema } from "../validators/objectIdValidator.js";
 
 export const validateId = (req, res, next) => {
-  const id = req.params.id?.trim();
+  const { success, data, error } = objectIdSchema.safeParse(req.params.id);
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).send({ success: false, message: "Invalid ID" });
-  }
+  if (!success) throw error;
 
-  req.params.id = id;
+  req.params.id = data;
   next();
 };

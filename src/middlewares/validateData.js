@@ -1,10 +1,10 @@
 export const validateData = (schema) => {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body);
+    const { success, data, error } = schema.safeParse(req.body);
 
-    if (!result.success) throw result.error;
+    if (!success) throw error;
 
-    req.body = result.data;
+    req.body = data;
     next();
   };
 };
