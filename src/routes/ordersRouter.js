@@ -9,6 +9,11 @@ import {
   isOrdered,
 } from "../controllers/ordersController.js";
 import { authorize } from "../middlewares/authorize.js";
+import { validateData } from "../middlewares/validateData.js";
+import {
+  orderSchema,
+  updateOrderSchema,
+} from "../validators/orderValidator.js";
 
 export const ordersRouter = express.Router();
 
@@ -24,6 +29,11 @@ ordersRouter.get(
   getLibrarianOrders,
 );
 
-ordersRouter.post("/", postOrder);
+ordersRouter.post("/", validateData(orderSchema), postOrder);
 
-ordersRouter.put("/:id", validateId, updateOrder);
+ordersRouter.put(
+  "/:id",
+  validateId,
+  validateData(updateOrderSchema),
+  updateOrder,
+);

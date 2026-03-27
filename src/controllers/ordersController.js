@@ -60,15 +60,7 @@ export const isOrdered = async (req, res, next) => {
 
 export const postOrder = async (req, res, next) => {
   try {
-    const orderData = req.body;
-
-    if (Object.keys(orderData || {}).length === 0) {
-      return res
-        .status(400)
-        .send({ success: false, message: "Order data is required" });
-    }
-
-    await Order.create(orderData);
+    await Order.create(req.body);
 
     res.status(201).send({
       success: true,
@@ -80,16 +72,9 @@ export const postOrder = async (req, res, next) => {
 };
 
 export const updateOrder = async (req, res, next) => {
-  const updatedData = req.body;
-  const { id } = req.params;
-
-  if (Object.keys(updatedData || {}).length === 0) {
-    return res
-      .status(400)
-      .send({ success: false, message: "No data provided for update" });
-  }
-
   try {
+    const { id } = req.params;
+
     const order = await Order.findById(id);
 
     if (!order) {
@@ -99,7 +84,7 @@ export const updateOrder = async (req, res, next) => {
       });
     }
 
-    await Order.findByIdAndUpdate(id, updatedData, {
+    await Order.findByIdAndUpdate(id, req.body, {
       new: true,
     });
 
