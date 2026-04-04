@@ -1,11 +1,13 @@
 {
   "name": "book-wagon-server",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "tsx --watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "npx tsc",
+    "type-check": "npx tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -18,11 +20,19 @@
     "firebase-admin": "^13.6.0",
     "mongodb": "^7.0.0",
     "mongoose": "^9.2.1",
-    "nanoid": "^5.1.7",
+    "mongoose-aggregate-paginate-v2": "^1.1.4",
+    "mongoose-paginate-v2": "^1.9.4",
     "stripe": "^20.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@tsconfig/node22": "^22.0.5",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^25.5.0",
+    "nodemon": "^3.1.11",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
   }
 }

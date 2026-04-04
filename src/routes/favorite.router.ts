@@ -1,0 +1,21 @@
+import { Router } from "express";
+import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
+import { validateId } from "../middlewares/validateId.middleware.ts.js";
+import {
+  getFavoriteBooks,
+  checkInFavorites,
+  addToFavorite,
+  removeFromFavorites,
+} from "../controllers/favorites.controller.js";
+
+export const favoritesRouter: Router = Router();
+
+favoritesRouter.use(verifyTokenID);
+
+favoritesRouter.get("/books", getFavoriteBooks);
+
+favoritesRouter.get("/is-in-favorites/:id", validateId, checkInFavorites);
+
+favoritesRouter.post("/:id", validateId, addToFavorite);
+
+favoritesRouter.delete("/:id", validateId, removeFromFavorites);
