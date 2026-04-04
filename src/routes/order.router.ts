@@ -7,7 +7,6 @@ import {
   isOrdered,
   getAllOrders,
 } from "../controllers/orders.controller.js";
-import { authorize } from "../middlewares/authorize.middleware.js";
 import { validateData } from "../middlewares/validateData.middleware.js";
 import {
   orderSchema,
