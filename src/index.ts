@@ -13,7 +13,10 @@ import { favoritesRouter } from "./routes/favorite.router.js";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler.middleware.js";
 
 import type { Request, Response } from "express";
-import type { TSuccessResponse } from "./types/index.interface.js";
+import type {
+  TErrorResponse,
+  TSuccessResponse,
+} from "./types/index.interface.js";
 import { BadRequestError } from "./utils/utils.js";
 
 const app = express();
@@ -40,8 +43,10 @@ const run = async () => {
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
 
-    app.use((req: Request, res: Response) => {
-      throw new BadRequestError("Route not found!");
+    app.use((req: Request, res: Response<TErrorResponse>) => {
+      return res
+        .status(404)
+        .send({ success: false, message: "Route not found!" });
     });
 
     app.use(globalErrorHandler);
