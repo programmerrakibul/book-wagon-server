@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { authorize } from "@/middlewares/authorize.middleware.js";
-import { verifyTokenID } from "@/middlewares/verifyTokenID.middleware.js";
 import {
-  getAdminDashboardData,
-  getLibrarianDashboardData,
   getUserDashboardData,
-} from "@/controllers/dashboard.controller.js";
+  getLibrarianDashboardData,
+  getAdminDashboardData,
+} from "../controllers/dashboard.controller.js";
+import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
+import { authorize } from "../middlewares/authorize.middleware.js";
 
 export const dashboardRouter: Router = Router();
 

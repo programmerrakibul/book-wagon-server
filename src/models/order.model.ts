@@ -1,14 +1,13 @@
+import type { TBookDocument } from "../types/book.interface.js";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { Aggregate, model, Schema, Types, type PipelineStage } from "mongoose";
-import { OrderStatus, PaymentStatus } from "@/validators/order.validator.js";
-
-import type {
-  TOrderDocument,
-  TOrderModel,
-  TOrderStatus,
-  TPaymentStatus,
-} from "@/types/order.interface.js";
-import type { TBookDocument } from "@/types/book.interface.js";
+import {
+  type TOrderDocument,
+  type TOrderModel,
+  type TOrderStatus,
+  type TPaymentStatus,
+} from "../types/order.interface.js";
+import { OrderStatus, PaymentStatus } from "../validators/order.validator.js";
 
 const orderSchema = new Schema<TOrderDocument>(
   {

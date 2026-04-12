@@ -4,7 +4,7 @@ import type {
   IBookCategory,
   TBookFormat,
   TBookStatus,
-} from "@/types/book.interface.js";
+} from "../types/book.interface.js";
 
 export const BookFormat = {
   HARDCOVER: "Hardcover",

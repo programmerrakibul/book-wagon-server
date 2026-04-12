@@ -5,7 +5,7 @@ import type {
   userQuerySchema,
   UserRole,
   userSchema,
-} from "@/validators/user.validator.js";
+} from "../validators/user.validator.js";
 
 export type TCreateUser = z.infer<typeof userSchema>;
 export interface TUserDocument extends Document, TCreateUser {

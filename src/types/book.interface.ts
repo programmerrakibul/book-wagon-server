@@ -6,7 +6,7 @@ import type {
   bookQuerySchema,
   BookStatus,
   createBookSchema,
-} from "@/validators/book.validator.js";
+} from "../validators/book.validator.js";
 
 export type TBookFormat = (typeof BookFormat)[keyof typeof BookFormat];
 export type IBookCategory = (typeof BookCategory)[keyof typeof BookCategory];

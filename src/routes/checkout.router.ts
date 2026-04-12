@@ -1,9 +1,9 @@
 import { Router } from "express";
+import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
 import {
   createCheckout,
   retrieveCheckout,
-} from "@/controllers/checkout.controller.js";
-import { verifyTokenID } from "@/middlewares/verifyTokenID.middleware.js";
+} from "../controllers/checkout.controller.js";
 
 export const checkoutRouter: Router = Router();
 

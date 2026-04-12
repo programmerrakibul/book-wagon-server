@@ -1,21 +1,20 @@
-import { Favorite } from "@/models/favorite.model.js";
 import { ObjectId } from "mongodb";
-import { Order } from "@/models/order.model.js";
-import { OrderStatus, PaymentStatus } from "@/validators/order.validator.js";
-import { Book } from "@/models/book.model.js";
-import { UserRole } from "@/validators/user.validator.js";
-import { User } from "@/models/user.model.js";
-
+import { Book } from "../models/book.model.js";
+import { User } from "../models/user.model.js";
+import { Order } from "../models/order.model.js";
+import { Favorite } from "../models/favorite.model.js";
 import type { Request, Response, NextFunction } from "express";
-import type { TSuccessResponse } from "@/types/index.interface.js";
 import type {
   TOrderDocument,
   TOrderStatus,
   TPaymentStatus,
-} from "@/types/order.interface.js";
-import type { TFavoriteDocument } from "@/types/favorite.interface.js";
-import type { TBookDocument, TBookStatus } from "@/types/book.interface.js";
-import type { TUserDocument } from "@/types/user.interface.js";
+} from "../types/order.interface.js";
+import type { TFavoriteDocument } from "../types/favorite.interface.js";
+import type { TBookDocument, TBookStatus } from "../types/book.interface.js";
+import { OrderStatus, PaymentStatus } from "../validators/order.validator.js";
+import type { TSuccessResponse } from "../types/index.interface.js";
+import type { TUserDocument } from "../types/user.interface.js";
+import { UserRole } from "../validators/user.validator.js";
 
 export const getUserDashboardData = async (
   req: Request,

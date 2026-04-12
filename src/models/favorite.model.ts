@@ -1,11 +1,10 @@
-import { Book } from "./book.model.js";
-import { bookQuerySchema } from "@/validators/book.validator.js";
-
-import type { TBookDocument, TBookQuery } from "@/types/book.interface.js";
+import type { TBookDocument, TBookQuery } from "../types/book.interface.js";
 import type {
   TFavoriteDocument,
   TFavoriteModel,
-} from "@/types/favorite.interface.js";
+} from "../types/favorite.interface.js";
+import { bookQuerySchema } from "../validators/book.validator.js";
+import { Book } from "./book.model.js";
 import {
   model,
   Schema,

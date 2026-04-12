@@ -1,12 +1,11 @@
-import { Favorite } from "@/models/favorite.model.js";
-
-import type { TBookDocument, TBookQuery } from "@/types/book.interface.js";
-import type { TFavoriteDocument } from "@/types/favorite.interface.js";
+import { Favorite } from "../models/favorite.model.js";
 import type { Request, Response, NextFunction } from "express";
 import type {
   TPaginatedResponse,
   TSuccessResponse,
-} from "@/types/index.interface.js";
+} from "../types/index.interface.js";
+import type { TBookDocument, TBookQuery } from "../types/book.interface.js";
+import type { TFavoriteDocument } from "../types/favorite.interface.js";
 
 export const getFavoriteBooks = async (
   req: Request<{}, {}, {}, TBookQuery>,

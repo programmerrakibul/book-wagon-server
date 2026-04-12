@@ -1,14 +1,14 @@
 import { ZodError } from "zod";
-import { ApiError } from "@/utils/utils.js";
+import { ApiError } from "../utils/utils.js";
 
 import type { Request, Response, NextFunction } from "express";
-import type { TErrorResponse } from "@/types/index.interface.js";
+import type { TErrorResponse } from "../types/index.interface.js";
 
 export const globalErrorHandler = (
   err: unknown,
-  _req: Request,
+  req: Request,
   res: Response<TErrorResponse>,
-  _next: NextFunction,
+  next: NextFunction,
 ) => {
   let message = "An unexpected error occurred!";
   let statusCode = 500;

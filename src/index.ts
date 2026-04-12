@@ -23,11 +23,11 @@ const port = envConfig.PORT;
 app.use(cors());
 app.use(json());
 
-(async () => {
+const run = async () => {
   try {
     await dbConnect();
 
-    app.get("/", (_req: Request, res: Response<TSuccessResponse>) => {
+    app.get("/", (req: Request, res: Response<TSuccessResponse>) => {
       res.send({ success: true, message: "Welcome to the Book Wagon Server!" });
     });
 
@@ -40,7 +40,7 @@ app.use(json());
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
 
-    app.use((_req: Request, _res: Response) => {
+    app.use((req: Request, res: Response) => {
       throw new BadRequestError("Route not found!");
     });
 
@@ -52,4 +52,6 @@ app.use(json());
     console.log(err);
     process.exit(1);
   }
-})();
+};
+
+run();

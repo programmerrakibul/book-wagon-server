@@ -1,21 +1,21 @@
-import { envConfig } from "@/config/env.config.js";
-import { stripe } from "@/config/stripe.config.js";
-import { Book } from "@/models/book.model.js";
-import { Order } from "@/models/order.model.js";
-import { Payment } from "@/models/payment.model.js";
-import { BadRequestError, NotFoundError } from "@/utils/utils.js";
-import { PaymentStatus } from "@/validators/order.validator.js";
+import { Book } from "../models/book.model.js";
+import { Order } from "../models/order.model.js";
+import { BadRequestError, NotFoundError } from "../utils/utils.js";
+import { stripe } from "../config/stripe.config.js";
+import { envConfig } from "../config/env.config.js";
+import { Payment } from "../models/payment.model.js";
 
-import type { TBookDocument } from "@/types/book.interface.js";
+import type { Request, Response, NextFunction } from "express";
+import type { TBookDocument } from "../types/book.interface.js";
+import {
+  type TOrderDocument,
+  type TPaymentStatus,
+} from "../types/order.interface.js";
 import type {
   TApiResponse,
   TSuccessResponse,
-} from "@/types/index.interface.js";
-import type {
-  TOrderDocument,
-  TPaymentStatus,
-} from "@/types/order.interface.js";
-import type { Request, Response, NextFunction } from "express";
+} from "../types/index.interface.js";
+import { PaymentStatus } from "../validators/order.validator.js";
 
 export const createCheckout = async (
   req: Request<{ orderID: string }>,

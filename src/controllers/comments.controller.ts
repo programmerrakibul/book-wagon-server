@@ -1,10 +1,10 @@
-import { Comment } from "@/models/comment.model.js";
-import { User } from "@/models/user.model.js";
+import { User } from "../models/user.model.js";
+import { Comment } from "../models/comment.model.js";
 
-import type { TCommentDocument } from "@/types/comment.interface.js";
-import type { TSuccessResponse } from "@/types/index.interface.js";
-import type { TUserDocument } from "@/types/user.interface.js";
 import type { Request, Response, NextFunction } from "express";
+import type { TUserDocument } from "../types/user.interface.js";
+import type { TSuccessResponse } from "../types/index.interface.js";
+import type { TCommentDocument } from "../types/comment.interface.js";
 
 export const postComment = async (
   req: Request<{ id: string }, {}, { comment: string }>,

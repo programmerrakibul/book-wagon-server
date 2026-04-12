@@ -1,13 +1,13 @@
-import { Payment } from "@/models/payment.model.js";
-import { paymentQuerySchema } from "@/validators/payment.validator.js";
+import { Payment } from "../models/payment.model.js";
+import { paymentQuerySchema } from "../validators/payment.validator.js";
 
 import type { Request, Response, NextFunction } from "express";
-import type { TPaginatedResponse } from "@/types/index.interface.js";
-import type { Aggregate, PaginateOptions, PipelineStage } from "mongoose";
+import type { TPaginatedResponse } from "../types/index.interface.js";
 import type {
   TPaymentDocument,
   TPaymentQuery,
-} from "@/types/payment.interface.js";
+} from "../types/payment.interface.js";
+import type { Aggregate, PaginateOptions, PipelineStage } from "mongoose";
 
 export const getInvoices = async (
   req: Request<{}, {}, {}, TPaymentQuery>,

@@ -1,9 +1,9 @@
+import { User } from "../models/user.model.js";
+import { envConfig } from "../config/env.config.js";
+import { UnauthorizedError } from "../utils/utils.js";
 import admin, { type ServiceAccount } from "firebase-admin";
 import type { Request, Response, NextFunction } from "express";
-import { envConfig } from "@/config/env.config.js";
-import { UnauthorizedError } from "@/utils/utils.js";
-import type { TUserDocument } from "@/types/user.interface.js";
-import { User } from "@/models/user.model.js";
+import type { TUserDocument } from "../types/user.interface.js";
 
 const serviceKey = envConfig.FIREBASE_SERVICE_KEY;
 const decoded = Buffer.from(serviceKey, "base64").toString("utf8");
@@ -15,7 +15,7 @@ admin.initializeApp({
 
 export const verifyTokenID = async (
   req: Request,
-  _res: Response,
+  res: Response,
   next: NextFunction,
 ) => {
   try {

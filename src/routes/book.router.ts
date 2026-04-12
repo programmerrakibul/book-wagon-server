@@ -1,20 +1,20 @@
 import { Router } from "express";
-import { authorize } from "@/middlewares/authorize.middleware.js";
-import { validateData } from "@/middlewares/validateData.middleware.js";
-import { validateId } from "@/middlewares/validateId.middleware.ts.js";
-import { verifyTokenID } from "@/middlewares/verifyTokenID.middleware.js";
+import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
+import { validateId } from "../middlewares/validateId.middleware.ts.js";
+import {
+  postBook,
+  getBooks,
+  getBookById,
+  updateBookById,
+  deleteBookById,
+  getCategories,
+} from "../controllers/books.controller.js";
+import { authorize } from "../middlewares/authorize.middleware.js";
+import { validateData } from "../middlewares/validateData.middleware.js";
 import {
   createBookSchema,
   updateBookSchema,
-} from "@/validators/book.validator.js";
-import {
-  deleteBookById,
-  getBookById,
-  getBooks,
-  getCategories,
-  postBook,
-  updateBookById,
-} from "@/controllers/books.controller.js";
+} from "../validators/book.validator.js";
 
 export const booksRouter: Router = Router();
 

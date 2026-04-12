@@ -1,5 +1,5 @@
-import { connect, type ConnectOptions } from "mongoose";
 import { envConfig } from "./env.config.js";
+import { connect, type ConnectOptions } from "mongoose";
 
 const opt: ConnectOptions = {
   dbName: envConfig.DB_NAME,

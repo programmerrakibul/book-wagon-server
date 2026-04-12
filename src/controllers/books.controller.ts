@@ -1,22 +1,22 @@
-import { Book } from "@/models/book.model.js";
-import { Order } from "@/models/order.model.js";
-import { User } from "@/models/user.model.js";
-import { NotFoundError } from "@/utils/utils.js";
-import { bookQuerySchema } from "@/validators/book.validator.js";
+import { Book } from "../models/book.model.js";
+import { User } from "../models/user.model.js";
+import { Order } from "../models/order.model.js";
+import { NotFoundError } from "../utils/utils.js";
+import { bookQuerySchema } from "../validators/book.validator.js";
 
+import type { Request, Response, NextFunction } from "express";
+import type { PaginateOptions, PaginateResult } from "mongoose";
+import type {
+  TPaginatedResponse,
+  TSuccessResponse,
+} from "../types/index.interface.js";
 import type {
   TBookCategory,
   TBookDocument,
   TBookQuery,
   TCreateBook,
   TUpdateBook,
-} from "@/types/book.interface.js";
-import type {
-  TPaginatedResponse,
-  TSuccessResponse,
-} from "@/types/index.interface.js";
-import type { Request, Response, NextFunction } from "express";
-import type { PaginateOptions, PaginateResult } from "mongoose";
+} from "../types/book.interface.js";
 
 export const getBooks = async (
   req: Request<{}, {}, {}, TBookQuery>,
@@ -207,7 +207,7 @@ export const deleteBookById = async (
 };
 
 export const getCategories = async (
-  _req: Request,
+  req: Request,
   res: Response<TSuccessResponse<TBookCategory[]>>,
   next: NextFunction,
 ) => {
