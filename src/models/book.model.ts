@@ -1,16 +1,17 @@
 import paginate from "mongoose-paginate-v2";
 import { model, Schema, type PaginateModel } from "mongoose";
+import {
+  BookCategory,
+  BookFormat,
+  BookStatus,
+} from "@/validators/book.validator.js";
+
 import type {
   IBookCategory,
   TBookDocument,
   TBookFormat,
   TBookStatus,
-} from "../types/book.interface.js";
-import {
-  BookCategory,
-  BookFormat,
-  BookStatus,
-} from "../validators/book.validator.js";
+} from "@/types/book.interface.js";
 
 const bookSchema = new Schema<TBookDocument>(
   {

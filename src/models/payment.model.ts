@@ -1,12 +1,12 @@
+import { PaymentStatus } from "@/validators/order.validator.js";
 import { Types, Schema, model } from "mongoose";
-import { PaymentStatus } from "../validators/order.validator.js";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-import type { TPaymentStatus } from "../types/order.interface.js";
+import type { TPaymentStatus } from "@/types/order.interface.js";
 import type {
   TPaymentDocument,
   TPaymentModel,
-} from "../types/payment.interface.js";
+} from "@/types/payment.interface.js";
 
 const paymentSchema = new Schema<TPaymentDocument>(
   {

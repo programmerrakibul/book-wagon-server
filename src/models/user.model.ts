@@ -1,13 +1,13 @@
-import { model, Schema, type PaginateModel } from "mongoose";
+import { NotFoundError } from "@/utils/utils.js";
+import { UserRole } from "@/validators/user.validator.js";
+import { model, Schema } from "mongoose";
 import paginate from "mongoose-paginate-v2";
-import { NotFoundError } from "../utils/utils.js";
 
 import type {
   TUserDocument,
   TUserModel,
   TUserRole,
-} from "../types/user.interface.js";
-import { UserRole } from "../validators/user.validator.js";
+} from "@/types/user.interface.js";
 
 const userSchema = new Schema(
   {

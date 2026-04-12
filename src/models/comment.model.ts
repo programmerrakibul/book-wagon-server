@@ -1,5 +1,6 @@
 import { model, Schema, Types } from "mongoose";
-import type { TCommentDocument } from "../types/comment.interface.js";
+
+import type { TCommentDocument } from "@/types/comment.interface.js";
 
 const commentSchema = new Schema<TCommentDocument>(
   {

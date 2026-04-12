@@ -1,5 +1,5 @@
+import type { TUserRole } from "@/types/user.interface.js";
 import z, { ZodArray, ZodString } from "zod";
-import type { TUserRole } from "../types/user.interface.js";
 
 export const UserRole = {
   USER: "user",

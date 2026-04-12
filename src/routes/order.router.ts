@@ -1,17 +1,17 @@
 import { Router } from "express";
-import { validateId } from "../middlewares/validateId.middleware.ts.js";
-import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
-import {
-  postOrder,
-  updateOrder,
-  isOrdered,
-  getAllOrders,
-} from "../controllers/orders.controller.js";
-import { validateData } from "../middlewares/validateData.middleware.js";
+import { validateData } from "@/middlewares/validateData.middleware.js";
+import { validateId } from "@/middlewares/validateId.middleware.ts.js";
+import { verifyTokenID } from "@/middlewares/verifyTokenID.middleware.js";
 import {
   orderSchema,
   updateOrderSchema,
-} from "../validators/order.validator.js";
+} from "@/validators/order.validator.js";
+import {
+  getAllOrders,
+  isOrdered,
+  postOrder,
+  updateOrder,
+} from "@/controllers/orders.controller.js";
 
 export const ordersRouter: Router = Router();
 

@@ -1,13 +1,13 @@
 import type z from "zod";
+import type { TBookDocument } from "./book.interface.js";
+import type { Aggregate, AggregatePaginateModel, Document } from "mongoose";
 import type {
   orderQuerySchema,
   orderSchema,
   OrderStatus,
   PaymentStatus,
   updateOrderSchema,
-} from "../validators/order.validator.js";
-import type { TBookDocument } from "./book.interface.js";
-import type { Aggregate, AggregatePaginateModel, Document } from "mongoose";
+} from "@/validators/order.validator.js";
 
 export type TCreateOrder = z.infer<typeof orderSchema>;
 export type TUpdateOrder = z.infer<typeof updateOrderSchema>;

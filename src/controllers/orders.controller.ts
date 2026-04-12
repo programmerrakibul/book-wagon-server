@@ -1,21 +1,22 @@
-import { Order } from "../models/order.model.js";
-import type { Request, Response, NextFunction } from "express";
-import { NotFoundError } from "../utils/utils.js";
-import { User } from "../models/user.model.js";
-import type { TUserDocument } from "../types/user.interface.js";
+import { Book } from "@/models/book.model.js";
+import { Order } from "@/models/order.model.js";
+import { User } from "@/models/user.model.js";
+import { NotFoundError } from "@/utils/utils.js";
+import { orderQuerySchema } from "@/validators/order.validator.js";
+
+import type { TBookDocument } from "@/types/book.interface.js";
+import type {
+  TPaginatedResponse,
+  TSuccessResponse,
+} from "@/types/index.interface.js";
 import type {
   TCreateOrder,
   TOrderDocument,
   TOrderQuery,
   TUpdateOrder,
-} from "../types/order.interface.js";
-import type {
-  TPaginatedResponse,
-  TSuccessResponse,
-} from "../types/index.interface.js";
-import { Book } from "../models/book.model.js";
-import type { TBookDocument } from "../types/book.interface.js";
-import { orderQuerySchema } from "../validators/order.validator.js";
+} from "@/types/order.interface.js";
+import type { TUserDocument } from "@/types/user.interface.js";
+import type { Request, Response, NextFunction } from "express";
 import type { PaginateOptions } from "mongoose";
 
 export const getAllOrders = async (

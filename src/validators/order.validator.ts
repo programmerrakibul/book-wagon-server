@@ -2,7 +2,7 @@ import z from "zod";
 import { objectIdSchema } from "./objectId.validator.js";
 import { userQuerySchema } from "./user.validator.js";
 import { Types } from "mongoose";
-import type { TOrderStatus, TPaymentStatus } from "../types/order.interface.js";
+import type { TOrderStatus, TPaymentStatus } from "@/types/order.interface.js";
 
 export const OrderStatus = {
   PENDING: "pending",
