@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "tsx --watch src/index.ts",
     "start": "node dist/index.js",
-    "build": "npx tsc",
-    "type-check": "npx tsc --noEmit"
+    "build": "npx tsc"
   },
   "keywords": [],
   "author": "",
