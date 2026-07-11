@@ -1,8 +1,8 @@
+import type { TCategory } from "@/category/interface/category.js";
+import Category from "@/category/model/category.js";
+import { createCategorySchema } from "@/category/validation/category.js";
+import { parseOrThrow } from "@/utils/utils.js";
 import { ConflictError } from "http-errors-enhanced";
-import { parseOrThrow } from "../../../utils/utils.js";
-import type { TCategory } from "../interface/category.js";
-import Category from "../model/category.js";
-import { createCategorySchema } from "../validation/category.js";
 
 const createCategory = async (payload: unknown) => {
   const parsedData = parseOrThrow(createCategorySchema, payload);

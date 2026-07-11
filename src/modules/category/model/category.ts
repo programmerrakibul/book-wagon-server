@@ -1,5 +1,5 @@
+import type { TCategory } from "@/category/interface/category.js";
 import { model, Schema } from "mongoose";
-import type { TCategory } from "../interface/category.js";
 
 const categorySchema = new Schema<TCategory>(
   {

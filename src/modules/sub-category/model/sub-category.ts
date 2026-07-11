@@ -1,5 +1,5 @@
+import type { TSubCategory } from "@/sub-category/interface/sub-category.js";
 import mongoose from "mongoose";
-import type { TSubCategory } from "../interface/sub-category.js";
 
 const subCategorySchema = new mongoose.Schema<TSubCategory>(
   {

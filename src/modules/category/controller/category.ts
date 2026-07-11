@@ -1,7 +1,7 @@
+import categoryService from "@/category/service/category.js";
+import { sendSuccessResponse } from "@/utils/sendResponse.js";
 import type { Request, Response } from "express";
 import status from "http-status";
-import { sendSuccessResponse } from "../../../utils/sendResponse.js";
-import categoryService from "../service/category.js";
 
 const createCategory = async (req: Request, res: Response) => {
   await categoryService.createCategory(req.body);

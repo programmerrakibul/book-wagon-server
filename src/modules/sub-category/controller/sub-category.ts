@@ -1,7 +1,7 @@
+import categoryService from "@/modules/sub-category/service/sub-category.js";
+import { sendSuccessResponse } from "@/utils/sendResponse.js";
 import type { Request, Response } from "express";
 import status from "http-status";
-import { sendSuccessResponse } from "../../../utils/sendResponse.js";
-import categoryService from "../services/sub-category.js";
 
 const createSubCategory = async (req: Request, res: Response) => {
   await categoryService.createSubCategory(req.body);

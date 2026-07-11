@@ -1,4 +1,4 @@
-import { envConfig } from "./env.config.js";
+import { envConfig } from "@/config/env.config.js";
 import { connect, type ConnectOptions } from "mongoose";
 
 const opt: ConnectOptions = {
@@ -14,7 +14,7 @@ const opt: ConnectOptions = {
 export const dbConnect = async () => {
   try {
     await connect(envConfig.MONGODB_URI, opt);
-    console.log("Database connected successfully!");
+    console.log("✅ Database connected successfully!");
   } catch (err) {
     throw err;
   }

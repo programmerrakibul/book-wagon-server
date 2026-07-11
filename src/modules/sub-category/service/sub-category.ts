@@ -1,10 +1,10 @@
+import Category from "@/category/model/category.js";
+import type { TSubCategory } from "@/sub-category/interface/sub-category.js";
+import SubCategory from "@/sub-category/model/sub-category.js";
+import { createSubCategorySchema } from "@/sub-category/validation/sub-category.js";
+import { parseOrThrow } from "@/utils/utils.js";
 import { NotFoundError } from "http-errors-enhanced";
 import mongoose from "mongoose";
-import { parseOrThrow } from "../../../utils/utils.js";
-import Category from "../../category/model/category.js";
-import type { TSubCategory } from "../interface/sub-category.js";
-import SubCategory from "../model/sub-category.js";
-import { createSubCategorySchema } from "../validation/sub-category.js";
 
 const createSubCategory = async (payload: unknown) => {
   const session = await mongoose.startSession();
