@@ -3,6 +3,8 @@ import express, { json } from "express";
 import { dbConnect } from "./config/db.config.js";
 import { envConfig } from "./config/env.config.js";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler.middleware.js";
+import categoryRouter from "./modules/category/routes/category.js";
+import subCategoryRouter from "./modules/sub-category/routes/sub-category.js";
 import { booksRouter } from "./routes/book.router.js";
 import { checkoutRouter } from "./routes/checkout.router.js";
 import { commentsRouter } from "./routes/comment.router.js";
@@ -24,6 +26,7 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const app = express();
 const port = envConfig.PORT;
+const API_PREFIX = "/api" as const;
 
 // Middlewares
 app.use(cors());
@@ -46,6 +49,8 @@ const run = async () => {
     app.use("/api/favorites", favoritesRouter);
     app.use("/api/comments", commentsRouter);
     app.use("/api/dashboard", dashboardRouter);
+    app.use(`${API_PREFIX}/categories`, categoryRouter);
+    app.use(`${API_PREFIX}/sub-categories`, subCategoryRouter);
 
     app.use((_req: Request, res: Response<TErrorResponse>) => {
       return res

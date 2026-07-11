@@ -1,3 +1,7 @@
+import type z from "zod";
+
+
+
 export class ApiError extends Error {
   constructor(
     public statusCode: number = 500,
@@ -30,3 +34,10 @@ export class UnauthorizedError extends ApiError {
     super(401, message);
   }
 }
+
+export const parseOrThrow = <T>(schema: z.Schema<T>, payload: unknown): T => {
+  return schema.parse(payload);
+};
+
+
+

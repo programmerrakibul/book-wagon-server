@@ -1,10 +1,10 @@
+import type { NextFunction, Request, Response } from "express";
+import { ForbiddenError } from "http-errors-enhanced";
 import { User } from "../models/user.model.js";
 import type { TUserDocument, TUserRole } from "../types/user.interface.js";
-import { ForbiddenError } from "../utils/utils.js";
-import type { Request, Response, NextFunction } from "express";
 
 export const authorize = (...roles: TUserRole[]) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const { _id } = req.user;
 
@@ -13,12 +13,12 @@ export const authorize = (...roles: TUserRole[]) => {
       roles = roles.map((role) => role?.toLowerCase() as TUserRole);
 
       if (!roles.includes(user?.role as TUserRole)) {
-        throw new ForbiddenError();
+        throw new ForbiddenError("Forbidden access!");
       }
 
       next();
     } catch {
-      throw new ForbiddenError();
+      throw new ForbiddenError("Forbidden access!");
     }
   };
 };

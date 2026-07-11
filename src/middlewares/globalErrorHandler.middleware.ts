@@ -1,14 +1,15 @@
+import type { NextFunction, Request, Response } from "express";
+import { HttpError } from "http-errors-enhanced";
 import { ZodError } from "zod";
-import { ApiError } from "../utils/utils.js";
-
-import type { Request, Response, NextFunction } from "express";
 import type { TErrorResponse } from "../types/index.interface.js";
+import { sendErrorResponse } from "../utils/sendResponse.js";
+import { ApiError } from "../utils/utils.js";
 
 export const globalErrorHandler = (
   err: unknown,
-  req: Request,
+  _req: Request,
   res: Response<TErrorResponse>,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   let message = "An unexpected error occurred!";
   let statusCode = 500;
@@ -25,7 +26,12 @@ export const globalErrorHandler = (
     statusCode = 400;
   }
 
+  if (err instanceof HttpError) {
+    message = err.message;
+    statusCode = err.statusCode;
+  }
+
   console.log("From global error: ", err);
 
-  res.status(statusCode).send({ success: false, message });
+  sendErrorResponse(res, statusCode, { message });
 };
