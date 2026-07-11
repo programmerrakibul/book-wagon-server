@@ -3,7 +3,7 @@ import type { TSubCategory } from "@/sub-category/interface/sub-category.js";
 import SubCategory from "@/sub-category/model/sub-category.js";
 import { createSubCategorySchema } from "@/sub-category/validation/sub-category.js";
 import { parseOrThrow } from "@/utils/utils.js";
-import { NotFoundError } from "http-errors-enhanced";
+import { ConflictError, NotFoundError } from "http-errors-enhanced";
 import mongoose from "mongoose";
 
 const createSubCategory = async (payload: unknown) => {
@@ -13,23 +13,36 @@ const createSubCategory = async (payload: unknown) => {
   try {
     const parsedData = parseOrThrow(createSubCategorySchema, payload);
 
-    const result = await SubCategory.create([parsedData], { session });
-    const updatedCategory = await Category.findByIdAndUpdate(
+    const parentCategory = await Category.findById(
+      parsedData.categoryId,
+    ).session(session);
+
+    if (!parentCategory) {
+      throw new NotFoundError("Parent Category not found!");
+    }
+
+    const existingSubCategory = await SubCategory.findOne({
+      categoryId: parsedData.categoryId,
+      name: {
+        $regex: new RegExp(`^${parsedData.name}$`, "i"),
+      },
+    }).session(session);
+
+    if (existingSubCategory) {
+      throw new ConflictError("SubCategory already exists in this category!");
+    }
+
+    const [result] = await SubCategory.create([parsedData], { session });
+
+    await Category.findByIdAndUpdate(
       parsedData.categoryId,
       {
         $push: {
-          subCategories: result[0]?._id,
+          subCategories: result?._id,
         },
       },
-      {
-        session,
-        new: true,
-      },
+      { session },
     );
-
-    if (!updatedCategory) {
-      throw new NotFoundError("Category not found!");
-    }
 
     await session.commitTransaction();
   } catch (error: unknown) {

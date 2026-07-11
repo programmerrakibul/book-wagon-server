@@ -9,7 +9,7 @@ const createCategory = async (payload: unknown) => {
 
   const existingCategory = await Category.findOne({
     name: {
-      $regex: new RegExp(parsedData.name, "i"),
+      $regex: new RegExp(`^${parsedData.name}$`, "i"),
     },
   });
 
