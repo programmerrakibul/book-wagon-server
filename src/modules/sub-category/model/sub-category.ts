@@ -11,8 +11,8 @@ const subCategorySchema = new mongoose.Schema<TSubCategory>(
     categoryId: {
       type: mongoose.Types.ObjectId,
       required: true,
-      trim: true,
       ref: "Category",
+      index: true,
     },
     photoUrl: {
       type: String,

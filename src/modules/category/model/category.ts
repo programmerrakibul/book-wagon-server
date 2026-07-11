@@ -19,6 +19,7 @@ const categorySchema = new Schema<TCategory>(
       {
         type: Schema.Types.ObjectId,
         ref: "SubCategory",
+        index: true,
       },
     ],
   },
