@@ -1,11 +1,12 @@
+import bookFormatRouter from "@/book-format/routes/book-format.js";
+import { booksRouter } from "@/book/routes/book.js";
+import categoryRouter from "@/category/routes/category.js";
+import { dbConnect } from "@/config/db.config.js";
+import { envConfig } from "@/config/env.config.js";
+import { globalErrorHandler } from "@/middlewares/globalErrorHandler.middleware.js";
+import subCategoryRouter from "@/sub-category/routes/sub-category.js";
 import cors from "cors";
 import express, { json } from "express";
-import { dbConnect } from "./config/db.config.js";
-import { envConfig } from "./config/env.config.js";
-import { globalErrorHandler } from "./middlewares/globalErrorHandler.middleware.js";
-import categoryRouter from "./modules/category/routes/category.js";
-import subCategoryRouter from "./modules/sub-category/routes/sub-category.js";
-import { booksRouter } from "./routes/book.router.js";
 import { checkoutRouter } from "./routes/checkout.router.js";
 import { commentsRouter } from "./routes/comment.router.js";
 import { dashboardRouter } from "./routes/dashboard.router.js";
@@ -42,7 +43,7 @@ const run = async () => {
     app.get("/api/health-check", healthCheck);
 
     app.use("/api/users", usersRouter);
-    app.use("/api/books", booksRouter);
+    app.use(`${API_PREFIX}/books`, booksRouter);
     app.use("/api/orders", ordersRouter);
     app.use("/api/checkout", checkoutRouter);
     app.use("/api/payments", paymentsRouter);
@@ -51,6 +52,7 @@ const run = async () => {
     app.use("/api/dashboard", dashboardRouter);
     app.use(`${API_PREFIX}/categories`, categoryRouter);
     app.use(`${API_PREFIX}/sub-categories`, subCategoryRouter);
+    app.use(`${API_PREFIX}/book-formats`, bookFormatRouter);
 
     app.use((_req: Request, res: Response<TErrorResponse>) => {
       return res
