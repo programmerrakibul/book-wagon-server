@@ -1,9 +1,9 @@
+import { envConfig } from "@/config/env.js";
+import type { TUserDocument } from "@/user/interface/user.js";
+import { User } from "@/user/model/user.js";
 import type { NextFunction, Request, Response } from "express";
 import admin, { type ServiceAccount } from "firebase-admin";
 import { UnauthorizedError } from "http-errors-enhanced";
-import { envConfig } from "../config/env.config.js";
-import { User } from "../models/user.model.js";
-import type { TUserDocument } from "../types/user.interface.js";
 
 const serviceKey = envConfig.FIREBASE_SERVICE_KEY;
 const decoded = Buffer.from(serviceKey, "base64").toString("utf8");

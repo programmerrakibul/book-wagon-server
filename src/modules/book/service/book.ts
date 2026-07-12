@@ -7,15 +7,15 @@ import {
   updateBookSchema,
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
-import { Order } from "@/models/order.model.js";
-import { User } from "@/models/user.model.js";
-import type { TUserRole } from "@/types/user.interface.js";
+import { Order } from "@/modules/order/model/order.js";
+import type { TUserRole } from "@/modules/user/interface/user.js";
+import { User } from "@/modules/user/model/user.js";
+import { UserRole } from "@/modules/user/validation/user.js";
 import {
   parseOrThrow,
   transformToObjectId,
   validateObjectId,
 } from "@/utils/utils.js";
-import { UserRole } from "@/validations/user.validator.js";
 import { BadRequestError, NotFoundError } from "http-errors-enhanced";
 import mongoose, {
   Types,

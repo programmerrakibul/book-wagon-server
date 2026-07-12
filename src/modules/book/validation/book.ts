@@ -1,14 +1,14 @@
 import {
-  double,
-  transformToObjectId,
-  validateObjectId,
-} from "@/utils/utils.js";
-import {
   paginationQuery,
   projectionQuery,
   searchQuery,
   sortQuery,
-} from "@/validations/query.js";
+} from "@/lib/query.js";
+import {
+  double,
+  transformToObjectId,
+  validateObjectId,
+} from "@/utils/utils.js";
 import z from "zod";
 
 export const BookStatus = {

@@ -1,4 +1,4 @@
-import type { TUserDocument } from "./user.interface.ts";
+import type { TUserDocument } from "@/user/interface/user.ts";
 
 declare global {
   namespace Express {

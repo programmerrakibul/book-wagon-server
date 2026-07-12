@@ -1,4 +1,4 @@
-import { envConfig } from "@/config/env.config.js";
+import { envConfig } from "@/config/env.js";
 import { connect, type ConnectOptions } from "mongoose";
 
 const opt: ConnectOptions = {

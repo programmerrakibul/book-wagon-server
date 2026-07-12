@@ -1,7 +1,7 @@
+import type { TUserDocument, TUserRole } from "@/user/interface/user.js";
+import { User } from "@/user/model/user.js";
 import type { NextFunction, Request, Response } from "express";
 import { ForbiddenError } from "http-errors-enhanced";
-import { User } from "../models/user.model.js";
-import type { TUserDocument, TUserRole } from "../types/user.interface.js";
 
 export const authorize = (...roles: TUserRole[]) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
