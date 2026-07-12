@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { BadRequestError } from "../utils/utils.js";
-import { envSchema } from "../validators/env.validator.js";
+import { envSchema } from "../validations/env.validator.js";
 
 config();
 

@@ -1,21 +1,21 @@
-import { Book } from "../models/book.model.js";
-import { Order } from "../models/order.model.js";
-import { BadRequestError, NotFoundError } from "../utils/utils.js";
-import { stripe } from "../config/stripe.config.js";
 import { envConfig } from "../config/env.config.js";
+import { stripe } from "../config/stripe.config.js";
+import { Order } from "../models/order.model.js";
 import { Payment } from "../models/payment.model.js";
+import Book from "../modules/book/model/book.js";
+import { BadRequestError, NotFoundError } from "../utils/utils.js";
 
-import type { Request, Response, NextFunction } from "express";
-import type { TBookDocument } from "../types/book.interface.js";
-import {
-  type TOrderDocument,
-  type TPaymentStatus,
-} from "../types/order.interface.js";
+import type { TBook } from "@/book/interface/book.js";
+import type { NextFunction, Request, Response } from "express";
 import type {
   TApiResponse,
   TSuccessResponse,
 } from "../types/index.interface.js";
-import { PaymentStatus } from "../validators/order.validator.js";
+import {
+  type TOrderDocument,
+  type TPaymentStatus,
+} from "../types/order.interface.js";
+import { PaymentStatus } from "../validations/order.validator.js";
 
 export const createCheckout = async (
   req: Request<{ orderID: string }>,
@@ -37,13 +37,13 @@ export const createCheckout = async (
 
     const { bookId, price } = order;
 
-    const book: TBookDocument | null = await Book.findById(bookId).lean();
+    const book: TBook | null = await Book.findById(bookId).lean();
 
     if (!book) {
       throw new NotFoundError("Book data not found!");
     }
 
-    const { bookName, description } = book;
+    const { name, description } = book;
 
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -52,7 +52,7 @@ export const createCheckout = async (
             unit_amount: Math.round(Number(price)) * 100,
             currency: "usd",
             product_data: {
-              name: bookName,
+              name,
               description,
             },
           },

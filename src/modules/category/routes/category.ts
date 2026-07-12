@@ -1,9 +1,9 @@
-import categoryController from "@/category/controller/category.js";
+import controllers from "@/category/controller/category.js";
 import { Router } from "express";
 
 const router = Router();
 
-router.get("/", categoryController.getCategories);
-router.post("/", categoryController.createCategory);
+router.get("/", controllers.getCategories);
+router.post("/", controllers.createCategory);
 
 export default router;

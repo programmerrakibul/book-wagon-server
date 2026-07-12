@@ -1,13 +1,13 @@
-import type { TBookDocument } from "../types/book.interface.js";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+import type { TBook } from "@/book/interface/book.js";
 import { Aggregate, model, Schema, Types, type PipelineStage } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 import {
   type TOrderDocument,
   type TOrderModel,
   type TOrderStatus,
   type TPaymentStatus,
 } from "../types/order.interface.js";
-import { OrderStatus, PaymentStatus } from "../validators/order.validator.js";
+import { OrderStatus, PaymentStatus } from "../validations/order.validator.js";
 
 const orderSchema = new Schema<TOrderDocument>(
   {
@@ -79,7 +79,7 @@ const orderSchema = new Schema<TOrderDocument>(
 
 orderSchema.statics.getOrdersByEmail = function (
   email: string,
-): Aggregate<TOrderDocument & { orderedBook: TBookDocument }[]> {
+): Aggregate<TOrderDocument & { orderedBook: TBook }[]> {
   try {
     const pipeline: PipelineStage[] = [
       {
@@ -114,7 +114,7 @@ orderSchema.statics.getOrdersByEmail = function (
     ];
 
     return this.aggregate(pipeline) as Aggregate<
-      TOrderDocument & { orderedBook: TBookDocument }[]
+      TOrderDocument & { orderedBook: TBook }[]
     >;
   } catch (error) {
     throw error;

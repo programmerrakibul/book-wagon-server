@@ -1,6 +1,6 @@
-import { Types, Schema, model } from "mongoose";
-import { PaymentStatus } from "../validators/order.validator.js";
+import { Schema, Types, model } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+import { PaymentStatus } from "../validations/order.validator.js";
 
 import type { TPaymentStatus } from "../types/order.interface.js";
 import type {

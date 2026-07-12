@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
-import { validateId } from "../middlewares/validateId.middleware.ts.js";
 import {
-  getFavoriteBooks,
-  checkInFavorites,
   addToFavorite,
+  checkInFavorites,
+  getFavoriteBooks,
   removeFromFavorites,
 } from "../controllers/favorites.controller.js";
+import { validateId } from "../middlewares/validateId.middleware.ts.js";
+import { verifyTokenID } from "../middlewares/verify-token.js";
 
 export const favoritesRouter: Router = Router();
 

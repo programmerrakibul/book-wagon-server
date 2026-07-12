@@ -24,21 +24,21 @@ const schema = new Schema<TCategory>(
       unique: true,
       lowercase: true,
     },
-    
+
     subCategories: [
       {
         type: Schema.Types.ObjectId,
         ref: "SubCategory",
         index: true,
+        required: true,
       },
     ],
-
   },
 
   {
     timestamps: true,
     versionKey: false,
-    collection: "category",
+    collection: "Category",
   },
 );
 

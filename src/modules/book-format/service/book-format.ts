@@ -29,9 +29,9 @@ const getBookFormats = async () => {
   return result;
 };
 
-const service = {
+const services = {
   createBookFormat,
   getBookFormats,
 };
 
-export default service;
+export default services;

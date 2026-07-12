@@ -1,10 +1,10 @@
-import service from "@/book-format/service/book-format.js";
+import services from "@/book-format/service/book-format.js";
 import { sendSuccessResponse } from "@/utils/sendResponse.js";
 import type { Request, Response } from "express";
 import status from "http-status";
 
 const createBookFormat = async (req: Request, res: Response) => {
-  await service.createBookFormat(req.body);
+  await services.createBookFormat(req.body);
 
   sendSuccessResponse(res, status.CREATED, {
     message: "Book format created successfully!",
@@ -12,7 +12,7 @@ const createBookFormat = async (req: Request, res: Response) => {
 };
 
 const getBookFormats = async (req: Request, res: Response) => {
-  const data = await service.getBookFormats();
+  const data = await services.getBookFormats();
 
   sendSuccessResponse(res, status.OK, {
     message: "Book formats fetched successfully!",
@@ -20,9 +20,9 @@ const getBookFormats = async (req: Request, res: Response) => {
   });
 };
 
-const controller = {
+const controllers = {
   createBookFormat,
   getBookFormats,
 };
 
-export default controller;
+export default controllers;

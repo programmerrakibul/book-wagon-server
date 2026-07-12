@@ -1,8 +1,8 @@
-import { User } from "../models/user.model.js";
-import { envConfig } from "../config/env.config.js";
-import { UnauthorizedError } from "../utils/utils.js";
+import type { NextFunction, Request, Response } from "express";
 import admin, { type ServiceAccount } from "firebase-admin";
-import type { Request, Response, NextFunction } from "express";
+import { UnauthorizedError } from "http-errors-enhanced";
+import { envConfig } from "../config/env.config.js";
+import { User } from "../models/user.model.js";
 import type { TUserDocument } from "../types/user.interface.js";
 
 const serviceKey = envConfig.FIREBASE_SERVICE_KEY;
@@ -15,21 +15,27 @@ admin.initializeApp({
 
 export const verifyTokenID = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) => {
   try {
     const token = req.headers.authorization?.substring(7);
 
-    if (!token) throw new UnauthorizedError();
+    console.log(`Validating token...`);
+
+    if (!token) throw new UnauthorizedError("Unauthorized access!");
 
     const { email } = await admin.auth().verifyIdToken(token);
 
-    if (!email) throw new UnauthorizedError();
+    console.log(`Verifying email...`);
+
+    if (!email) throw new UnauthorizedError("Unauthorized access!");
 
     const dbUser: TUserDocument | null = await User.findOne({ email });
 
-    if (!dbUser) throw new UnauthorizedError();
+    console.log(`Verifying user...`);
+
+    if (!dbUser) throw new UnauthorizedError("Unauthorized access!");
 
     req.user = {
       _id: dbUser._id,
@@ -38,8 +44,10 @@ export const verifyTokenID = async (
       role: dbUser.role,
     };
 
+    console.log("User verified!");
+
     next();
-  } catch {
-    throw new UnauthorizedError();
+  } catch (err: unknown) {
+    throw new UnauthorizedError(err as Error);
   }
 };

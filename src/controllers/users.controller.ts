@@ -1,17 +1,17 @@
+import type { NextFunction, Request, Response } from "express";
+import type { PaginateOptions, PaginateResult } from "mongoose";
 import { User } from "../models/user.model.js";
-import type { Request, Response, NextFunction } from "express";
+import type {
+  TPaginatedResponse,
+  TSuccessResponse,
+} from "../types/index.interface.js";
 import type {
   TCreateUser,
   TToggleRole,
   TUserDocument,
   TUserQuery,
 } from "../types/user.interface.js";
-import type {
-  TPaginatedResponse,
-  TSuccessResponse,
-} from "../types/index.interface.js";
-import type { PaginateOptions, PaginateResult } from "mongoose";
-import { userQuerySchema } from "../validators/user.validator.js";
+import { userQuerySchema } from "../validations/user.validator.js";
 
 export const getUsers = async (
   req: Request<{}, {}, {}, TUserQuery>,

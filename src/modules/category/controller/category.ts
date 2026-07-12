@@ -1,10 +1,10 @@
-import categoryService from "@/category/service/category.js";
+import services from "@/category/service/category.js";
 import { sendSuccessResponse } from "@/utils/sendResponse.js";
 import type { Request, Response } from "express";
 import status from "http-status";
 
 const createCategory = async (req: Request, res: Response) => {
-  await categoryService.createCategory(req.body);
+  await services.createCategory(req.body);
 
   sendSuccessResponse(res, status.CREATED, {
     message: "Category created successfully!",
@@ -12,7 +12,7 @@ const createCategory = async (req: Request, res: Response) => {
 };
 
 const getCategories = async (_req: Request, res: Response) => {
-  const data = await categoryService.getCategories();
+  const data = await services.getCategories();
 
   sendSuccessResponse(res, status.OK, {
     message: "Categories fetched successfully!",
@@ -20,6 +20,6 @@ const getCategories = async (_req: Request, res: Response) => {
   });
 };
 
-const categoryController = { createCategory, getCategories };
+const controllers = { createCategory, getCategories };
 
-export default categoryController;
+export default controllers;

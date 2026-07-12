@@ -1,9 +1,9 @@
 import bookFormatRouter from "@/book-format/routes/book-format.js";
-import { booksRouter } from "@/book/routes/book.js";
+import booksRouter from "@/book/routes/book.js";
 import categoryRouter from "@/category/routes/category.js";
-import { dbConnect } from "@/config/db.config.js";
+import { dbConnect } from "@/config/db.js";
 import { envConfig } from "@/config/env.config.js";
-import { globalErrorHandler } from "@/middlewares/globalErrorHandler.middleware.js";
+import { globalErrorHandler } from "@/middlewares/global-error-handler.js";
 import subCategoryRouter from "@/sub-category/routes/sub-category.js";
 import cors from "cors";
 import express, { json } from "express";

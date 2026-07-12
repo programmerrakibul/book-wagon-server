@@ -36,9 +36,9 @@ const getCategories = async (): Promise<TCategory[]> => {
   return result;
 };
 
-const categoryService = {
+const services = {
   createCategory,
   getCategories,
 };
 
-export default categoryService;
+export default services;

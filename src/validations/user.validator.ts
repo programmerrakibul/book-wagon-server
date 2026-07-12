@@ -1,5 +1,11 @@
-import z, { ZodArray, ZodString } from "zod";
+import z from "zod";
 import type { TUserRole } from "../types/user.interface.js";
+import {
+  paginationQuery,
+  projectionQuery,
+  searchQuery,
+  sortQuery,
+} from "./query.js";
 
 export const UserRole = {
   USER: "user",
@@ -66,33 +72,8 @@ export const toggleRoleSchema = z.object({
 });
 
 export const userQuerySchema = z.object({
-  page: z
-    .string()
-    .trim()
-    .transform((val) => Number(val) || 1)
-    .optional(),
-  limit: z
-    .string()
-    .trim()
-    .transform((val) => Number(val) || 10)
-    .optional(),
-  search: z
-    .string()
-    .transform((val) => val.trim())
-    .optional(),
-  sortBy: z.string().trim().optional(),
-  sortOrder: z
-    .string()
-    .transform((val) => val.trim().toLowerCase())
-    .optional(),
-  fields: z
-    .preprocess<string[], ZodArray<ZodString>, string>((val) => {
-      return val.split(",").map((field) => field.trim());
-    }, z.array(z.string()))
-    .optional(),
-  excludes: z
-    .preprocess<string[], ZodArray<ZodString>, string>((val) => {
-      return val.split(",").map((field) => field.trim());
-    }, z.array(z.string()))
-    .optional(),
+  ...paginationQuery,
+  ...searchQuery,
+  ...sortQuery,
+  ...projectionQuery,
 });

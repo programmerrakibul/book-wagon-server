@@ -1,10 +1,4 @@
-import type { TBookDocument, TBookQuery } from "../types/book.interface.js";
-import type {
-  TFavoriteDocument,
-  TFavoriteModel,
-} from "../types/favorite.interface.js";
-import { bookQuerySchema } from "../validators/book.validator.js";
-import { Book } from "./book.model.js";
+import type { TBook } from "@/book/interface/book.js";
 import {
   model,
   Schema,
@@ -12,6 +6,12 @@ import {
   type PaginateOptions,
   type PaginateResult,
 } from "mongoose";
+import  Book  from "../modules/book/model/book.js";
+import { bookQuerySchema, type TBookQuery } from "@/book/validation/book.js";
+import type {
+  TFavoriteDocument,
+  TFavoriteModel,
+} from "../types/favorite.interface.js";
 
 const favoriteSchema = new Schema<TFavoriteDocument>(
   {
@@ -99,7 +99,7 @@ favoriteSchema.statics.getFavoriteBooks = async function (
     return (await Book.paginate(
       { _id: { $in: bookIds } },
       options,
-    )) as PaginateResult<TBookDocument>;
+    )) as PaginateResult<TBook>;
   } catch (error) {
     throw error;
   }

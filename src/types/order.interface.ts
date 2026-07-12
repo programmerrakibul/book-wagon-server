@@ -1,13 +1,13 @@
+import type { Aggregate, AggregatePaginateModel, Document } from "mongoose";
 import type z from "zod";
+import type { TBook } from "@/book/interface/book.js";
 import type {
   orderQuerySchema,
   orderSchema,
   OrderStatus,
   PaymentStatus,
   updateOrderSchema,
-} from "../validators/order.validator.js";
-import type { TBookDocument } from "./book.interface.js";
-import type { Aggregate, AggregatePaginateModel, Document } from "mongoose";
+} from "../validations/order.validator.js";
 
 export type TCreateOrder = z.infer<typeof orderSchema>;
 export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
@@ -29,6 +29,6 @@ export interface TOrderDocument extends TCreateOrder, Document {
 export interface TOrderModel extends AggregatePaginateModel<TOrderDocument> {
   getOrdersByEmail(
     email: string,
-  ): Aggregate<TOrderDocument & { orderedBook: TBookDocument }[]>;
+  ): Aggregate<TOrderDocument & { orderedBook: TBook }[]>;
   isOrdered(bookId: string, customerEmail: string): Promise<boolean>;
 }

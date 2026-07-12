@@ -9,6 +9,8 @@ const opt: ConnectOptions = {
     deprecationErrors: true,
   },
   bufferCommands: false,
+  connectTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
 };
 
 export const dbConnect = async () => {

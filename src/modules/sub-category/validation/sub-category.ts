@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { transformToObjectId, validateObjectId } from "@/utils/utils.js";
 import z from "zod";
 
 export const createSubCategorySchema = z
@@ -15,9 +15,9 @@ export const createSubCategorySchema = z
       .trim()
       .min(1, "Category ID is required!")
       .refine((val) => {
-        return Types.ObjectId.isValid(val);
+        return validateObjectId(val);
       }, "Please provide a valid MongoDB ID!")
-      .transform((val) => new Types.ObjectId(val)),
+      .transform((val) => transformToObjectId(val)),
 
     photoUrl: z
       .url("Please provide a valid URL!")

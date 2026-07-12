@@ -1,20 +1,21 @@
+import type { TBook } from "@/book/interface/book.js";
+import Book from "@/book/model/book.js";
+import type { TBookStatus } from "@/book/validation/book.js";
+import type { NextFunction, Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { Book } from "../models/book.model.js";
-import { User } from "../models/user.model.js";
-import { Order } from "../models/order.model.js";
 import { Favorite } from "../models/favorite.model.js";
-import type { Request, Response, NextFunction } from "express";
+import { Order } from "../models/order.model.js";
+import { User } from "../models/user.model.js";
+import type { TFavoriteDocument } from "../types/favorite.interface.js";
+import type { TSuccessResponse } from "../types/index.interface.js";
 import type {
   TOrderDocument,
   TOrderStatus,
   TPaymentStatus,
 } from "../types/order.interface.js";
-import type { TFavoriteDocument } from "../types/favorite.interface.js";
-import type { TBookDocument, TBookStatus } from "../types/book.interface.js";
-import { OrderStatus, PaymentStatus } from "../validators/order.validator.js";
-import type { TSuccessResponse } from "../types/index.interface.js";
 import type { TUserDocument } from "../types/user.interface.js";
-import { UserRole } from "../validators/user.validator.js";
+import { OrderStatus, PaymentStatus } from "../validations/order.validator.js";
+import { UserRole } from "../validations/user.validator.js";
 
 export const getUserDashboardData = async (
   req: Request,
@@ -34,7 +35,7 @@ export const getUserDashboardData = async (
 
     const wishlistBookIds = wishlist?.bookIDs || [];
 
-    const wishlistBooksData: TBookDocument[] =
+    const wishlistBooksData: TBook[] =
       wishlistBookIds.length > 0
         ? await Book.find({ _id: { $in: wishlistBookIds } }).limit(5)
         : [];
@@ -51,7 +52,7 @@ export const getUserDashboardData = async (
 
     const orderIds = purchasedBooks.map((order) => order.bookId);
 
-    const orderBooks: TBookDocument[] =
+    const orderBooks: TBook[] =
       orderIds.length > 0 ? await Book.find({ _id: { $in: orderIds } }) : [];
 
     const bookPriceMap: Record<string, number> = {};
@@ -71,14 +72,14 @@ export const getUserDashboardData = async (
 
     const recentOrders = await Promise.all(
       orders.slice(0, 5).map(async (order) => {
-        const book: TBookDocument | null = await Book.findById(order.bookId);
+        const book: TBook | null = await Book.findById(order.bookId);
 
         if (!book) return null;
 
         return {
           id: order.orderID,
-          bookName: book.bookName,
-          bookImage: book.bookImage,
+          bookName: book.name,
+          bookImage: book.photoUrl,
           amount: `৳ ${book.price}`,
           paymentStatus: order.paymentStatus,
           date: new Date(order.createdAt).toLocaleDateString("en-US", {
@@ -133,10 +134,10 @@ export const getUserDashboardData = async (
       : new Date().getFullYear();
 
     const formattedWishlist = wishlistBooksData.map((book) => ({
-      title: book.bookName,
+      title: book.name,
       author: book.author,
       price: `৳ ${book.price}`,
-      image: book.bookImage,
+      image: book.photoUrl,
       bookId: book._id.toString(),
     }));
 
@@ -185,13 +186,13 @@ export const getLibrarianDashboardData = async (
       createdAt: -1,
     });
 
-    const myBooks: TBookDocument[] = await Book.find({ librarianEmail });
+    const myBooks: TBook[] = await Book.find({ librarianEmail });
 
     const totalOrders = allOrders.length;
     const myBooksCount = myBooks.length;
 
     const orderBookIds = allOrders.map((order) => order.bookId);
-    const orderBooks: TBookDocument[] = await Book.find({
+    const orderBooks: TBook[] = await Book.find({
       _id: { $in: orderBookIds },
     });
 
@@ -235,7 +236,7 @@ export const getLibrarianDashboardData = async (
 
     const recentOrders = await Promise.all(
       allOrders.slice(0, 8).map(async (order) => {
-        const book: TBookDocument | null = await Book.findById(order.bookId);
+        const book: TBook | null = await Book.findById(order.bookId);
 
         const customer: TUserDocument | null = await User.findOne({
           email: order.customerEmail,
@@ -245,8 +246,8 @@ export const getLibrarianDashboardData = async (
           id: order.orderID,
           customerName: order.customerName || customer?.name,
           customerEmail: order.customerEmail,
-          bookName: book?.bookName,
-          bookImage: book?.bookImage,
+          bookName: book?.name,
+          bookImage: book?.photoUrl,
           amount: `৳ ${book?.price}`,
           status: order.status,
           paymentStatus: order.paymentStatus,
@@ -271,7 +272,7 @@ export const getLibrarianDashboardData = async (
       .slice(0, 5)
       .map(([id]) => new ObjectId(id));
 
-    const topBooks: TBookDocument[] = await Book.find({
+    const topBooks: TBook[] = await Book.find({
       _id: { $in: sortedBookIds },
     });
 
@@ -280,7 +281,7 @@ export const getLibrarianDashboardData = async (
       const revenue = (book.price || 0) * sales;
 
       return {
-        title: book.bookName,
+        title: book.name,
         sales,
         revenue: `৳ ${revenue}`,
         bookId: book._id,
@@ -393,7 +394,7 @@ export const getAdminDashboardData = async (
 ) => {
   try {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
-      Book.find({}).sort({ createdAt: -1 }) as Promise<TBookDocument[]>,
+      Book.find({}).sort({ createdAt: -1 }) as Promise<TBook[]>,
       Order.find({}).sort({ createdAt: -1 }) as Promise<TOrderDocument[]>,
       User.find({}).sort({ createdAt: -1 }) as Promise<TUserDocument[]>,
       Favorite.find({}).sort({ createdAt: -1 }) as Promise<TFavoriteDocument[]>,
@@ -439,7 +440,7 @@ export const getAdminDashboardData = async (
 
     const recentOrders = await Promise.all(
       allOrders.slice(0, 10).map(async (order) => {
-        const book: TBookDocument | null = await Book.findById(order.bookId);
+        const book: TBook | null = await Book.findById(order.bookId);
         const customer: TUserDocument | null = await User.findOne({
           email: order.customerEmail,
         });
@@ -455,8 +456,8 @@ export const getAdminDashboardData = async (
           customerEmail: order.customerEmail,
           librarianName: librarian?.name || "Librarian",
           librarianEmail: order.librarianEmail,
-          bookName: book?.bookName || "Unknown Book",
-          bookImage: book?.bookImage,
+          bookName: book?.name || "Unknown Book",
+          bookImage: book?.photoUrl,
           amount: `৳ ${book?.price || 0}`,
           status: order.status,
           paymentStatus: order.paymentStatus,
@@ -481,7 +482,7 @@ export const getAdminDashboardData = async (
       .slice(0, 5)
       .map(([id]) => new ObjectId(id));
 
-    const topBooks: TBookDocument[] = await Book.find({
+    const topBooks: TBook[] = await Book.find({
       _id: { $in: sortedBookIds },
     });
 
@@ -489,10 +490,10 @@ export const getAdminDashboardData = async (
       const sales = bookSales[book._id.toString()] || 0;
 
       return {
-        title: book.bookName,
+        title: book.name,
         sales,
         author: book.author,
-        category: book.category,
+        category: book.categoryId,
         bookId: book._id,
         status: book.status,
         librarian: book.librarianEmail,

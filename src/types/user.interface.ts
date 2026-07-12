@@ -1,11 +1,11 @@
-import type z from "zod";
 import type { Document, PaginateModel } from "mongoose";
+import type z from "zod";
 import type {
   toggleRoleSchema,
   userQuerySchema,
   UserRole,
   userSchema,
-} from "../validators/user.validator.js";
+} from "../validations/user.validator.js";
 
 export type TCreateUser = z.infer<typeof userSchema>;
 export interface TUserDocument extends Document, TCreateUser {

@@ -1,5 +1,5 @@
-import type { Request, Response, NextFunction } from "express";
-import { objectIdSchema } from "../validators/objectId.validator.js";
+import type { NextFunction, Request, Response } from "express";
+import { objectIdSchema } from "../validations/objectId.validator.js";
 
 export const validateId = (
   req: Request<{ id: string }>,

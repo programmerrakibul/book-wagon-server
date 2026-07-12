@@ -69,9 +69,9 @@ const getSubCategories = async (): Promise<TSubCategory[]> => {
   return result;
 };
 
-const subCategoryService = {
+const services = {
   createSubCategory,
   getSubCategories,
 };
 
-export default subCategoryService;
+export default services;

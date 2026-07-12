@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors-enhanced";
+import status from "http-status";
 import { ZodError } from "zod";
 import type { TErrorResponse } from "../types/index.interface.js";
 import { sendErrorResponse } from "../utils/sendResponse.js";
@@ -12,7 +13,7 @@ export const globalErrorHandler = (
   _next: NextFunction,
 ) => {
   let message = "An unexpected error occurred!";
-  let statusCode = 500;
+  let statusCode = status.INTERNAL_SERVER_ERROR as number;
 
   if (err instanceof ApiError) {
     message = err.message;
@@ -23,7 +24,7 @@ export const globalErrorHandler = (
     const issues = Object.values(err.issues);
 
     message = issues.map((iss) => iss.message).join(", ");
-    statusCode = 400;
+    statusCode = status.UNPROCESSABLE_ENTITY as number;
   }
 
   if (err instanceof HttpError) {

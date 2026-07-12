@@ -1,26 +1,26 @@
+import type { NextFunction, Request, Response } from "express";
+import type { PaginateOptions } from "mongoose";
 import { Order } from "../models/order.model.js";
-import type { Request, Response, NextFunction } from "express";
-import { NotFoundError } from "../utils/utils.js";
 import { User } from "../models/user.model.js";
-import type { TUserDocument } from "../types/user.interface.js";
+import type { TBook } from "@/book/interface/book.js";
+import Book from "../modules/book/model/book.js";
+import type {
+  TPaginatedResponse,
+  TSuccessResponse,
+} from "../types/index.interface.js";
 import type {
   TCreateOrder,
   TOrderDocument,
   TOrderQuery,
   TUpdateOrder,
 } from "../types/order.interface.js";
-import type {
-  TPaginatedResponse,
-  TSuccessResponse,
-} from "../types/index.interface.js";
-import { Book } from "../models/book.model.js";
-import type { TBookDocument } from "../types/book.interface.js";
-import { orderQuerySchema } from "../validators/order.validator.js";
-import type { PaginateOptions } from "mongoose";
+import type { TUserDocument } from "../types/user.interface.js";
+import { NotFoundError } from "../utils/utils.js";
+import { orderQuerySchema } from "../validations/order.validator.js";
 
 export const getAllOrders = async (
   req: Request<{}, {}, {}, TOrderQuery>,
-  res: Response<TPaginatedResponse<{ orderedBook: TBookDocument }>>,
+  res: Response<TPaginatedResponse<{ orderedBook: TBook }>>,
   next: NextFunction,
 ) => {
   try {
@@ -100,7 +100,7 @@ export const postOrder = async (
     const { email } = req.user;
     const { bookId, ...orderData } = req.body;
 
-    const book: TBookDocument | null = await Book.findById(bookId);
+    const book: TBook | null = await Book.findById(bookId);
     const user: TUserDocument | null = await User.findOne({ email });
 
     if (!book) {

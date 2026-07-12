@@ -35,7 +35,7 @@ const schema = new mongoose.Schema<TSubCategory>(
   {
     timestamps: true,
     versionKey: false,
-    collection: "sub-category",
+    collection: "SubCategory",
   },
 );
 

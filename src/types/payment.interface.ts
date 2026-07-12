@@ -1,7 +1,7 @@
-import type z from "zod";
-import type { TPaymentStatus } from "./order.interface.js";
 import type { AggregatePaginateModel, Document, Types } from "mongoose";
-import type { paymentQuerySchema } from "../validators/payment.validator.js";
+import type z from "zod";
+import type { paymentQuerySchema } from "../validations/payment.validator.js";
+import type { TPaymentStatus } from "./order.interface.js";
 
 export interface TPaymentDocument extends Document {
   orderID: string;

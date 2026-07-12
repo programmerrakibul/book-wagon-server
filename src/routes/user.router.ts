@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { verifyTokenID } from "../middlewares/verifyTokenID.middleware.js";
 import {
-  postUser,
-  getUsers,
-  updateUserRole,
   getUserRole,
+  getUsers,
+  postUser,
+  updateUserRole,
 } from "../controllers/users.controller.js";
-import { authorize } from "../middlewares/authorize.middleware.js";
+import { authorize } from "../middlewares/authorize.js";
 import { validateData } from "../middlewares/validateData.middleware.js";
-import { userSchema, toggleRoleSchema } from "../validators/user.validator.js";
+import { verifyTokenID } from "../middlewares/verify-token.js";
+import { toggleRoleSchema, userSchema } from "../validations/user.validator.js";
 
 export const usersRouter: Router = Router();
 
