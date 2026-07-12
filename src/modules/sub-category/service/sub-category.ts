@@ -32,6 +32,14 @@ const createSubCategory = async (payload: unknown) => {
       throw new ConflictError("SubCategory already exists in this category!");
     }
 
+    const existingSlugInSubCategory = await SubCategory.findOne({
+      slug: parsedData.slug,
+    }).session(session);
+
+    if (existingSlugInSubCategory) {
+      throw new ConflictError("SubCategory with this slug already exists!");
+    }
+
     const [result] = await SubCategory.create([parsedData], { session });
 
     await Category.findByIdAndUpdate(
@@ -56,7 +64,7 @@ const createSubCategory = async (payload: unknown) => {
 const getSubCategories = async (): Promise<TSubCategory[]> => {
   const result = await SubCategory.find({})
     .sort({ createdAt: -1, name: 1 })
-    .populate("categoryId", "name");
+    .populate("categoryId", "name slug");
 
   return result;
 };

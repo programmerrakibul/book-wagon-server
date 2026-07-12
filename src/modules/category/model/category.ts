@@ -1,7 +1,7 @@
 import type { TCategory } from "@/category/interface/category.js";
 import { model, Schema } from "mongoose";
 
-const categorySchema = new Schema<TCategory>(
+const schema = new Schema<TCategory>(
   {
     name: {
       type: String,
@@ -9,12 +9,22 @@ const categorySchema = new Schema<TCategory>(
       trim: true,
       unique: true,
     },
+
     photoUrl: {
       type: String,
       required: false,
       trim: true,
       default: "",
     },
+
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      lowercase: true,
+    },
+    
     subCategories: [
       {
         type: Schema.Types.ObjectId,
@@ -22,7 +32,9 @@ const categorySchema = new Schema<TCategory>(
         index: true,
       },
     ],
+
   },
+
   {
     timestamps: true,
     versionKey: false,
@@ -30,6 +42,12 @@ const categorySchema = new Schema<TCategory>(
   },
 );
 
-const Category = model<TCategory>("Category", categorySchema);
+schema.pre("save", function () {
+  if (!this.slug) {
+    this.slug = this.name.toLowerCase().replace(/\s+/g, "-");
+  }
+});
+
+const Category = model<TCategory>("Category", schema);
 
 export default Category;

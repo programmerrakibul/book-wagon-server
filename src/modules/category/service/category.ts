@@ -17,13 +17,21 @@ const createCategory = async (payload: unknown) => {
     throw new ConflictError("Category already exists!");
   }
 
+  const existingSlugInCategory = await Category.findOne({
+    slug: parsedData.slug,
+  });
+
+  if (existingSlugInCategory) {
+    throw new ConflictError("Category with this slug already exists!");
+  }
+
   await Category.create(parsedData);
 };
 
 const getCategories = async (): Promise<TCategory[]> => {
   const result = await Category.find({})
     .sort({ name: 1, createdAt: -1 })
-    .populate("subCategories", "name");
+    .populate("subCategories", "name slug");
 
   return result;
 };
