@@ -9,7 +9,7 @@ import { dashboardRouter } from "@/dashboard/routes/dashboard.js";
 import { favoritesRouter } from "@/favorite/routes/favorite.js";
 import { healthCheck } from "@/health/controller/health.js";
 import { globalErrorHandler } from "@/middlewares/global-error-handler.js";
-import { ordersRouter } from "@/order/routes/order.js";
+import ordersRouter from "@/order/routes/order.js";
 import { paymentsRouter } from "@/payment/routes/payment.js";
 import subCategoryRouter from "@/sub-category/routes/sub-category.js";
 import { usersRouter } from "@/user/routes/user.js";

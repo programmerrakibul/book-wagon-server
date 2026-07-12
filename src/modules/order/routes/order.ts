@@ -1,28 +1,21 @@
 import { validateData } from "@/middlewares/validateData.middleware.js";
 import { validateId } from "@/middlewares/validateId.middleware.ts.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
-import {
+import controllers, {
   getAllOrders,
-  isOrdered,
-  postOrder,
   updateOrder,
 } from "@/order/controller/order.js";
-import { orderSchema, updateOrderSchema } from "@/order/validation/order.js";
+import { updateOrderSchema } from "@/order/validation/order.js";
 import { Router } from "express";
 
-export const ordersRouter: Router = Router();
+const router = Router();
 
-ordersRouter.use(verifyTokenID);
+router.use(verifyTokenID);
 
-ordersRouter.get("/check-ordered/:id", validateId, isOrdered);
+router.get("/", getAllOrders);
 
-ordersRouter.get("/", getAllOrders);
+router.post("/", controllers.createOrder);
 
-ordersRouter.post("/", validateData(orderSchema), postOrder);
+router.put("/:id", validateId, validateData(updateOrderSchema), updateOrder);
 
-ordersRouter.put(
-  "/:id",
-  validateId,
-  validateData(updateOrderSchema),
-  updateOrder,
-);
+export default router;

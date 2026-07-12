@@ -1,59 +1,64 @@
-import type { TOrderStatus, TPaymentStatus } from "@/order/interface/order.js";
-import { userQuerySchema } from "@/user/validation/user.js";
-import { objectIdSchema } from "@/validations/objectId.validator.js";
-import { Types } from "mongoose";
+import {
+  paginationQuery,
+  projectionQuery,
+  searchQuery,
+  sortQuery,
+} from "@/lib/query.js";
+import {
+  double,
+  transformToObjectId,
+  validateObjectId,
+} from "@/utils/utils.js";
 import z from "zod";
 
 export const OrderStatus = {
-  PENDING: "pending",
-  SHIPPED: "shipped",
-  DELIVERED: "delivered",
-  CANCELLED: "cancelled",
+  PENDING: "PENDING",
+  SHIPPED: "SHIPPED",
+  DELIVERED: "DELIVERED",
+  CANCELLED: "CANCELLED",
 } as const;
 
 export const PaymentStatus = {
-  PAID: "paid",
-  UNPAID: "unpaid",
-  PENDING: "pending",
-  FAILED: "failed",
-  REFUNDED: "refunded",
+  UNPAID: "UNPAID",
+  PAID: "PAID",
+  FAILED: "FAILED",
+  REFUNDED: "REFUNDED",
 } as const;
 
-export const orderSchema = z.object(
-  {
-    bookId: objectIdSchema.transform((val) => new Types.ObjectId(val)),
-    price: z.coerce
-      .number({
-        error: (iss) => {
-          return iss.input === undefined || iss.received === "NaN"
-            ? "Price is required!"
-            : "Please provide a valid price!";
-        },
-      })
-      .min(1, "Price must be positive!")
-      .max(999999.99, "Price is too high!"),
-    phone: z.string({
-      error: (iss) => {
-        return iss.input === undefined
-          ? "Phone number is required!"
-          : "Please provide a valid phone number!";
-      },
-    }),
-    address: z
-      .string({
-        error: (iss) => {
-          return iss.input === undefined
-            ? "Address is required!"
-            : "Please provide a valid address!";
-        },
-      })
-      .min(3, "Address must be at least 3 characters long")
-      .max(100, "Address cannot exceed 100 characters"),
-  },
-  "Order data is required in the request body!",
-);
+export const createOrderSchema = z.object({
+  bookId: z
+    .string("Please provide a valid book ID!")
+    .trim()
+    .min(1, "Book ID is required!")
+    .refine((val) => {
+      return validateObjectId(val);
+    }, "Please provide a valid MongoDB ID!")
+    .transform((val) => transformToObjectId(val)),
 
-export const updateOrderSchema = orderSchema
+  price: z.coerce
+    .number("Please provide a valid price!")
+    .positive("Price must be positive!")
+    .min(1, "Price is required!")
+    .max(999999.99, "Price is too high!")
+    .transform((value) => double(value)),
+
+  quantity: z.coerce
+    .number("Please provide a valid quantity!")
+    .min(1, "Quantity must be at least 1")
+    .max(9999, "Quantity cannot exceed 9999"),
+
+  phoneNumber: z
+    .string("Please provide a valid Phone Number!")
+    .trim()
+    .min(1, "Phone Number is required!"),
+
+  address: z
+    .string("Please provide a valid address!")
+    .min(3, "Address must be at least 3 characters long")
+    .max(100, "Address cannot exceed 100 characters"),
+});
+
+export const updateOrderSchema = createOrderSchema
   .extend({
     status: z.enum(
       Object.values(OrderStatus) as [TOrderStatus, ...TOrderStatus[]],
@@ -66,4 +71,15 @@ export const updateOrderSchema = orderSchema
   })
   .partial();
 
-export const orderQuerySchema = userQuerySchema;
+export const orderQuerySchema = z.object({
+  ...paginationQuery,
+  ...searchQuery,
+  ...sortQuery,
+  ...projectionQuery,
+});
+
+export type TCreateOrder = z.infer<typeof createOrderSchema>;
+export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
+export type TOrderQuery = z.infer<typeof orderQuerySchema>;
+export type TOrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+export type TPaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];

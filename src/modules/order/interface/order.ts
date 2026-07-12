@@ -1,34 +1,23 @@
 import type { TBook } from "@/book/interface/book.js";
 import type {
-  orderQuerySchema,
-  orderSchema,
-  OrderStatus,
-  PaymentStatus,
-  updateOrderSchema,
+  TCreateOrder,
+  TOrderStatus,
+  TPaymentStatus,
 } from "@/order/validation/order.js";
-import type { Aggregate, AggregatePaginateModel, Document } from "mongoose";
-import type z from "zod";
+import type {
+  Aggregate,
+  AggregatePaginateModel,
+  Document,
+  Types,
+} from "mongoose";
 
-export type TCreateOrder = z.infer<typeof orderSchema>;
-export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
-export type TOrderQuery = z.infer<typeof orderQuerySchema>;
-export type TOrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
-export type TPaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
-
-export interface TOrderDocument extends TCreateOrder, Document {
-  customerName: string;
-  customerEmail: string;
-  librarianEmail: string;
-  orderID: string;
+export interface TOrder extends TCreateOrder, Document {
   status: TOrderStatus;
   paymentStatus: TPaymentStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  customerId: Types.ObjectId;
 }
 
-export interface TOrderModel extends AggregatePaginateModel<TOrderDocument> {
-  getOrdersByEmail(
-    email: string,
-  ): Aggregate<TOrderDocument & { orderedBook: TBook }[]>;
+export interface TOrderModel extends AggregatePaginateModel<TOrder> {
+  getOrdersByEmail(email: string): Aggregate<TOrder & { orderedBook: TBook }[]>;
   isOrdered(bookId: string, customerEmail: string): Promise<boolean>;
 }

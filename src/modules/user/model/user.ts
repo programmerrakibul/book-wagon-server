@@ -40,8 +40,11 @@ const userSchema = new Schema(
       default: () => new Date(),
     },
   },
+  
   {
     timestamps: true,
+    collection: "User",
+    versionKey: false,
   },
 );
 

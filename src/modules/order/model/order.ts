@@ -1,70 +1,66 @@
 import type { TBook } from "@/book/interface/book.js";
+import { type TOrder, type TOrderModel } from "@/order/interface/order.js";
 import {
-  type TOrderDocument,
-  type TOrderModel,
+  OrderStatus,
+  PaymentStatus,
   type TOrderStatus,
   type TPaymentStatus,
-} from "@/order/interface/order.js";
-import { OrderStatus, PaymentStatus } from "@/order/validation/order.js";
+} from "@/order/validation/order.js";
 import { Aggregate, model, Schema, Types, type PipelineStage } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-const orderSchema = new Schema<TOrderDocument>(
+const orderSchema = new Schema<TOrder>(
   {
     bookId: {
       type: Types.ObjectId,
       required: true,
       ref: "Book",
+      index: true,
     },
+
+    customerId: {
+      type: Types.ObjectId,
+      required: true,
+      ref: "User",
+      index: true,
+    },
+
     price: {
       type: Number,
       required: true,
     },
-    librarianEmail: {
-      type: String,
+
+    quantity: {
+      type: Number,
       required: true,
-      trim: true,
-      lowercase: true,
     },
-    customerName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    customerEmail: {
-      type: String,
-      required: true,
-      trim: true,
-      lowercase: true,
-    },
-    phone: {
+
+    phoneNumber: {
       type: String,
       required: true,
       trim: true,
     },
+
     address: {
       type: String,
       required: true,
       trim: true,
     },
-    orderID: {
-      type: String,
-      unique: true,
-      default: () => `BW${new Types.ObjectId().toString().slice(0, 10)}`,
-    },
+
     status: {
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
+      uppercase: true,
       enum: Object.values(OrderStatus) as [TOrderStatus, ...TOrderStatus[]],
       default: OrderStatus.PENDING,
     },
+
     paymentStatus: {
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
+      uppercase: true,
       enum: Object.values(PaymentStatus) as [
         TPaymentStatus,
         ...TPaymentStatus[],
@@ -72,14 +68,17 @@ const orderSchema = new Schema<TOrderDocument>(
       default: PaymentStatus.UNPAID,
     },
   },
+
   {
     timestamps: true,
+    collection: "Order",
+    versionKey: false,
   },
 );
 
 orderSchema.statics.getOrdersByEmail = function (
   email: string,
-): Aggregate<TOrderDocument & { orderedBook: TBook }[]> {
+): Aggregate<TOrder & { orderedBook: TBook }[]> {
   try {
     const pipeline: PipelineStage[] = [
       {
@@ -114,7 +113,7 @@ orderSchema.statics.getOrdersByEmail = function (
     ];
 
     return this.aggregate(pipeline) as Aggregate<
-      TOrderDocument & { orderedBook: TBook }[]
+      TOrder & { orderedBook: TBook }[]
     >;
   } catch (error) {
     throw error;
@@ -126,7 +125,7 @@ orderSchema.statics.isOrdered = async function (
   customerEmail: string,
 ) {
   try {
-    const order: TOrderDocument | null = await this.findOne({
+    const order: TOrder | null = await this.findOne({
       bookId,
       customerEmail,
     });
@@ -150,4 +149,4 @@ orderSchema.statics.isOrdered = async function (
 
 orderSchema.plugin(mongooseAggregatePaginate);
 
-export const Order = model<TOrderDocument, TOrderModel>("Order", orderSchema);
+export const Order = model<TOrder, TOrderModel>("Order", orderSchema);

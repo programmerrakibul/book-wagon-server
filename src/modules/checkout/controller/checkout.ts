@@ -2,10 +2,7 @@ import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import { envConfig } from "@/config/env.js";
 import { stripe } from "@/config/stripe.js";
-import {
-  type TOrderDocument,
-  type TPaymentStatus,
-} from "@/order/interface/order.js";
+import { type TOrder, type TPaymentStatus } from "@/order/interface/order.js";
 import { Order } from "@/order/model/order.js";
 import { PaymentStatus } from "@/order/validation/order.js";
 import { Payment } from "@/payment/model/payment.js";
@@ -26,7 +23,7 @@ export const createCheckout = async (
     const clientUrl = envConfig.CLIENT_URL;
     const { email: customerEmail } = req.user;
 
-    const order: TOrderDocument | null = await Order.findOne({
+    const order: TOrder | null = await Order.findOne({
       orderID,
     });
 

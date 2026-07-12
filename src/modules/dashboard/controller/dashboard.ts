@@ -4,7 +4,7 @@ import type { TBookStatus } from "@/book/validation/book.js";
 import type { TFavoriteDocument } from "@/favorite/interface/favorite.js";
 import { Favorite } from "@/favorite/model/favorite.js";
 import type {
-  TOrderDocument,
+  TOrder,
   TOrderStatus,
   TPaymentStatus,
 } from "@/order/interface/order.js";
@@ -25,7 +25,7 @@ export const getUserDashboardData = async (
   try {
     const { email: customerEmail } = req.user;
 
-    const orders: TOrderDocument[] | null = await Order.find({
+    const orders: TOrder[] | null = await Order.find({
       customerEmail,
     }).sort({ createdAt: -1 });
 
@@ -180,7 +180,7 @@ export const getLibrarianDashboardData = async (
   try {
     const { email: librarianEmail } = req.user;
 
-    const allOrders: TOrderDocument[] = await Order.find({
+    const allOrders: TOrder[] = await Order.find({
       librarianEmail,
     }).sort({
       createdAt: -1,
@@ -231,8 +231,8 @@ export const getLibrarianDashboardData = async (
       {} as Record<TOrderStatus, number>,
     );
 
-    const totalCompletedOrder = statusCounts.delivered || 0;
-    const pendingOrders = statusCounts.pending || 0;
+    const totalCompletedOrder = statusCounts.DELIVERED || 0;
+    const pendingOrders = statusCounts.PENDING || 0;
 
     const recentOrders = await Promise.all(
       allOrders.slice(0, 8).map(async (order) => {
@@ -395,7 +395,7 @@ export const getAdminDashboardData = async (
   try {
     const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
       Book.find({}).sort({ createdAt: -1 }) as Promise<TBook[]>,
-      Order.find({}).sort({ createdAt: -1 }) as Promise<TOrderDocument[]>,
+      Order.find({}).sort({ createdAt: -1 }) as Promise<TOrder[]>,
       User.find({}).sort({ createdAt: -1 }) as Promise<TUserDocument[]>,
       Favorite.find({}).sort({ createdAt: -1 }) as Promise<TFavoriteDocument[]>,
     ]);
@@ -550,7 +550,7 @@ export const getAdminDashboardData = async (
       {} as Record<TBookStatus, number>,
     );
 
-    const totalCompletedOrder = orderStatusCounts.delivered || 0;
+    const totalCompletedOrder = orderStatusCounts.DELIVERED || 0;
     const successRate =
       totalOrders > 0
         ? Math.round((totalCompletedOrder / totalOrders) * 100)

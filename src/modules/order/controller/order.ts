@@ -1,21 +1,20 @@
 import type { TBook } from "@/book/interface/book.js";
-import Book from "@/book/model/book.js";
-import type {
-  TCreateOrder,
-  TOrderDocument,
-  TOrderQuery,
-  TUpdateOrder,
-} from "@/order/interface/order.js";
+import type { TOrder } from "@/order/interface/order.js";
 import { Order } from "@/order/model/order.js";
-import { orderQuerySchema } from "@/order/validation/order.js";
+import services from "@/order/service/order.js";
+import {
+  orderQuerySchema,
+  type TOrderQuery,
+  type TUpdateOrder,
+} from "@/order/validation/order.js";
 import type {
   TPaginatedResponse,
   TSuccessResponse,
 } from "@/types/index.interface.js";
-import type { TUserDocument } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import { sendSuccessResponse } from "@/utils/sendResponse.js";
 import type { NextFunction, Request, Response } from "express";
 import { NotFoundError } from "http-errors-enhanced";
+import status from "http-status";
 import type { PaginateOptions } from "mongoose";
 
 export const getAllOrders = async (
@@ -91,41 +90,13 @@ export const isOrdered = async (
   }
 };
 
-export const postOrder = async (
-  req: Request<{}, {}, TCreateOrder>,
-  res: Response<TSuccessResponse>,
-  next: NextFunction,
-) => {
-  try {
-    const { email } = req.user;
-    const { bookId, ...orderData } = req.body;
+const createOrder = async (req: Request, res: Response) => {
+  const { _id } = req.user;
+  await services.createOrder(req.body, _id);
 
-    const book: TBook | null = await Book.findById(bookId);
-    const user: TUserDocument | null = await User.findOne({ email });
-
-    if (!book) {
-      throw new NotFoundError("Book data not found!");
-    }
-
-    if (!user) {
-      throw new NotFoundError("Customer data not found!");
-    }
-
-    await Order.create({
-      bookId,
-      ...orderData,
-      customerEmail: email,
-      customerName: user.name,
-      librarianEmail: book.librarianEmail,
-    });
-
-    res.status(201).send({
-      success: true,
-      message: "Order data posted successfully",
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.CREATED, {
+    message: "Order created successfully!",
+  });
 };
 
 export const updateOrder = async (
@@ -136,7 +107,7 @@ export const updateOrder = async (
   try {
     const { id } = req.params;
 
-    const order: TOrderDocument | null = await Order.findById(id);
+    const order: TOrder | null = await Order.findById(id);
 
     if (!order) {
       throw new NotFoundError("Order data not found!");
@@ -154,3 +125,12 @@ export const updateOrder = async (
     next(err);
   }
 };
+
+const controllers = {
+  getAllOrders,
+  isOrdered,
+  createOrder,
+  updateOrder,
+};
+
+export default controllers;
