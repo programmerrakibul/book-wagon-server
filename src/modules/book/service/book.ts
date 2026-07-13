@@ -7,10 +7,11 @@ import {
   updateBookSchema,
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
-import { Order } from "@/modules/order/model/order.js";
-import type { TUserRole } from "@/modules/user/interface/user.js";
-import { User } from "@/modules/user/model/user.js";
-import { UserRole } from "@/modules/user/validation/user.js";
+import Order from "@/order/model/order.js";
+import type { TUserRole } from "@/user/interface/user.js";
+import { User } from "@/user/model/user.js";
+import { UserRole } from "@/user/validation/user.js";
+import { getPaginatedData } from "@/utils/getPaginatedData.js";
 import {
   parseOrThrow,
   transformToObjectId,
@@ -24,9 +25,54 @@ import mongoose, {
   type PopulateOptions,
 } from "mongoose";
 
-const createBook = async (payload: unknown, librarianEmail: string) => {
+const bookPopulateOptions: PopulateOptions[] = [
+  {
+    path: "categoryId",
+    select: "name slug",
+  },
+  {
+    path: "subcategoryId",
+    select: "name slug",
+  },
+  {
+    path: "formatId",
+    select: "name",
+  },
+  {
+    path: "librarianId",
+    select: "name email",
+  },
+];
+
+const createBook = async (
+  payload: unknown,
+  librarianId: TBook["librarianId"],
+) => {
   const parsedData = parseOrThrow(createBookSchema, payload);
-  await Book.create({ ...parsedData, librarianEmail });
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const [book] = await Book.create([{ ...parsedData, librarianId }], {
+      session,
+    });
+
+    const librarian = await User.findById(librarianId).session(session);
+
+    if (!librarian) {
+      throw new NotFoundError("Librarian not found!");
+    }
+
+    librarian.books.push(book?._id);
+    await librarian.save({ session });
+
+    await session.commitTransaction();
+  } catch (error: unknown) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 };
 
 const getBooks = async (queryPayload: unknown) => {
@@ -40,7 +86,6 @@ const getBooks = async (queryPayload: unknown) => {
   let sort: Record<string, 1 | -1> = {
     createdAt: -1,
   };
-  let projectionField: Record<string, 1 | 0> = {};
 
   const {
     search,
@@ -48,23 +93,25 @@ const getBooks = async (queryPayload: unknown) => {
     sortOrder,
     limit = 10,
     page = 1,
-    fields,
-    excludes,
     category,
     email,
   } = parseOrThrow(bookQuerySchema, queryPayload);
 
   if (email) {
-    const role = await User.getRole(email);
+    const user = await User.findOne({ email }).select("role").lean().exec();
 
-    if (roles.includes(role as Exclude<TUserRole, "user">)) {
-      delete query.status;
-      delete query.isActive;
-    }
+    if (user) {
+      const { role, _id } = user;
 
-    if (role === UserRole.LIBRARIAN) {
-      query.librarianEmail = email;
-      delete query.isActive;
+      if (roles.includes(role as Exclude<TUserRole, "user">)) {
+        delete query.status;
+        delete query.isActive;
+
+        if (role === UserRole.LIBRARIAN) {
+          query.librarianId = _id;
+          delete query.isActive;
+        }
+      }
     }
   }
 
@@ -72,7 +119,11 @@ const getBooks = async (queryPayload: unknown) => {
     if (validateObjectId(category)) {
       query.categoryId = transformToObjectId(category);
     } else {
-      const categoryDoc = await Category.findOne({ slug: category });
+      const categoryDoc = await Category.findOne({ slug: category })
+        .select("_id")
+        .lean()
+        .exec();
+
       if (categoryDoc) {
         query.categoryId = categoryDoc._id;
       } else {
@@ -91,12 +142,6 @@ const getBooks = async (queryPayload: unknown) => {
           $options: "i",
         },
       },
-      {
-        librarianEmail: {
-          $regex: search,
-          $options: "i",
-        },
-      },
     ];
   }
 
@@ -105,42 +150,16 @@ const getBooks = async (queryPayload: unknown) => {
     sort[sortBy] = order;
   }
 
-  if (fields) {
-    fields.forEach((f) => {
-      projectionField![f] = 1;
-    });
-  }
-
-  if (excludes) {
-    excludes.forEach((f) => {
-      projectionField![f] = 0;
-    });
-  }
-
   const options: PaginateOptions = {
     limit,
     page,
     sort,
-    projection: projectionField,
-    populate: [
-      {
-        path: "categoryId",
-        select: "name slug",
-      },
-      {
-        path: "subcategoryId",
-        select: "name slug",
-      },
-      {
-        path: "formatId",
-        select: "name",
-      },
-    ],
+    populate: bookPopulateOptions,
   };
 
   const result: PaginateResult<TBook> = await Book.paginate(query, options);
 
-  return result;
+  return getPaginatedData(result);
 };
 
 const getBookById = async (id: string) => {
@@ -148,23 +167,8 @@ const getBookById = async (id: string) => {
     throw new BadRequestError("Provided id is not valid MongoDB id!");
   }
 
-  const populateOptions: PopulateOptions[] = [
-    {
-      path: "categoryId",
-      select: "name slug",
-    },
-    {
-      path: "subcategoryId",
-      select: "name slug",
-    },
-    {
-      path: "formatId",
-      select: "name",
-    },
-  ];
-
   const book: TBook | null = await Book.findById(id)
-    .populate(populateOptions)
+    .populate(bookPopulateOptions)
     .lean();
 
   if (!book) {

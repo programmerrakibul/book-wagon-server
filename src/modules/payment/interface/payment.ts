@@ -1,4 +1,4 @@
-import type { TPaymentStatus } from "@/order/interface/order.js";
+import type { TPaymentStatus } from "@/order/validation/order.js";
 import type { paymentQuerySchema } from "@/payment/validation/payment.js";
 import type { AggregatePaginateModel, Document, Types } from "mongoose";
 import type z from "zod";

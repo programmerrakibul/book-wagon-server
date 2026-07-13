@@ -5,17 +5,19 @@ interface TPaginatedLabel extends CustomLabels<
   number | boolean | null | undefined
 > {}
 
+export type TPagination = {
+  totalDocs: TPaginatedLabel["totalDocs"];
+  hasPrevPage: TPaginatedLabel["hasPrevPage"];
+  hasNextPage: TPaginatedLabel["hasNextPage"];
+  totalPages: TPaginatedLabel["totalPages"];
+  page?: TPaginatedLabel["page"];
+};
+
 export type TSuccessResponse<T = unknown> = {
   success: true;
   message: string;
   data?: T;
-  pagination?: {
-    totalDocs: TPaginatedLabel["totalDocs"];
-    hasPrevPage: TPaginatedLabel["hasPrevPage"];
-    hasNextPage: TPaginatedLabel["hasNextPage"];
-    totalPages: TPaginatedLabel["totalPages"];
-    page?: TPaginatedLabel["page"];
-  };
+  pagination?: TPagination;
 };
 
 export type TErrorResponse = {

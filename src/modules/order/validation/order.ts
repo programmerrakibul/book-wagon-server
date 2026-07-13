@@ -1,14 +1,5 @@
-import {
-  paginationQuery,
-  projectionQuery,
-  searchQuery,
-  sortQuery,
-} from "@/lib/query.js";
-import {
-  double,
-  transformToObjectId,
-  validateObjectId,
-} from "@/utils/utils.js";
+import { paginationQuery, searchQuery, sortQuery } from "@/lib/query.js";
+import { transformToObjectId, validateObjectId } from "@/utils/utils.js";
 import z from "zod";
 
 export const OrderStatus = {
@@ -26,26 +17,25 @@ export const PaymentStatus = {
 } as const;
 
 export const createOrderSchema = z.object({
-  bookId: z
-    .string("Please provide a valid book ID!")
-    .trim()
-    .min(1, "Book ID is required!")
-    .refine((val) => {
-      return validateObjectId(val);
-    }, "Please provide a valid MongoDB ID!")
-    .transform((val) => transformToObjectId(val)),
+  books: z.array(
+    z.object({
+      bookId: z
+        .string("Please provide a valid book ID!")
+        .trim()
+        .min(1, "Book ID is required!")
+        .refine((val) => {
+          return validateObjectId(val);
+        }, "Please provide a valid MongoDB ID!")
+        .transform((val) => transformToObjectId(val)),
 
-  price: z.coerce
-    .number("Please provide a valid price!")
-    .positive("Price must be positive!")
-    .min(1, "Price is required!")
-    .max(999999.99, "Price is too high!")
-    .transform((value) => double(value)),
+      quantity: z.coerce
+        .number("Please provide a valid quantity!")
+        .min(1, "Quantity must be at least 1")
+        .max(9999, "Quantity cannot exceed 9999"),
+    }),
 
-  quantity: z.coerce
-    .number("Please provide a valid quantity!")
-    .min(1, "Quantity must be at least 1")
-    .max(9999, "Quantity cannot exceed 9999"),
+    "Please provide at least one book!",
+  ),
 
   phoneNumber: z
     .string("Please provide a valid Phone Number!")
@@ -75,7 +65,6 @@ export const orderQuerySchema = z.object({
   ...paginationQuery,
   ...searchQuery,
   ...sortQuery,
-  ...projectionQuery,
 });
 
 export type TCreateOrder = z.infer<typeof createOrderSchema>;

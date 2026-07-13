@@ -21,7 +21,7 @@ router.put(
 router.delete(
   "/:id",
   verifyTokenID,
-  // authorize("admin"),
+  authorize("admin"),
   controllers.deleteBookById,
 );
 

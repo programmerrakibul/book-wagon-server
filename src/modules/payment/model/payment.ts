@@ -1,4 +1,4 @@
-import type { TPaymentStatus } from "@/order/interface/order.js";
+import type { TPaymentStatus } from "@/order/validation/order.js";
 import { PaymentStatus } from "@/order/validation/order.js";
 import type {
   TPaymentDocument,

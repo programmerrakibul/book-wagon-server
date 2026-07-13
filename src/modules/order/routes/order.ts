@@ -1,10 +1,7 @@
 import { validateData } from "@/middlewares/validateData.middleware.js";
 import { validateId } from "@/middlewares/validateId.middleware.ts.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
-import controllers, {
-  getAllOrders,
-  updateOrder,
-} from "@/order/controller/order.js";
+import controllers, { updateOrder } from "@/order/controller/order.js";
 import { updateOrderSchema } from "@/order/validation/order.js";
 import { Router } from "express";
 
@@ -12,7 +9,7 @@ const router = Router();
 
 router.use(verifyTokenID);
 
-router.get("/", getAllOrders);
+router.get("/", controllers.getOrders);
 
 router.post("/", controllers.createOrder);
 

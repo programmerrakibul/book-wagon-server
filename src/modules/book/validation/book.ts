@@ -78,10 +78,10 @@ const baseBookSchema = z.object({
     }, "Please provide a valid MongoDB ID!")
     .transform((val) => transformToObjectId(val)),
 
-  quantity: z.coerce
-    .number<number>("Please provide a valid quantity!")
-    .min(1, "Quantity must be at least 1")
-    .max(9999, "Quantity cannot exceed 9999"),
+  stock: z.coerce
+    .number<number>("Please provide a valid stock!")
+    .min(1, "Stock must be at least 1")
+    .max(9999, "Stock cannot exceed 9999"),
 
   price: z.coerce
     .number<number>("Please provide a valid price!")
@@ -109,7 +109,7 @@ const baseBookSchema = z.object({
 });
 
 export const createBookSchema = baseBookSchema.extend({
-  quantity: baseBookSchema.shape.quantity.default(1),
+  quantity: baseBookSchema.shape.stock.default(1),
   status: baseBookSchema.shape.status.default(BookStatus.UNPUBLISHED),
 });
 

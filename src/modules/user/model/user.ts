@@ -15,6 +15,7 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
+
     email: {
       type: String,
       required: true,
@@ -22,11 +23,13 @@ const userSchema = new Schema(
       trim: true,
       lowercase: true,
     },
-    photoURL: {
+
+    photoUrl: {
       type: String,
       trim: true,
       required: true,
     },
+
     role: {
       type: String,
       required: true,
@@ -35,12 +38,31 @@ const userSchema = new Schema(
       enum: Object.values(UserRole) as [TUserRole, ...TUserRole[]],
       default: UserRole.USER,
     },
+
+    books: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Book",
+        required: true,
+        index: true,
+      },
+    ],
+
+    orders: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Order",
+        required: true,
+        index: true,
+      },
+    ],
+
     lastLoggedIn: {
       type: Date,
       default: () => new Date(),
     },
   },
-  
+
   {
     timestamps: true,
     collection: "User",
@@ -48,9 +70,13 @@ const userSchema = new Schema(
   },
 );
 
-userSchema.statics.getRole = async function (email: string) {
+userSchema.statics.getRole = async function (
+  query: string | Schema.Types.ObjectId,
+) {
   try {
-    const user: TUserDocument | null = await this.findOne({ email });
+    const user: TUserDocument | null = await this.findOne({
+      $or: [{ email: query }, { _id: query }],
+    });
 
     if (!user) {
       throw new NotFoundError("User not found!");
@@ -63,11 +89,13 @@ userSchema.statics.getRole = async function (email: string) {
 };
 
 userSchema.statics.toggleRole = async function (
-  email: string,
+  query: string | Schema.Types.ObjectId,
   newRole: string,
 ) {
   try {
-    const user: TUserDocument | null = await this.findOne({ email });
+    const user: TUserDocument | null = await this.findOne({
+      $or: [{ email: query }, { _id: query }],
+    });
 
     if (!user) {
       throw new NotFoundError("User not found!");

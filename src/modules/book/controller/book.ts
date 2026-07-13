@@ -4,18 +4,11 @@ import type { Request, Response } from "express";
 import status from "http-status";
 
 const getBooks = async (req: Request, res: Response) => {
-  const { docs, ...pagination } = await services.getBooks(req.query);
+  const result = await services.getBooks(req.query);
 
   sendSuccessResponse(res, status.OK, {
     message: "Books data fetched successfully",
-    data: docs,
-    pagination: {
-      totalDocs: pagination.totalDocs,
-      hasPrevPage: pagination.hasPrevPage,
-      hasNextPage: pagination.hasNextPage,
-      totalPages: pagination.totalPages,
-      page: pagination.page,
-    },
+    ...result,
   });
 };
 
@@ -29,8 +22,8 @@ const getBookById = async (req: Request<{ id: string }>, res: Response) => {
 };
 
 const createBook = async (req: Request, res: Response) => {
-  const { email } = req.user;
-  await services.createBook(req.body, email);
+  const { _id } = req.user;
+  await services.createBook(req.body, _id);
 
   sendSuccessResponse(res, status.CREATED, {
     message: "Book created successfully!",

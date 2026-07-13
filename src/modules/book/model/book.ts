@@ -38,6 +38,13 @@ const schema = new Schema<TBook>(
       index: true,
     },
 
+    librarianId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+      index: true,
+    },
+
     publicationYear: {
       type: Number,
       required: true,
@@ -55,7 +62,7 @@ const schema = new Schema<TBook>(
       index: true,
     },
 
-    quantity: {
+    stock: {
       type: Number,
       required: true,
       default: 1,
@@ -89,13 +96,6 @@ const schema = new Schema<TBook>(
       type: String,
       required: true,
       trim: true,
-    },
-
-    librarianEmail: {
-      type: String,
-      required: true,
-      trim: true,
-      lowercase: true,
     },
 
     weight: {

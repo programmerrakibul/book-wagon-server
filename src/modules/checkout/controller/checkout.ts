@@ -2,9 +2,12 @@ import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import { envConfig } from "@/config/env.js";
 import { stripe } from "@/config/stripe.js";
-import { type TOrder, type TPaymentStatus } from "@/order/interface/order.js";
-import { Order } from "@/order/model/order.js";
-import { PaymentStatus } from "@/order/validation/order.js";
+import { type TOrder } from "@/order/interface/order.js";
+import Order  from "@/order/model/order.js";
+import {
+  PaymentStatus,
+  type TPaymentStatus,
+} from "@/order/validation/order.js";
 import { Payment } from "@/payment/model/payment.js";
 import type {
   TApiResponse,

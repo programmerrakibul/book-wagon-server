@@ -21,7 +21,7 @@ export const postComment = async (
       throw new Error("User not found!");
     }
 
-    const { name, photoURL } = user;
+    const { name, photoUrl } = user;
 
     let commentDoc: TCommentDocument | null = await Comment.findOne({ bookId });
 
@@ -32,7 +32,7 @@ export const postComment = async (
     commentDoc.comments.push({
       customerEmail: email,
       customerName: name,
-      customerImage: photoURL,
+      customerImage: photoUrl,
       comment,
       createdAt: new Date(),
       updatedAt: new Date(),

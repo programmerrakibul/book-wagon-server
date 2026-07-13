@@ -14,60 +14,30 @@ export const UserRole = {
 } as const;
 
 export const roleSchema = z
-  .enum(Object.values(UserRole) as [TUserRole, ...TUserRole[]], {
-    error: (iss) => {
-      return iss.input === undefined
-        ? "Role is required!"
-        : "Role must be either 'user', 'librarian', or 'admin'.";
-    },
-  })
+  .enum(
+    Object.values(UserRole) as [TUserRole, ...TUserRole[]],
+    "Role must be either user, librarian or admin!",
+  )
   .transform((role) => role.toLowerCase());
 
-export const userSchema = z.object(
-  {
-    name: z
-      .string({
-        error: (iss) => {
-          return iss.input === undefined
-            ? "Name is required!"
-            : "Provide a valid name!";
-        },
-      })
-      .min(3, "Name must be at least 3 characters long!")
-      .max(50, "Name cannot exceed 50 characters!"),
-    email: z
-      .email({
-        error: (iss) => {
-          return iss.input === undefined
-            ? "Email is required!"
-            : "Please provide a valid email address";
-        },
-      })
-      .transform((email) => email.toLowerCase()),
-    photoURL: z
-      .url({
-        error: (iss) => {
-          return iss.input === undefined
-            ? "Photo URL is required!"
-            : "Please provide a valid photo URL!";
-        },
-      })
-      .transform((url) => url.toLowerCase()),
-    role: roleSchema.default("user"),
-  },
-  "User data is required in the request body!",
-);
+export const userSchema = z.object({
+  name: z
+    .string("Please provide a valid name!")
+    .min(3, "Name must be at least 3 characters long!")
+    .max(50, "Name cannot exceed 50 characters!"),
+  email: z
+    .email("Please provide a valid email!")
+    .transform((email) => email.toLowerCase()),
+  photoUrl: z
+    .url("Please provide a valid URL!")
+    .transform((url) => url.toLowerCase()),
+  role: roleSchema.default("user"),
+});
 
 export const toggleRoleSchema = z.object({
   role: roleSchema,
   email: z
-    .email({
-      error: (iss) => {
-        return iss.input === undefined
-          ? "Email is required!"
-          : "Please provide a valid email address!";
-      },
-    })
+    .email("Please provide a valid email!")
     .transform((email) => email.toLowerCase().trim()),
 });
 

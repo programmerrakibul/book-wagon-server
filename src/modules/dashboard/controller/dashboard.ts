@@ -5,11 +5,9 @@ import type { TFavoriteDocument } from "@/favorite/interface/favorite.js";
 import { Favorite } from "@/favorite/model/favorite.js";
 import type {
   TOrder,
-  TOrderStatus,
-  TPaymentStatus,
 } from "@/order/interface/order.js";
-import { Order } from "@/order/model/order.js";
-import { OrderStatus, PaymentStatus } from "@/order/validation/order.js";
+import  Order  from "@/order/model/order.js";
+import { OrderStatus, PaymentStatus, type TOrderStatus, type TPaymentStatus } from "@/order/validation/order.js";
 import type { TSuccessResponse } from "@/types/index.interface.js";
 import type { TUserDocument } from "@/user/interface/user.js";
 import { User } from "@/user/model/user.js";

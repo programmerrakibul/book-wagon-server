@@ -8,6 +8,7 @@ const schema = new Schema<TCategory>(
       required: true,
       trim: true,
       unique: true,
+      index: true,
     },
 
     photoUrl: {
@@ -23,6 +24,7 @@ const schema = new Schema<TCategory>(
       trim: true,
       unique: true,
       lowercase: true,
+      index: true,
     },
 
     subCategories: [
