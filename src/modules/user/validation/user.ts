@@ -25,12 +25,15 @@ export const userSchema = z.object({
     .string("Please provide a valid name!")
     .min(3, "Name must be at least 3 characters long!")
     .max(50, "Name cannot exceed 50 characters!"),
+
   email: z
     .email("Please provide a valid email!")
     .transform((email) => email.toLowerCase()),
+
   photoUrl: z
     .url("Please provide a valid URL!")
     .transform((url) => url.toLowerCase()),
+    
   role: roleSchema.default("user"),
 });
 

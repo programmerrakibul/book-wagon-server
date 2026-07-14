@@ -30,7 +30,17 @@ const port = envConfig.PORT;
 const API_PREFIX = "/api" as const;
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: [
+      "http://localhost:3000",
+      "https://book-wagon-46880.firebaseapp.com/",
+      "https://book-wagon-46880.web.app/",
+      envConfig.CLIENT_URL,
+    ],
+  }),
+);
 app.use(json());
 
 const run = async () => {

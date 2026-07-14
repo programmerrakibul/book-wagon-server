@@ -74,9 +74,15 @@ userSchema.statics.getRole = async function (
   query: string | Schema.Types.ObjectId,
 ) {
   try {
-    const user: TUserDocument | null = await this.findOne({
-      $or: [{ email: query }, { _id: query }],
-    });
+    const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
+
+    if (typeof query === "string") {
+      queryObj.email = query;
+    } else {
+      queryObj._id = query;
+    }
+
+    const user: TUserDocument | null = await this.findOne(queryObj);
 
     if (!user) {
       throw new NotFoundError("User not found!");
@@ -93,9 +99,15 @@ userSchema.statics.toggleRole = async function (
   newRole: string,
 ) {
   try {
-    const user: TUserDocument | null = await this.findOne({
-      $or: [{ email: query }, { _id: query }],
-    });
+    const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
+
+    if (typeof query === "string") {
+      queryObj.email = query;
+    } else {
+      queryObj._id = query;
+    }
+
+    const user: TUserDocument | null = await this.findOne(queryObj);
 
     if (!user) {
       throw new NotFoundError("User not found!");
