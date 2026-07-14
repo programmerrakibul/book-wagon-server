@@ -1,8 +1,11 @@
 import Category from "@/category/model/category.js";
 import type { TSubCategory } from "@/sub-category/interface/sub-category.js";
 import SubCategory from "@/sub-category/model/sub-category.js";
-import { createSubCategorySchema } from "@/sub-category/validation/sub-category.js";
-import { parseOrThrow } from "@/utils/utils.js";
+import {
+  createSubCategorySchema,
+  querySchema,
+} from "@/sub-category/validation/sub-category.js";
+import { parseOrThrow, validateObjectId } from "@/utils/utils.js";
 import { ConflictError, NotFoundError } from "http-errors-enhanced";
 import mongoose from "mongoose";
 
@@ -61,8 +64,20 @@ const createSubCategory = async (payload: unknown) => {
   }
 };
 
-const getSubCategories = async (): Promise<TSubCategory[]> => {
-  const result = await SubCategory.find({})
+const getSubCategories = async (
+  queryPayload: unknown,
+): Promise<TSubCategory[]> => {
+  const parsedData = parseOrThrow(querySchema, queryPayload);
+  const categoryId = parsedData.categoryId;
+  const query: Record<string, unknown> = {};
+
+  if (typeof categoryId === "string") {
+    if (!validateObjectId(categoryId)) return [];
+
+    query.categoryId = categoryId;
+  }
+
+  const result = await SubCategory.find(query)
     .sort({ createdAt: -1, name: 1 })
     .populate("categoryId", "name slug");
 

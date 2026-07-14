@@ -11,8 +11,8 @@ const createSubCategory = async (req: Request, res: Response) => {
   });
 };
 
-const getSubCategories = async (_req: Request, res: Response) => {
-  const data = await services.getSubCategories();
+const getSubCategories = async (req: Request, res: Response) => {
+  const data = await services.getSubCategories(req.query);
 
   sendSuccessResponse(res, status.OK, {
     message: "SubCategories fetched successfully!",

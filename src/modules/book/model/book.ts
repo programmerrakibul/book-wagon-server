@@ -33,7 +33,7 @@ const schema = new Schema<TBook>(
 
     subcategoryId: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: false,
       ref: "SubCategory",
       index: true,
     },

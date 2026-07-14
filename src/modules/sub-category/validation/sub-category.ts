@@ -37,4 +37,11 @@ export const createSubCategorySchema = z
     slug: data.slug || data.name.toLowerCase().replace(/\s+/g, "-"),
   }));
 
+export const querySchema = z.object({
+  categoryId: z
+    .string()
+    .trim()
+    .optional(),
+});
+
 export type TCreateSubCategory = z.infer<typeof createSubCategorySchema>;
