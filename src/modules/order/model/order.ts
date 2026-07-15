@@ -11,27 +11,36 @@ import paginate from "mongoose-paginate-v2";
 
 const schema = new Schema<TOrder>(
   {
-    books: [
-      {
-        bookId: {
-          type: Types.ObjectId,
-          required: true,
-          ref: "Book",
-          index: true,
-        },
+    bookId: {
+      type: Types.ObjectId,
+      required: true,
+      ref: "Book",
+      index: true,
+    },
 
-        quantity: {
-          type: Number,
-          required: true,
-        },
-      },
-    ],
+    quantity: {
+      type: Number,
+      required: true,
+    },
 
     customerId: {
       type: Types.ObjectId,
       required: true,
       ref: "User",
       index: true,
+    },
+
+    librarianId: {
+      type: Types.ObjectId,
+      required: true,
+      ref: "User",
+      index: true,
+    },
+
+    price: {
+      type: Number,
+      required: true,
+      set: (value: number) => double(value),
     },
 
     totalPrice: {

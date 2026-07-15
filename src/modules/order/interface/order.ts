@@ -9,5 +9,7 @@ export interface TOrder extends TCreateOrder, Document {
   status: TOrderStatus;
   paymentStatus: TPaymentStatus;
   customerId: Types.ObjectId;
+  librarianId: Types.ObjectId;
+  price: number;
   totalPrice: number;
 }
