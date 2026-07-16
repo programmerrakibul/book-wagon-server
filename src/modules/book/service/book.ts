@@ -6,6 +6,7 @@ import {
   createBookSchema,
   updateBookSchema,
   updateBookStatusSchema,
+  type TCreateBook,
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
 import Order from "@/order/model/order.js";
@@ -192,7 +193,25 @@ const updateBookById = async (id: string, payload: unknown) => {
     throw new NotFoundError("Book data not found!");
   }
 
-  Object.assign(book, parsedData);
+  const data: TCreateBook = {
+    name: parsedData.name || book.name,
+    author: parsedData.author || book.author,
+    description: parsedData.description || book.description,
+    photoUrl: parsedData.photoUrl || book.photoUrl,
+    categoryId: parsedData.categoryId || book.categoryId,
+    subcategoryId: parsedData.subcategoryId || book.subcategoryId,
+    formatId: parsedData.formatId || book.formatId,
+    price: parsedData.price || book.price,
+    discount: parsedData.discount || book.discount,
+    stock: parsedData.stock || book.stock,
+    publicationYear: parsedData.publicationYear || book.publicationYear,
+    pageCount: parsedData.pageCount || book.pageCount,
+    quantity: parsedData.quantity || book.quantity,
+    status: parsedData.status || book.status,
+    weight: parsedData.weight || book.weight,
+  };
+
+  Object.assign(book, data);
 
   await book.save();
 };
