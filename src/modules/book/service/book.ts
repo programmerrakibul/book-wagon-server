@@ -150,6 +150,8 @@ const getBooks = async (queryPayload: unknown) => {
   if (sortBy && sortOrder) {
     const order = sortOrder === "desc" ? -1 : 1;
     sort[sortBy] = order;
+
+    sortBy !== "createdAt" && delete sort.createdAt;
   }
 
   const options: PaginateOptions = {
