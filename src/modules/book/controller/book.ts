@@ -38,6 +38,17 @@ const updateBookById = async (req: Request<{ id: string }>, res: Response) => {
   });
 };
 
+const updateBookStatusById = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
+  await services.updateBookStatusById(req.params.id, req.body);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "Book status updated successfully!",
+  });
+};
+
 const deleteBookById = async (req: Request<{ id: string }>, res: Response) => {
   await services.deleteBookById(req.params.id);
 
@@ -51,6 +62,7 @@ const controllers = {
   getBooks,
   getBookById,
   updateBookById,
+  updateBookStatusById,
   deleteBookById,
 };
 export default controllers;

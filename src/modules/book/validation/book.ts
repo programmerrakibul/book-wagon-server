@@ -119,6 +119,10 @@ export const updateBookSchema = createBookSchema
   })
   .partial();
 
+export const updateBookStatusSchema = z.object({
+  status: baseBookSchema.shape.status,
+})
+
 export const bookQuerySchema = z.object({
   category: z
     .string()
@@ -137,6 +141,5 @@ export const bookQuerySchema = z.object({
 });
 
 export type TCreateBook = z.infer<typeof createBookSchema>;
-export type TUpdateBook = z.infer<typeof updateBookSchema>;
 export type TBookStatus = (typeof BookStatus)[keyof typeof BookStatus];
 export type TBookQuery = z.infer<typeof bookQuerySchema>;

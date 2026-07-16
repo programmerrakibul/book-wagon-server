@@ -5,6 +5,7 @@ import {
   BookStatus,
   createBookSchema,
   updateBookSchema,
+  updateBookStatusSchema,
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
 import Order from "@/order/model/order.js";
@@ -196,6 +197,23 @@ const updateBookById = async (id: string, payload: unknown) => {
   await book.save();
 };
 
+const updateBookStatusById = async (id: string, payload: unknown) => {
+  if (!validateObjectId(id)) {
+    throw new BadRequestError("Provided id is not valid MongoDB id!");
+  }
+
+  const book: TBook | null = await Book.findById(id).select("status");
+
+  if (!book) {
+    throw new NotFoundError("Book data not found!");
+  }
+
+  const { status } = parseOrThrow(updateBookStatusSchema, payload);
+  book.status = status;
+
+  await book.save();
+};
+
 const deleteBookById = async (id: string) => {
   if (!validateObjectId(id)) {
     throw new BadRequestError("Provided id is not valid MongoDB id!");
@@ -229,6 +247,7 @@ const services = {
   getBooks,
   getBookById,
   updateBookById,
+  updateBookStatusById,
   deleteBookById,
 };
 

@@ -18,6 +18,13 @@ router.put(
   controllers.updateBookById,
 );
 
+router.patch(
+  "/:id",
+  verifyTokenID,
+  authorize("librarian"),
+  controllers.updateBookStatusById,
+);
+
 router.delete(
   "/:id",
   verifyTokenID,
