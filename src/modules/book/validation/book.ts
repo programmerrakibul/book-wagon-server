@@ -126,7 +126,7 @@ export const bookQuerySchema = z.object({
     .optional(),
 
   email: z
-    .email("Please provide a valid email!")
+    .email()
     .transform((val) => val.trim().toLowerCase())
     .optional(),
 
