@@ -1,9 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
-import { objectIdSchema } from "../validations/objectId.validator.js";
+import { objectIdSchema } from "@/validations/objectId.validator.js";
 
 export const validateId = (
   req: Request<{ id: string }>,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) => {
   const { success, data, error } = objectIdSchema.safeParse(req.params.id);

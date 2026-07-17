@@ -14,6 +14,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
 
     email: {
@@ -22,6 +23,7 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      index: true,
     },
 
     photoUrl: {
@@ -37,6 +39,7 @@ const userSchema = new Schema(
       lowercase: true,
       enum: Object.values(UserRole) as [TUserRole, ...TUserRole[]],
       default: UserRole.USER,
+      index: true,
     },
 
     books: [
@@ -73,51 +76,43 @@ const userSchema = new Schema(
 userSchema.statics.getRole = async function (
   query: string | Schema.Types.ObjectId,
 ) {
-  try {
-    const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
+  const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
 
-    if (typeof query === "string") {
-      queryObj.email = query;
-    } else {
-      queryObj._id = query;
-    }
-
-    const user: TUserDocument | null = await this.findOne(queryObj);
-
-    if (!user) {
-      throw new NotFoundError("User not found!");
-    }
-
-    return user.role;
-  } catch (error) {
-    throw error;
+  if (typeof query === "string") {
+    queryObj.email = query;
+  } else {
+    queryObj._id = query;
   }
+
+  const user: TUserDocument | null = await this.findOne(queryObj);
+
+  if (!user) {
+    throw new NotFoundError("User not found!");
+  }
+
+  return user.role;
 };
 
 userSchema.statics.toggleRole = async function (
   query: string | Schema.Types.ObjectId,
   newRole: string,
 ) {
-  try {
-    const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
+  const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
 
-    if (typeof query === "string") {
-      queryObj.email = query;
-    } else {
-      queryObj._id = query;
-    }
-
-    const user: TUserDocument | null = await this.findOne(queryObj);
-
-    if (!user) {
-      throw new NotFoundError("User not found!");
-    }
-
-    user.role = newRole;
-    await user.save();
-  } catch (error) {
-    throw error;
+  if (typeof query === "string") {
+    queryObj.email = query;
+  } else {
+    queryObj._id = query;
   }
+
+  const user: TUserDocument | null = await this.findOne(queryObj);
+
+  if (!user) {
+    throw new NotFoundError("User not found!");
+  }
+
+  user.role = newRole;
+  await user.save();
 };
 
 userSchema.plugin(paginate);

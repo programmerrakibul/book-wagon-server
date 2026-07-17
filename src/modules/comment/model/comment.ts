@@ -8,6 +8,7 @@ const commentSchema = new Schema<TCommentDocument>(
       required: true,
       ref: "Book",
       unique: true,
+      index: true,
     },
     comments: [
       {

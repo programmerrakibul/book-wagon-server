@@ -1,5 +1,5 @@
 import type { Document, Types } from "mongoose";
-import type { TCreateBook } from "../validation/book.js";
+import type { TCreateBook } from "@/book/validation/book.js";
 
 export interface TBook extends Document, TCreateBook {
   librarianId: Types.ObjectId;

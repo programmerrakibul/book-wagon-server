@@ -68,6 +68,7 @@ const schema = new Schema<TOrder>(
       uppercase: true,
       enum: Object.values(OrderStatus) as [TOrderStatus, ...TOrderStatus[]],
       default: OrderStatus.PENDING,
+      index: true,
     },
 
     paymentStatus: {
@@ -80,6 +81,7 @@ const schema = new Schema<TOrder>(
         ...TPaymentStatus[],
       ],
       default: PaymentStatus.UNPAID,
+      index: true,
     },
   },
 

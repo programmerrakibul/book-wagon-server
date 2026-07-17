@@ -6,10 +6,11 @@ import Order from "@/order/model/order.js";
 import {
   createOrderSchema,
   orderQuerySchema,
+  updateOrderSchema,
 } from "@/order/validation/order.js";
 import { User } from "@/user/model/user.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
-import { double, parseOrThrow } from "@/utils/utils.js";
+import { double, parseOrThrow, validateObjectId } from "@/utils/utils.js";
 import { BadRequestError, NotFoundError } from "http-errors-enhanced";
 import type { PaginateOptions, PaginateResult, Types } from "mongoose";
 import mongoose from "mongoose";
@@ -130,9 +131,26 @@ const getOrders = async (queryPayload: unknown, id: Types.ObjectId) => {
   return getPaginatedData(result);
 };
 
+const updateOrder = async (id: string, payload: unknown) => {
+  if (!validateObjectId(id)) {
+    throw new NotFoundError("Order data not found!");
+  }
+
+  const parsedData = parseOrThrow(updateOrderSchema, payload);
+
+  const order: TOrder | null = await Order.findById(id);
+
+  if (!order) {
+    throw new NotFoundError("Order data not found!");
+  }
+
+  await Order.findByIdAndUpdate(id, parsedData, { new: true });
+};
+
 const services = {
   createOrder,
   getOrders,
+  updateOrder,
 };
 
 export default services;

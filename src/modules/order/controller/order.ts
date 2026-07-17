@@ -1,11 +1,6 @@
-import type { TOrder } from "@/order/interface/order.js";
-import Order from "@/order/model/order.js";
 import services from "@/order/service/order.js";
-import { type TUpdateOrder } from "@/order/validation/order.js";
-import type { TSuccessResponse } from "@/types/index.interface.js";
 import { sendSuccessResponse } from "@/utils/sendResponse.js";
-import type { NextFunction, Request, Response } from "express";
-import { NotFoundError } from "http-errors-enhanced";
+import type { Request, Response } from "express";
 import status from "http-status";
 
 const getOrders = async (req: Request, res: Response) => {
@@ -18,27 +13,6 @@ const getOrders = async (req: Request, res: Response) => {
   });
 };
 
-export const isOrdered = async (
-  req: Request<{ id: string }>,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { id } = req.params;
-    const { email } = req.user;
-
-    // const result = await Order.isOrdered(id, email);
-
-    res.send({
-      success: true,
-      message: "Order status retrieved successfully",
-      // data: result,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
 const createOrder = async (req: Request, res: Response) => {
   const { _id } = req.user;
   await services.createOrder(req.body, _id);
@@ -48,36 +22,17 @@ const createOrder = async (req: Request, res: Response) => {
   });
 };
 
-export const updateOrder = async (
-  req: Request<{ id: string }, {}, TUpdateOrder>,
-  res: Response<TSuccessResponse>,
-  next: NextFunction,
-) => {
-  try {
-    const { id } = req.params;
+const updateOrder = async (req: Request<{ id: string }>, res: Response) => {
+  const { id } = req.params;
+  await services.updateOrder(id, req.body);
 
-    const order: TOrder | null = await Order.findById(id);
-
-    if (!order) {
-      throw new NotFoundError("Order data not found!");
-    }
-
-    await Order.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-
-    res.send({
-      success: true,
-      message: "Order data updated successfully!",
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.OK, {
+    message: "Order data updated successfully!",
+  });
 };
 
 const controllers = {
   getOrders,
-  isOrdered,
   createOrder,
   updateOrder,
 };

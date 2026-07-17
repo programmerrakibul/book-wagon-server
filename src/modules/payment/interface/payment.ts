@@ -1,6 +1,6 @@
 import type { TPaymentStatus } from "@/order/validation/order.js";
 import type { paymentQuerySchema } from "@/payment/validation/payment.js";
-import type { AggregatePaginateModel, Document, Types } from "mongoose";
+import type { Document, PaginateModel, Types } from "mongoose";
 import type z from "zod";
 
 export interface TPaymentDocument extends Document {
@@ -12,6 +12,6 @@ export interface TPaymentDocument extends Document {
   price: number;
 }
 
-export interface TPaymentModel extends AggregatePaginateModel<TPaymentDocument> {}
+export interface TPaymentModel extends PaginateModel<TPaymentDocument> {}
 
 export type TPaymentQuery = z.infer<typeof paymentQuerySchema>;

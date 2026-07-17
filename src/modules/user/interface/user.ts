@@ -12,6 +12,8 @@ export interface TUserDocument extends Document, TCreateUser {
   books: Types.Array<Types.ObjectId>;
   orders: Types.Array<Types.ObjectId>;
   lastLoggedIn: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type TUserRole = (typeof UserRole)[keyof typeof UserRole];

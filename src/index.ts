@@ -1,5 +1,6 @@
 import bookFormatRouter from "@/book-format/routes/book-format.js";
 import booksRouter from "@/book/routes/book.js";
+import { cartRouter } from "@/cart/routes/cart.js";
 import categoryRouter from "@/category/routes/category.js";
 import { checkoutRouter } from "@/checkout/routes/checkout.js";
 import { commentsRouter } from "@/comment/routes/comment.js";
@@ -11,6 +12,7 @@ import { healthCheck } from "@/health/controller/health.js";
 import { globalErrorHandler } from "@/middlewares/global-error-handler.js";
 import ordersRouter from "@/order/routes/order.js";
 import { paymentsRouter } from "@/payment/routes/payment.js";
+import { reviewsRouter } from "@/review/routes/review.js";
 import subCategoryRouter from "@/sub-category/routes/sub-category.js";
 import { usersRouter } from "@/user/routes/user.js";
 import {
@@ -29,7 +31,6 @@ const app = express();
 const port = envConfig.PORT;
 const API_PREFIX = "/api" as const;
 
-// Middlewares
 app.use(
   cors({
     credentials: true,
@@ -62,6 +63,8 @@ const run = async () => {
     app.use(`${API_PREFIX}/payments`, paymentsRouter);
     app.use(`${API_PREFIX}/favorites`, favoritesRouter);
     app.use(`${API_PREFIX}/comments`, commentsRouter);
+    app.use(`${API_PREFIX}/reviews`, reviewsRouter);
+    app.use(`${API_PREFIX}/cart`, cartRouter);
     app.use(`${API_PREFIX}/dashboard`, dashboardRouter);
     app.use(`${API_PREFIX}/categories`, categoryRouter);
     app.use(`${API_PREFIX}/sub-categories`, subCategoryRouter);
@@ -75,7 +78,6 @@ const run = async () => {
 
     app.use(globalErrorHandler);
 
-    // Start the server
     app.listen(port, () => console.log("Server is running on port: " + port));
   } catch (err) {
     console.log(err);

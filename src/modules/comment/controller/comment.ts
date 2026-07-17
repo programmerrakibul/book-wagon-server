@@ -1,75 +1,32 @@
-import type { TCommentDocument } from "@/comment/interface/comment.js";
-import { Comment } from "@/comment/model/comment.js";
-import type { TSuccessResponse } from "@/types/index.interface.js";
-import type { TUserDocument } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
-import type { NextFunction, Request, Response } from "express";
+import services from "@/comment/service/comment.js";
+import { sendSuccessResponse } from "@/utils/sendResponse.js";
+import type { Request, Response } from "express";
+import status from "http-status";
 
-export const postComment = async (
-  req: Request<{ id: string }, {}, { comment: string }>,
-  res: Response<TSuccessResponse>,
-  next: NextFunction,
-) => {
-  try {
-    const { email } = req.user;
-    const { comment } = req.body;
-    const { id: bookId } = req.params;
+const postComment = async (req: Request<{ id: string }>, res: Response) => {
+  const { email } = req.user;
+  const { id: bookId } = req.params;
 
-    const user: TUserDocument | null = await User.findOne({ email });
+  await services.postComment(bookId, email, req.body);
 
-    if (!user) {
-      throw new Error("User not found!");
-    }
-
-    const { name, photoUrl } = user;
-
-    let commentDoc: TCommentDocument | null = await Comment.findOne({ bookId });
-
-    if (!commentDoc) {
-      commentDoc = new Comment({ bookId, comments: [] });
-    }
-
-    commentDoc.comments.push({
-      customerEmail: email,
-      customerName: name,
-      customerImage: photoUrl,
-      comment,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await commentDoc.save();
-
-    res.status(201).send({
-      success: true,
-      message: "Comment posted successfully",
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.CREATED, {
+    message: "Comment posted successfully!",
+  });
 };
 
-export const getComments = async (
-  req: Request<{ id: string }>,
-  res: Response<TSuccessResponse>,
-  next: NextFunction,
-) => {
-  try {
-    const { id: bookId } = req.params;
+const getComments = async (req: Request<{ id: string }>, res: Response) => {
+  const { id: bookId } = req.params;
+  const result = await services.getComments(bookId);
 
-    const result: TCommentDocument | null = await Comment.findOne({ bookId });
-
-    const comments = result?.comments.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-
-    res.send({
-      success: true,
-      message: "Comments data retrieved successfully!",
-      data: comments,
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.OK, {
+    message: "Comments data retrieved successfully!",
+    data: result,
+  });
 };
+
+const controllers = {
+  postComment,
+  getComments,
+};
+
+export default controllers;

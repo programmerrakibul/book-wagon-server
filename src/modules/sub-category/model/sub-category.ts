@@ -29,6 +29,7 @@ const schema = new mongoose.Schema<TSubCategory>(
       trim: true,
       lowercase: true,
       unique: true,
+      index: true,
     },
   },
 

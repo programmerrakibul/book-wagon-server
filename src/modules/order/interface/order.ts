@@ -12,4 +12,6 @@ export interface TOrder extends TCreateOrder, Document {
   librarianId: Types.ObjectId;
   price: number;
   totalPrice: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

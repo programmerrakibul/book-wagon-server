@@ -10,12 +10,14 @@ const schema = new Schema<TBook>(
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
 
     author: {
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
 
     photoUrl: {
@@ -90,6 +92,7 @@ const schema = new Schema<TBook>(
       enum: Object.values(BookStatus),
       default: BookStatus.PUBLISHED,
       uppercase: true,
+      index: true,
     },
 
     description: {

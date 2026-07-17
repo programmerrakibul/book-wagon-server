@@ -1,8 +1,6 @@
-import { validateData } from "@/middlewares/validateData.middleware.js";
-import { validateId } from "@/middlewares/validateId.middleware.ts.js";
+import { validateId } from "@/middlewares/validate-id.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
-import controllers, { updateOrder } from "@/order/controller/order.js";
-import { updateOrderSchema } from "@/order/validation/order.js";
+import controllers from "@/order/controller/order.js";
 import { Router } from "express";
 
 const router = Router();
@@ -13,6 +11,6 @@ router.get("/", controllers.getOrders);
 
 router.post("/", controllers.createOrder);
 
-router.put("/:id", validateId, validateData(updateOrderSchema), updateOrder);
+router.put("/:id", validateId, controllers.updateOrder);
 
 export default router;

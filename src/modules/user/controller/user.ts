@@ -1,144 +1,51 @@
-import type {
-  TPaginatedResponse,
-  TSuccessResponse,
-} from "@/types/index.interface.js";
-import type {
-  TCreateUser,
-  TToggleRole,
-  TUserDocument,
-  TUserQuery,
-} from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
-import { userQuerySchema } from "@/user/validation/user.js";
-import type { NextFunction, Request, Response } from "express";
-import type { PaginateOptions, PaginateResult } from "mongoose";
+import services from "@/user/service/user.js";
+import { sendSuccessResponse } from "@/utils/sendResponse.js";
+import type { Request, Response } from "express";
+import status from "http-status";
 
-export const getUsers = async (
-  req: Request<{}, {}, {}, TUserQuery>,
-  res: Response<TPaginatedResponse<TUserDocument>>,
-  next: NextFunction,
-) => {
-  try {
-    const query: Record<string, unknown> = {};
-    const sort: Record<string, 1 | -1> = {
-      createdAt: -1,
-    };
+const getUsers = async (req: Request, res: Response) => {
+  const result = await services.getUsers(req.query);
 
-    const {
-      limit = 10,
-      page = 1,
-      search,
-      sortBy,
-      sortOrder,
-    } = userQuerySchema.parse(req.query);
-
-    if (search) {
-      query["$or"] = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    if (sortBy && sortOrder) {
-      const order = sortOrder === "desc" ? -1 : 1;
-      sort[sortBy] = order;
-
-      delete sort.createdAt;
-    }
-
-    const opt: PaginateOptions = {
-      sort,
-      limit,
-      page,
-      select: "-__v",
-    };
-
-    const { docs, ...data }: PaginateResult<TUserDocument> =
-      await User.paginate(query, opt);
-
-    res.send({
-      success: true,
-      message: "Users data retrieved successfully",
-      data: docs,
-      pagination: {
-        totalDocs: data.totalDocs,
-        hasPrevPage: data.hasPrevPage,
-        hasNextPage: data.hasNextPage,
-        totalPages: data.totalPages,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.OK, {
+    message: "Users data retrieved successfully!",
+    ...result,
+  });
 };
 
-export const getUserRole = async (
-  req: Request,
-  res: Response<TSuccessResponse<Pick<TUserDocument, "role">>>,
-  next: NextFunction,
-) => {
-  try {
-    const { email } = req.user;
+const getUserRole = async (req: Request, res: Response) => {
+  const { email } = req.user;
+  const result = await services.getUserRole(email);
 
-    const role = await User.getRole(email);
-
-    res.send({
-      success: true,
-      message: "User role retrieved successfully!",
-      data: { role },
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.OK, {
+    message: "User role retrieved successfully!",
+    data: result,
+  });
 };
 
-export const postUser = async (
-  req: Request<{}, {}, TCreateUser>,
-  res: Response<TSuccessResponse>,
-  next: NextFunction,
-) => {
-  try {
-    const { email, ...userData } = req.body;
+const postUser = async (req: Request, res: Response) => {
+  const result = await services.upsertUser(req.body);
 
-    const user: TUserDocument | null = await User.findOne({
-      email,
-    });
+  const statusCode = result.isNewUser ? status.CREATED : status.OK;
+  const message = result.isNewUser
+    ? "User created successfully!"
+    : "User with this email already exists!";
 
-    if (user) {
-      await User.findByIdAndUpdate(user._id, { lastLoggedIn: Date.now() });
-
-      return res.send({
-        success: true,
-        message: "User with this email already exists!",
-      });
-    }
-
-    await User.create({ email, ...userData });
-
-    res.status(201).send({
-      success: true,
-      message: "User data posted successfully!",
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, statusCode, { message });
 };
 
-export const updateUserRole = async (
-  req: Request<{}, {}, TToggleRole>,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { role, email } = req.body;
+const updateUserRole = async (req: Request, res: Response) => {
+  await services.updateUserRole(req.body);
 
-    await User.toggleRole(email, role);
-
-    res.send({
-      success: true,
-      message: "User role updated successfully!",
-    });
-  } catch (err) {
-    next(err);
-  }
+  sendSuccessResponse(res, status.OK, {
+    message: "User role updated successfully!",
+  });
 };
+
+const controllers = {
+  getUsers,
+  getUserRole,
+  postUser,
+  updateUserRole,
+};
+
+export default controllers;
