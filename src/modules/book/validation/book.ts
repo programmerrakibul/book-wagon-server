@@ -119,6 +119,10 @@ export const updateBookStatusSchema = z.object({
   status: baseBookSchema.shape.status,
 });
 
+export const updateBookActiveStatusSchema = z.object({
+  isActive: z.boolean("Please provide a valid status!"),
+});
+
 export const bookQuerySchema = z.object({
   category: z
     .string()

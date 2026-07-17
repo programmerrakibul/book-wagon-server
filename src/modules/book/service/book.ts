@@ -4,6 +4,7 @@ import {
   bookQuerySchema,
   BookStatus,
   createBookSchema,
+  updateBookActiveStatusSchema,
   updateBookSchema,
   updateBookStatusSchema,
   type TCreateBook,
@@ -19,7 +20,7 @@ import {
   transformToObjectId,
   validateObjectId,
 } from "@/utils/utils.js";
-import { BadRequestError, NotFoundError } from "http-errors-enhanced";
+import { NotFoundError } from "http-errors-enhanced";
 import mongoose, {
   Types,
   type PaginateOptions,
@@ -107,12 +108,11 @@ const getBooks = async (queryPayload: unknown) => {
 
       if (roles.includes(role as Exclude<TUserRole, "user">)) {
         delete query.status;
-        delete query.isActive;
 
-        if (role === UserRole.LIBRARIAN) {
-          query.librarianId = _id;
-          delete query.isActive;
-        }
+        if (role === UserRole.LIBRARIAN) query.librarianId = _id;
+        if (role === UserRole.ADMIN) delete query.isActive;
+
+        console.log(role);
       }
     }
   }
@@ -167,10 +167,6 @@ const getBooks = async (queryPayload: unknown) => {
 };
 
 const getBookById = async (id: string) => {
-  if (!validateObjectId(id)) {
-    throw new BadRequestError("Provided id is not valid MongoDB id!");
-  }
-
   const book: TBook | null = await Book.findById(id)
     .populate(bookPopulateOptions)
     .lean();
@@ -183,10 +179,6 @@ const getBookById = async (id: string) => {
 };
 
 const updateBookById = async (id: string, payload: unknown) => {
-  if (!validateObjectId(id)) {
-    throw new BadRequestError("Provided id is not valid MongoDB id!");
-  }
-
   const parsedData = parseOrThrow(updateBookSchema, payload);
 
   const book: TBook | null = await Book.findById(id);
@@ -219,10 +211,6 @@ const updateBookById = async (id: string, payload: unknown) => {
 };
 
 const updateBookStatusById = async (id: string, payload: unknown) => {
-  if (!validateObjectId(id)) {
-    throw new BadRequestError("Provided id is not valid MongoDB id!");
-  }
-
   const book: TBook | null = await Book.findById(id).select("status");
 
   if (!book) {
@@ -235,11 +223,19 @@ const updateBookStatusById = async (id: string, payload: unknown) => {
   await book.save();
 };
 
-const deleteBookById = async (id: string) => {
-  if (!validateObjectId(id)) {
-    throw new BadRequestError("Provided id is not valid MongoDB id!");
+const updateBookActiveStatusById = async (id: string, payload: unknown) => {
+  const { isActive } = parseOrThrow(updateBookActiveStatusSchema, payload);
+  const book: TBook | null = await Book.findById(id).select("isActive");
+
+  if (!book) {
+    throw new NotFoundError("Book data not found!");
   }
 
+  book.isActive = isActive;
+  await book.save();
+};
+
+const deleteBookById = async (id: string) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -270,6 +266,7 @@ const services = {
   updateBookById,
   updateBookStatusById,
   deleteBookById,
+  updateBookActiveStatusById,
 };
 
 export default services;
