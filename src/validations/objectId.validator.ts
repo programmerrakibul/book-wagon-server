@@ -1,8 +1,8 @@
+import { validateObjectId } from "@/utils/utils.js";
 import z from "zod";
-import { Types } from "mongoose";
 
 export const objectIdSchema = z.custom<string>(
-  (data) => Types.ObjectId.isValid(data as string),
+  (data) => validateObjectId(data as string),
   {
     error: (iss) => {
       return iss.input === undefined

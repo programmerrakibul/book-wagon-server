@@ -28,7 +28,7 @@ router.patch(
 router.delete(
   "/:id",
   verifyTokenID,
-  authorize("admin"),
+  authorize("admin", "librarian"),
   controllers.deleteBookById,
 );
 

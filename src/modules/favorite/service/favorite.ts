@@ -1,9 +1,6 @@
 import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
-import {
-  bookQuerySchema,
-  type TBookQuery,
-} from "@/book/validation/book.js";
+import { bookQuerySchema } from "@/book/validation/book.js";
 import type { TFavoriteDocument } from "@/favorite/interface/favorite.js";
 import { Favorite } from "@/favorite/model/favorite.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
