@@ -1,9 +1,9 @@
-import type { TUserDocument } from "@/user/interface/user.ts";
+import type { TUser } from "@/user/interface/user.ts";
 
 declare global {
   namespace Express {
     interface Request {
-      user: Pick<TUserDocument, "_id" | "name" | "email" | "role">;
+      user: Pick<TUser, "_id" | "name" | "email" | "role">;
     }
   }
 }

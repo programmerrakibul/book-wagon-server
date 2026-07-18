@@ -5,9 +5,9 @@ import status from "http-status";
 
 const createCheckout = async (req: Request<{ orderID: string }>, res: Response) => {
   const { orderID } = req.params;
-  const { email: customerEmail } = req.user;
+  const { email } = req.user;
 
-  const sessionUrl = await services.createCheckout(orderID, customerEmail);
+  const sessionUrl = await services.createCheckout(orderID, email);
 
   sendSuccessResponse(res, status.OK, {
     message: "Checkout created successfully!",

@@ -1,4 +1,3 @@
-import type { TPaymentStatus } from "@/order/validation/order.js";
 import { PaymentStatus } from "@/order/validation/order.js";
 import type { TPaymentDocument } from "@/payment/interface/payment.js";
 import { Schema, Types, model, type PaginateModel } from "mongoose";
@@ -43,10 +42,7 @@ const paymentSchema = new Schema<TPaymentDocument>(
       required: true,
       trim: true,
       lowercase: true,
-      enum: Object.values(PaymentStatus) as [
-        TPaymentStatus,
-        ...TPaymentStatus[],
-      ],
+      enum: Object.values(PaymentStatus),
       default: PaymentStatus.UNPAID,
       index: true,
     },

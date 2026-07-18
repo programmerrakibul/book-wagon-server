@@ -21,5 +21,9 @@ export const validateObjectId = (
 };
 
 export const transformToObjectId = (id: string) => {
+  if (!validateObjectId(id)) {
+    throw new Error("Please provide a valid MongoDB ID!");
+  }
+
   return new Types.ObjectId(id);
 };

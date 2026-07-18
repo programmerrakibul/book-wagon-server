@@ -1,8 +1,6 @@
-import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import { envConfig } from "@/config/env.js";
 import stripe from "@/config/stripe.js";
-import type { TOrder } from "@/order/interface/order.js";
 import Order from "@/order/model/order.js";
 import {
   PaymentStatus,
@@ -14,15 +12,21 @@ import { BadRequestError, NotFoundError } from "http-errors-enhanced";
 const createCheckout = async (orderID: string, customerEmail: string) => {
   const clientUrl = envConfig.CLIENT_URL;
 
-  const order: TOrder | null = await Order.findOne({ orderID });
+  const order = await Order.findOne({ orderID })
+    .select("bookId totalPrice")
+    .lean()
+    .exec();
 
   if (!order) {
     throw new NotFoundError("Order data not found!");
   }
 
-  const { bookId, price } = order;
+  const { bookId, totalPrice } = order;
 
-  const book: TBook | null = await Book.findById(bookId).lean();
+  const book = await Book.findById(bookId)
+    .select("name description")
+    .lean()
+    .exec();
 
   if (!book) {
     throw new NotFoundError("Book data not found!");
@@ -34,7 +38,7 @@ const createCheckout = async (orderID: string, customerEmail: string) => {
     line_items: [
       {
         price_data: {
-          unit_amount: Math.round(Number(price)) * 100,
+          unit_amount: Math.round(totalPrice * 100),
           currency: "usd",
           product_data: {
             name,
@@ -73,7 +77,7 @@ const retrieveCheckout = async (sessionId: string) => {
   const transactionId = payment_intent as string;
 
   if (paymentStatus === PaymentStatus.PAID) {
-    const isExist = await Payment.findOne({ orderID });
+    const isExist = await Payment.exists({ orderID });
 
     if (isExist) {
       return {

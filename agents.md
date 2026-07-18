@@ -3,9 +3,9 @@
 ## 1. Project Overview
 
 **Book Wagon** is an e-commerce bookstore backend built with the MERN stack
-(MongoDB, Express 5, React, Node.js 22). It uses TypeScript in strict mode with
-ESM (`"type": "module"`), Mongoose for ODM, Zod for validation, Firebase Admin
-for auth, and Stripe for payments.
+(MongoDB, Express 5, Node.js 22). It uses TypeScript in strict mode with ESM
+(`"type": "module"`), Mongoose for ODM, Zod for validation, Firebase Admin for
+auth, and Stripe for payments.
 
 ---
 
@@ -42,6 +42,10 @@ src/modules/<domain>/
 └── routes/<domain>.ts         # Express Router definitions
 ```
 
+Not every module requires all layers. Modules without database models (e.g.,
+`checkout`, `dashboard`) omit the `interface/`, `model/`, and `validation/`
+directories.
+
 ### 3.2 Strict Layer Responsibilities
 
 | Layer          | Responsibility                              | Rules                                                                                                                                                                     |
@@ -64,7 +68,7 @@ Request → Route (middleware) → Controller → Service → Model → MongoDB
                                     ↓
                               Model operations (populate, paginate)
                                     ↓
-                              getPaginatedData() / throw errors
+                              getPaginatedData()
                                     ↓
                               sendSuccessResponse(res, statusCode, data)
 ```
@@ -133,13 +137,12 @@ export const myQuerySchema = z.object({
 
 ### 5.3 Middlewares
 
-| File                         | Export                 | Purpose                                                  |
-| ---------------------------- | ---------------------- | -------------------------------------------------------- |
-| `verify-token.ts`            | `verifyTokenID`        | Firebase Admin token verification, attaches `req.user`   |
-| `authorize.ts`               | `authorize(...roles)`  | Role-based access control                                |
-| `validateData.middleware.ts` | `validateData(schema)` | Zod body validation middleware                           |
-| `validateId.middleware.ts`   | `validateId`           | MongoDB ObjectId param validation                        |
-| `global-error-handler.ts`    | `globalErrorHandler`   | Catches ZodError (422) and HttpError (respective status) |
+| File                      | Export                | Purpose                                                  |
+| ------------------------- | --------------------- | -------------------------------------------------------- |
+| `verify-token.ts`         | `verifyTokenID`       | Firebase Admin token verification, attaches `req.user`   |
+| `authorize.ts`            | `authorize(...roles)` | Role-based access control                                |
+| `validate-id.ts`          | `validateId`          | MongoDB ObjectId param validation                        |
+| `global-error-handler.ts` | `globalErrorHandler`  | Catches ZodError (422) and HttpError (respective status) |
 
 ### 5.4 Config
 
@@ -155,8 +158,7 @@ export const myQuerySchema = z.object({
 
 ### 6.1 Every Endpoint MUST Use Zod
 
-- **Body**: Use `validateData(schema)` middleware OR
-  `parseOrThrow(schema, payload)` in service.
+- **Body**: Use `parseOrThrow(schema, payload)` in service.
 - **Query params**: Use `parseOrThrow(querySchema, req.query)` in controller or
   service.
 - **URL params**: Use `validateId` middleware for `:id` params.
@@ -266,13 +268,10 @@ Book ←→ SubCategory (subcategoryId)
 Book ←→ BookFormat (formatId)
 Book ←→ Order (bookId)
 Book ←→ Payment (bookId)
-Book ←→ Favorite (bookIDs[])
+Book ←→ Favorite (books[])
 Book ←→ Comment (bookId)
-Book ←→ Review (bookId)
 Order ←→ Payment (orderID)
 Order ←→ Checkout (orderId)
-User ←→ Cart (userId)
-Cart ←→ Book (bookId)
 ```
 
 ---
@@ -357,21 +356,64 @@ import { parseOrThrow } from "@/utils/utils.js"; // → src/utils/utils.ts
 
 ---
 
-## 13. Complete Module Inventory
+## 13. Environment Variables
 
-| Module       | Status      | Has Service | Has Model     | Has Validation | Notes                            |
-| ------------ | ----------- | ----------- | ------------- | -------------- | -------------------------------- |
-| book         | ✅ Complete | ✅          | ✅            | ✅             | Reference module                 |
-| category     | ✅ Complete | ✅          | ✅            | ✅             |                                  |
-| sub-category | ✅ Complete | ✅          | ✅            | ✅             |                                  |
-| book-format  | ✅ Complete | ✅          | ✅            | ✅             |                                  |
-| user         | ✅ Complete | ✅          | ✅            | ✅             | Service layer added              |
-| order        | ✅ Complete | ✅          | ✅            | ✅             |                                  |
-| checkout     | ✅ Complete | ✅          | ❌ (no model) | ❌             | Service layer added              |
-| payment      | ✅ Complete | ✅          | ✅            | ✅             | Migrated to mongoose-paginate-v2 |
-| favorite     | ✅ Complete | ✅          | ✅            | ✅             | Service layer added              |
-| comment      | ✅ Complete | ✅          | ✅            | ✅             | Service layer added              |
-| dashboard    | ✅ Complete | ✅          | ❌ (no model) | ❌             | Service layer added              |
-| review       | ✅ Complete | ✅          | ✅            | ✅             | Star ratings for books           |
-| cart         | ✅ Complete | ✅          | ✅            | ✅             | Shopping cart                    |
-| health       | ✅ Complete | N/A         | N/A           | N/A            | Simple health check              |
+| Variable                     | Type   | Required | Default                   | Validation                           |
+| ---------------------------- | ------ | -------- | ------------------------- | ------------------------------------ |
+| `PORT`                       | number | No       | `8000`                    | Positive integer                     |
+| `MONGODB_URI`                | string | Yes      | —                         | Must start with `"mongodb"`          |
+| `DB_NAME`                    | string | No       | `"book_wagon"`            | Trimmed                              |
+| `PAYMENT_GATEWAY_SECRET_KEY` | string | Yes      | —                         | Trimmed, min 1 char                  |
+| `CLIENT_URL`                 | string | No       | `"http://localhost:5173"` | Valid URL                            |
+| `FIREBASE_SERVICE_KEY`       | string | Yes      | —                         | Base64-encoded Firebase service JSON |
+
+---
+
+## 14. Complete Module Inventory
+
+| Module       | Status      | Has Service | Has Model | Has Validation | Notes                                    |
+| ------------ | ----------- | ----------- | --------- | -------------- | ---------------------------------------- |
+| book         | ✅ Complete | ✅          | ✅        | ✅             | Reference module, uses transactions      |
+| category     | ✅ Complete | ✅          | ✅        | ✅             | Auto-slug from name                      |
+| sub-category | ✅ Complete | ✅          | ✅        | ✅             | Linked to parent Category                |
+| book-format  | ✅ Complete | ✅          | ✅        | ✅             | Simple name + photoUrl                   |
+| user         | ✅ Complete | ✅          | ✅        | ✅             | Custom `toggleRole()` static, upsert     |
+| order        | ✅ Complete | ✅          | ✅        | ✅             | Uses transactions for create/delete      |
+| checkout     | ✅ Complete | ✅          | ❌        | ❌             | Stripe Checkout Session integration      |
+| payment      | ✅ Complete | ✅          | ✅        | ✅             | Paginated invoices, Stripe transactionId |
+| favorite     | ✅ Complete | ✅          | ✅        | ✅             | Per-user book wishlist with add/remove   |
+| comment      | ✅ Complete | ✅          | ✅        | ✅             | Paginated comments per book              |
+| dashboard    | ✅ Complete | ✅          | ❌        | ❌             | Aggregated analytics per role            |
+| health       | ✅ Complete | N/A         | N/A       | N/A            | Simple health check endpoint             |
+
+---
+
+## 15. Role-Based Access Control
+
+Three roles: `USER`, `LIBRARIAN`, `ADMIN`
+
+| Endpoint Category                       | Access                 |
+| --------------------------------------- | ---------------------- |
+| Book listing (GET)                      | Public                 |
+| Book create                             | LIBRARIAN only         |
+| Book update                             | LIBRARIAN or ADMIN     |
+| Book delete                             | LIBRARIAN or ADMIN     |
+| Book status toggle                      | LIBRARIAN only         |
+| Book active status toggle               | ADMIN only             |
+| Order listing / creation                | Any authenticated user |
+| Order status update                     | ADMIN only             |
+| Order delete                            | ADMIN or LIBRARIAN     |
+| Payment listing                         | Any authenticated user |
+| Checkout                                | Any authenticated user |
+| Favorites                               | Any authenticated user |
+| Comments (read)                         | Public                 |
+| Comments (write)                        | Any authenticated user |
+| User listing                            | ADMIN only             |
+| User profile / role (read)              | Any authenticated user |
+| User create (POST upsert)               | Public                 |
+| User role update                        | ADMIN only             |
+| Dashboard (user)                        | USER role only         |
+| Dashboard (librarian)                   | LIBRARIAN role only    |
+| Dashboard (admin)                       | ADMIN role only        |
+| Category / SubCategory / Format create  | ADMIN only             |
+| Category / SubCategory / Format listing | Public                 |

@@ -21,7 +21,7 @@ router.put(
   "/:id",
   validateId,
   verifyTokenID,
-  authorize(...LIBRARIAN_ADMIN),
+  authorize(LIBRARIAN),
   controllers.updateBookById,
 );
 
