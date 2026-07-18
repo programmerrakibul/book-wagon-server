@@ -3,18 +3,16 @@ import { validateId } from "@/middlewares/validate-id.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
 import { Router } from "express";
 
-export const favoritesRouter: Router = Router();
+const router = Router();
 
-favoritesRouter.use(verifyTokenID);
+router.use(verifyTokenID);
 
-favoritesRouter.get("/books", controllers.getFavoriteBooks);
+router.get("/books", controllers.getFavoriteBooks);
 
-favoritesRouter.get(
-  "/is-in-favorites/:id",
-  validateId,
-  controllers.checkInFavorites,
-);
+router.get("/check/:id", validateId, controllers.checkInFavorites);
 
-favoritesRouter.post("/:id", validateId, controllers.addToFavorite);
+router.post("/:id", validateId, controllers.addToFavorite);
 
-favoritesRouter.delete("/:id", validateId, controllers.removeFromFavorites);
+router.delete("/:id", validateId, controllers.removeFromFavorites);
+
+export default router;

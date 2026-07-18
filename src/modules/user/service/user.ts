@@ -1,14 +1,14 @@
-import type { TUserDocument } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import type { TUser } from "@/user/interface/user.js";
+import User from "@/user/model/user.js";
 import {
-  toggleRoleSchema,
+  createUserSchema,
+  updateUserRoleSchema,
   userQuerySchema,
-  userSchema,
 } from "@/user/validation/user.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
 import { parseOrThrow } from "@/utils/utils.js";
 import { NotFoundError } from "http-errors-enhanced";
-import type { PaginateOptions, PaginateResult } from "mongoose";
+import type { PaginateOptions, PaginateResult, Types } from "mongoose";
 
 const getUsers = async (queryPayload: unknown) => {
   const sort: Record<string, 1 | -1> = {
@@ -29,6 +29,7 @@ const getUsers = async (queryPayload: unknown) => {
     query["$or"] = [
       { name: { $regex: search, $options: "i" } },
       { email: { $regex: search, $options: "i" } },
+      { role: { $regex: search, $options: "i" } },
     ];
   }
 
@@ -43,29 +44,45 @@ const getUsers = async (queryPayload: unknown) => {
     sort,
     limit,
     page,
-    select: "-__v",
+    select: "-books -orders",
   };
 
-  const result: PaginateResult<TUserDocument> = await User.paginate(query, opt);
+  const result: PaginateResult<TUser> = await User.paginate(query, opt);
 
   return getPaginatedData(result);
 };
 
-const getUserRole = async (email: string) => {
-  const role = await User.getRole(email);
+const getUserProfile = async (id: Types.ObjectId) => {
+  const user = await User.findById(id).lean().exec();
 
-  return { role };
+  if (!user) {
+    throw new NotFoundError("This user does not exist!");
+  }
+
+  return user;
+};
+
+const getUserRole = async (id: Types.ObjectId) => {
+  const user = await User.findById(id).select("role").lean().exec();
+
+  if (!user) {
+    throw new NotFoundError("This user does not exist!");
+  }
+
+  return { role: user.role };
 };
 
 const upsertUser = async (payload: unknown) => {
-  const { email, ...userData } = parseOrThrow(userSchema, payload);
+  const { email, ...userData } = parseOrThrow(createUserSchema, payload);
 
-  const existingUser = await User.findOne({ email });
+  const user = await User.findOne({ email })
+    .select("lastLoggedIn")
+    .lean()
+    .exec();
 
-  if (existingUser) {
-    await User.findByIdAndUpdate(existingUser._id, {
-      lastLoggedIn: Date.now(),
-    });
+  if (user) {
+    user.lastLoggedIn = new Date();
+    await user.save();
 
     return { isNewUser: false };
   }
@@ -75,20 +92,22 @@ const upsertUser = async (payload: unknown) => {
   return { isNewUser: true };
 };
 
-const updateUserRole = async (payload: unknown) => {
-  const { role, email } = parseOrThrow(toggleRoleSchema, payload);
+const updateUserRole = async (userId: string, payload: unknown) => {
+  const { role } = parseOrThrow(updateUserRoleSchema, payload);
 
-  const user = await User.findOne({ email });
+  const user = await User.findById(userId).select("role").lean().exec();
 
   if (!user) {
     throw new NotFoundError("User not found!");
   }
 
-  await User.toggleRole(email, role);
+  user.role = role;
+  await user.save();
 };
 
 const services = {
   getUsers,
+  getUserProfile,
   getUserRole,
   upsertUser,
   updateUserRole,

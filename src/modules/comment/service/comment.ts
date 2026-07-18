@@ -1,65 +1,68 @@
-import type { TCommentDocument } from "@/comment/interface/comment.js";
-import { Comment } from "@/comment/model/comment.js";
-import { commentSchema } from "@/comment/validation/comment.js";
-import { parseOrThrow, validateObjectId } from "@/utils/utils.js";
-import type { TUserDocument } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import Book from "@/book/model/book.js";
+import Comment from "@/comment/model/comment.js";
+import {
+  createCommentSchema,
+  querySchema,
+} from "@/comment/validation/comment.js";
+import User from "@/user/model/user.js";
+import { getPaginatedData } from "@/utils/getPaginatedData.js";
+import { parseOrThrow, transformToObjectId } from "@/utils/utils.js";
 import { NotFoundError } from "http-errors-enhanced";
+import type { PopulateOptions, Types } from "mongoose";
 
-const postComment = async (
-  bookId: string,
-  email: string,
-  payload: unknown,
-) => {
-  const { comment } = parseOrThrow(commentSchema, payload);
-  if (!validateObjectId(bookId)) {
+const createComment = async (_id: Types.ObjectId, payload: unknown) => {
+  const { comment, bookId } = parseOrThrow(createCommentSchema, payload);
+
+  const book = await Book.exists(bookId);
+
+  if (!book) {
     throw new NotFoundError("Book not found!");
   }
 
-  const user: TUserDocument | null = await User.findOne({ email });
+  const user = await User.exists(_id);
 
   if (!user) {
     throw new NotFoundError("User not found!");
   }
 
-  const { name, photoUrl } = user;
-
-  let commentDoc: TCommentDocument | null = await Comment.findOne({ bookId });
-
-  if (!commentDoc) {
-    commentDoc = new Comment({ bookId, comments: [] });
-  }
-
-  commentDoc.comments.push({
-    customerEmail: email,
-    customerName: name,
-    customerImage: photoUrl,
-    comment,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
-
-  await commentDoc.save();
+  await Comment.create({ bookId, userId: _id, comment });
 };
 
-const getComments = async (bookId: string) => {
-  if (!validateObjectId(bookId)) {
+const getCommentsByBookId = async (id: string, queryPayload: unknown) => {
+  const bookId = transformToObjectId(id);
+  const { limit = 10, page = 1 } = parseOrThrow(querySchema, queryPayload);
+  const book = await Book.exists(bookId);
+
+  if (!book) {
     throw new NotFoundError("Book not found!");
   }
 
-  const result: TCommentDocument | null = await Comment.findOne({ bookId });
+  const populateOptions: PopulateOptions[] = [
+    {
+      path: "userId",
+      select: "name email photoUrl",
+    },
+    {
+      path: "bookId",
+      select: "name author description photoUrl",
+    },
+  ];
 
-  const comments = result?.comments.sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+  const options = {
+    page,
+    limit,
+    populate: populateOptions,
+    sort: { createdAt: -1 },
+  };
 
-  return comments || [];
+  const result = await Comment.paginate({ bookId }, options);
+
+  return getPaginatedData(result);
 };
 
 const services = {
-  postComment,
-  getComments,
+  createComment,
+  getCommentsByBookId,
 };
 
 export default services;

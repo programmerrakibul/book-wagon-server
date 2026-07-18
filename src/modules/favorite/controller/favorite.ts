@@ -4,8 +4,7 @@ import type { Request, Response } from "express";
 import status from "http-status";
 
 const getFavoriteBooks = async (req: Request, res: Response) => {
-  const { email: customerEmail } = req.user;
-  const result = await services.getFavoriteBooks(customerEmail, req.query);
+  const result = await services.getFavoriteBooks(req.user._id, req.query);
 
   sendSuccessResponse(res, status.OK, {
     message: "Favorite books data retrieved successfully!",
@@ -14,10 +13,7 @@ const getFavoriteBooks = async (req: Request, res: Response) => {
 };
 
 const addToFavorite = async (req: Request<{ id: string }>, res: Response) => {
-  const { id: bookId } = req.params;
-  const { email: customerEmail } = req.user;
-
-  await services.addToFavorite(bookId, customerEmail);
+  await services.addToFavorite(req.params.id, req.user._id);
 
   sendSuccessResponse(res, status.CREATED, {
     message: "Book added to favorites successfully!",
@@ -28,10 +24,7 @@ const checkInFavorites = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
-  const { id: bookId } = req.params;
-  const { email: customerEmail } = req.user;
-
-  const result = await services.checkInFavorites(bookId, customerEmail);
+  const result = await services.checkInFavorites(req.params.id, req.user._id);
 
   sendSuccessResponse(res, status.OK, {
     message: "Favorite status retrieved successfully!",
@@ -43,10 +36,7 @@ const removeFromFavorites = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
-  const { id: bookId } = req.params;
-  const { email: customerEmail } = req.user;
-
-  await services.removeFromFavorites(bookId, customerEmail);
+  await services.removeFromFavorites(req.params.id, req.user._id);
 
   sendSuccessResponse(res, status.OK, {
     message: "Book successfully removed from favorites!",

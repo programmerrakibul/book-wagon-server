@@ -12,9 +12,17 @@ const getUsers = async (req: Request, res: Response) => {
   });
 };
 
+const getUserProfile = async (req: Request, res: Response) => {
+  const result = await services.getUserProfile(req.user._id);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "User data retrieved successfully!",
+    data: result,
+  });
+};
+
 const getUserRole = async (req: Request, res: Response) => {
-  const { email } = req.user;
-  const result = await services.getUserRole(email);
+  const result = await services.getUserRole(req.user._id);
 
   sendSuccessResponse(res, status.OK, {
     message: "User role retrieved successfully!",
@@ -33,8 +41,8 @@ const postUser = async (req: Request, res: Response) => {
   sendSuccessResponse(res, statusCode, { message });
 };
 
-const updateUserRole = async (req: Request, res: Response) => {
-  await services.updateUserRole(req.body);
+const updateUserRole = async (req: Request<{ id: string }>, res: Response) => {
+  await services.updateUserRole(req.params.id, req.body);
 
   sendSuccessResponse(res, status.OK, {
     message: "User role updated successfully!",
@@ -43,6 +51,7 @@ const updateUserRole = async (req: Request, res: Response) => {
 
 const controllers = {
   getUsers,
+  getUserProfile,
   getUserRole,
   postUser,
   updateUserRole,

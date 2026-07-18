@@ -1,6 +1,5 @@
 import { envConfig } from "@/config/env.js";
-import type { TUserDocument } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import User from "@/user/model/user.js";
 import type { NextFunction, Request, Response } from "express";
 import admin, { type ServiceAccount } from "firebase-admin";
 import { UnauthorizedError } from "http-errors-enhanced";
@@ -31,7 +30,7 @@ export const verifyTokenID = async (
 
     if (!email) throw new UnauthorizedError("Unauthorized access!");
 
-    const dbUser: TUserDocument | null = await User.findOne({ email });
+    const dbUser = await User.findOne({ email });
 
     console.log(`Verifying user...`);
 

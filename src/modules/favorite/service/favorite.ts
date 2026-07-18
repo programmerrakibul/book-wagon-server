@@ -1,15 +1,15 @@
 import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import { bookQuerySchema } from "@/book/validation/book.js";
-import type { TFavoriteDocument } from "@/favorite/interface/favorite.js";
-import { Favorite } from "@/favorite/model/favorite.js";
+import type { TFavorite } from "@/favorite/interface/favorite.js";
+import Favorite from "@/favorite/model/favorite.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
-import { parseOrThrow, validateObjectId } from "@/utils/utils.js";
+import { parseOrThrow, transformToObjectId } from "@/utils/utils.js";
 import { NotFoundError } from "http-errors-enhanced";
-import type { PaginateOptions, PaginateResult } from "mongoose";
+import type { PaginateOptions, PaginateResult, Types } from "mongoose";
 
 const getFavoriteBooks = async (
-  customerEmail: string,
+  userId: Types.ObjectId,
   queryPayload: unknown,
 ) => {
   const query: Record<string, unknown> = {};
@@ -17,7 +17,6 @@ const getFavoriteBooks = async (
   let sort: Record<string, 1 | -1> = {
     createdAt: -1,
   };
-  let projectionField: Record<string, 1 | 0> = {};
 
   const {
     search,
@@ -25,14 +24,13 @@ const getFavoriteBooks = async (
     sortOrder,
     limit = 10,
     page = 1,
-    fields,
-    excludes,
   } = parseOrThrow(bookQuerySchema, queryPayload);
 
   if (search) {
     query["$or"] = [
       { name: { $regex: search, $options: "i" } },
       { author: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
     ];
   }
 
@@ -41,73 +39,79 @@ const getFavoriteBooks = async (
     sort[sortBy] = order;
   }
 
-  if (fields) {
-    fields.forEach((f) => {
-      projectionField[f] = 1;
-    });
-  }
-
-  if (excludes) {
-    excludes.forEach((f) => {
-      projectionField[f] = 0;
-    });
-  }
-
   const options: PaginateOptions = {
     limit,
     page,
     sort,
-    projection: projectionField,
-    select: "-__v",
+    select: "name author description photoUrl",
   };
 
-  const favDoc: TFavoriteDocument | null = await Favorite.findOne({
-    customerEmail,
-  });
+  const favDoc: TFavorite | null = await Favorite.findOne({
+    userId,
+  }).select("books");
 
-  const bookIds = favDoc?.bookIDs.toReversed() || [];
+  const bookIds = favDoc?.books.toReversed() || [];
 
   const result: PaginateResult<TBook> = await Book.paginate(
-    { _id: { $in: bookIds } },
+    {
+      _id: { $in: bookIds },
+    },
     options,
   );
 
   return getPaginatedData(result);
 };
 
-const addToFavorite = async (bookId: string, customerEmail: string) => {
-  if (!validateObjectId(bookId)) {
+const addToFavorite = async (bookId: string, userId: Types.ObjectId) => {
+  const id = transformToObjectId(bookId);
+  const book = await Book.exists(id);
+
+  if (!book) {
     throw new NotFoundError("Book not found!");
   }
 
-  let favDoc: TFavoriteDocument | null = await Favorite.findOne({
-    customerEmail,
-  });
+  let favDoc: TFavorite | null = await Favorite.findOne({
+    userId,
+  }).select("books");
 
   if (!favDoc) {
-    favDoc = new Favorite({ customerEmail, bookIDs: [] });
+    favDoc = new Favorite({ userId, books: [] });
   }
 
-  favDoc.bookIDs.addToSet(bookId);
+  favDoc.books.addToSet(bookId);
   await favDoc.save();
 };
 
-const checkInFavorites = async (bookId: string, customerEmail: string) => {
+const checkInFavorites = async (bookId: string, userId: Types.ObjectId) => {
   const query = {
-    customerEmail,
-    bookIDs: bookId,
+    userId,
+    books: transformToObjectId(bookId),
   };
 
-  const result: TFavoriteDocument | null = await Favorite.findOne(query);
+  const result = await Favorite.exists(query);
 
   return Boolean(result);
 };
 
-const removeFromFavorites = async (bookId: string, customerEmail: string) => {
-  await Favorite.findOneAndUpdate(
-    { customerEmail },
-    { $pull: { bookIDs: bookId } },
-  );
+const removeFromFavorites = async (bookId: string, userId: Types.ObjectId) => {
+  const id = transformToObjectId(bookId);
+  const book = await Book.exists(id);
+
+  if (!book) {
+    throw new NotFoundError("This book does not exist!");
+  }
+
+  const favDoc: TFavorite | null = await Favorite.findOne({
+    userId,
+    books: id,
+  }).select("books");
+
+  if (!favDoc) {
+    throw new NotFoundError("This book is not in your favorites!");
+  }
+
+  favDoc.books.pull(bookId);
+  await favDoc.save();
 };
 
 const services = {

@@ -1,7 +1,8 @@
-import type { TCommentDocument } from "@/comment/interface/comment.js";
-import { model, Schema, Types } from "mongoose";
+import type { TComment } from "@/comment/interface/comment.js";
+import { model, Schema, Types, type PaginateModel } from "mongoose";
+import paginate from "mongoose-paginate-v2";
 
-const commentSchema = new Schema<TCommentDocument>(
+const schema = new Schema<TComment>(
   {
     bookId: {
       type: Types.ObjectId,
@@ -10,44 +11,28 @@ const commentSchema = new Schema<TCommentDocument>(
       unique: true,
       index: true,
     },
-    comments: [
-      {
-        customerEmail: {
-          type: String,
-          required: true,
-          trim: true,
-          lowercase: true,
-        },
-        customerName: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-        customerImage: {
-          type: String,
-          required: true,
-          trim: true,
-          lowercase: true,
-        },
-        comment: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-        createdAt: {
-          type: Date,
-          default: () => new Date(),
-        },
-        updatedAt: {
-          type: Date,
-          default: () => new Date(),
-        },
-      },
-    ],
+
+    userId: {
+      type: Types.ObjectId,
+      required: true,
+      ref: "User",
+      index: true,
+    },
+
+    comment: {
+      type: String,
+      required: true,
+      trim: true,
+    },
   },
   {
     timestamps: true,
+    collection: "Comment",
+    versionKey: false,
   },
 );
 
-export const Comment = model<TCommentDocument>("Comment", commentSchema);
+schema.plugin(paginate);
+
+const Comment = model<TComment, PaginateModel<TComment>>("Comment", schema);
+export default Comment;

@@ -1,9 +1,5 @@
-import type {
-  TUserDocument,
-  TUserModel,
-  TUserRole,
-} from "@/user/interface/user.js";
-import { UserRole } from "@/user/validation/user.js";
+import type { TUser, TUserModel } from "@/user/interface/user.js";
+import { UserRole, type TUserRole } from "@/user/validation/user.js";
 import { NotFoundError } from "http-errors-enhanced";
 import { model, Schema } from "mongoose";
 import paginate from "mongoose-paginate-v2";
@@ -36,8 +32,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
-      enum: Object.values(UserRole) as [TUserRole, ...TUserRole[]],
+      enum: Object.values(UserRole),
       default: UserRole.USER,
       index: true,
     },
@@ -73,29 +68,11 @@ const userSchema = new Schema(
   },
 );
 
-userSchema.statics.getRole = async function (
-  query: string | Schema.Types.ObjectId,
-) {
-  const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
 
-  if (typeof query === "string") {
-    queryObj.email = query;
-  } else {
-    queryObj._id = query;
-  }
-
-  const user: TUserDocument | null = await this.findOne(queryObj);
-
-  if (!user) {
-    throw new NotFoundError("User not found!");
-  }
-
-  return user.role;
-};
 
 userSchema.statics.toggleRole = async function (
   query: string | Schema.Types.ObjectId,
-  newRole: string,
+  newRole: TUserRole,
 ) {
   const queryObj: Record<string, string | Schema.Types.ObjectId> = {};
 
@@ -105,7 +82,7 @@ userSchema.statics.toggleRole = async function (
     queryObj._id = query;
   }
 
-  const user: TUserDocument | null = await this.findOne(queryObj);
+  const user: TUser | null = await this.findOne(queryObj);
 
   if (!user) {
     throw new NotFoundError("User not found!");
@@ -117,4 +94,5 @@ userSchema.statics.toggleRole = async function (
 
 userSchema.plugin(paginate);
 
-export const User = model<TUserDocument, TUserModel>("User", userSchema);
+const User = model<TUser, TUserModel>("User", userSchema);
+export default User;

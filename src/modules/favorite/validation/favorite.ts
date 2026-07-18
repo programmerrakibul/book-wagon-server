@@ -6,5 +6,3 @@ export const favoriteQuerySchema = z.object({
   ...searchQuery,
   ...sortQuery,
 });
-
-export type TFavoriteQuery = z.infer<typeof favoriteQuerySchema>;

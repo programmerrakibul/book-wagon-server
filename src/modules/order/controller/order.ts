@@ -13,6 +13,15 @@ const getOrders = async (req: Request, res: Response) => {
   });
 };
 
+const getOrderById = async (req: Request<{ id: string }>, res: Response) => {
+  const result = await services.getOrderById(req.params.id);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "Order data fetched successfully!",
+    data: result,
+  });
+};
+
 const createOrder = async (req: Request, res: Response) => {
   const { _id } = req.user;
   await services.createOrder(req.body, _id);
@@ -22,19 +31,32 @@ const createOrder = async (req: Request, res: Response) => {
   });
 };
 
-const updateOrder = async (req: Request<{ id: string }>, res: Response) => {
+const updateOrderStatus = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
-  await services.updateOrder(id, req.body);
+  await services.updateOrderStatus(id, req.body);
 
   sendSuccessResponse(res, status.OK, {
     message: "Order data updated successfully!",
   });
 };
 
+const deleteOrderById = async (req: Request<{ id: string }>, res: Response) => {
+  await services.deleteOrderById(req.params.id);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "Order data deleted successfully!",
+  });
+};
+
 const controllers = {
   getOrders,
   createOrder,
-  updateOrder,
+  getOrderById,
+  updateOrderStatus,
+  deleteOrderById,
 };
 
 export default controllers;

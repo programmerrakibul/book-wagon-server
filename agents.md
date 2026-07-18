@@ -359,19 +359,19 @@ import { parseOrThrow } from "@/utils/utils.js"; // → src/utils/utils.ts
 
 ## 13. Complete Module Inventory
 
-| Module       | Status      | Has Service | Has Model     | Has Validation | Notes                                           |
-| ------------ | ----------- | ----------- | ------------- | -------------- | ----------------------------------------------- |
-| book         | ✅ Complete | ✅          | ✅            | ✅             | Reference module                                |
-| category     | ✅ Complete | ✅          | ✅            | ✅             |                                                 |
-| sub-category | ✅ Complete | ✅          | ✅            | ✅             |                                                 |
-| book-format  | ✅ Complete | ✅          | ✅            | ✅             |                                                 |
-| user         | ✅ Complete | ✅          | ✅            | ✅             | Service layer added                             |
-| order        | ✅ Complete | ✅          | ✅            | ✅             |                                                 |
-| checkout     | ✅ Complete | ✅          | ❌ (no model) | ❌             | Service layer added                             |
-| payment      | ✅ Complete | ✅          | ✅            | ✅             | Migrated to mongoose-paginate-v2                |
-| favorite     | ✅ Complete | ✅          | ✅            | ✅             | Service layer added                             |
-| comment      | ✅ Complete | ✅          | ✅            | ✅             | Service layer added                             |
-| dashboard    | ✅ Complete | ✅          | ❌ (no model) | ❌             | Service layer added                             |
-| review       | ✅ Complete | ✅          | ✅            | ✅             | Star ratings for books                          |
-| cart         | ✅ Complete | ✅          | ✅            | ✅             | Shopping cart                                   |
-| health       | ✅ Complete | N/A         | N/A           | N/A            | Simple health check                             |
+| Module       | Status      | Has Service | Has Model     | Has Validation | Notes                            |
+| ------------ | ----------- | ----------- | ------------- | -------------- | -------------------------------- |
+| book         | ✅ Complete | ✅          | ✅            | ✅             | Reference module                 |
+| category     | ✅ Complete | ✅          | ✅            | ✅             |                                  |
+| sub-category | ✅ Complete | ✅          | ✅            | ✅             |                                  |
+| book-format  | ✅ Complete | ✅          | ✅            | ✅             |                                  |
+| user         | ✅ Complete | ✅          | ✅            | ✅             | Service layer added              |
+| order        | ✅ Complete | ✅          | ✅            | ✅             |                                  |
+| checkout     | ✅ Complete | ✅          | ❌ (no model) | ❌             | Service layer added              |
+| payment      | ✅ Complete | ✅          | ✅            | ✅             | Migrated to mongoose-paginate-v2 |
+| favorite     | ✅ Complete | ✅          | ✅            | ✅             | Service layer added              |
+| comment      | ✅ Complete | ✅          | ✅            | ✅             | Service layer added              |
+| dashboard    | ✅ Complete | ✅          | ❌ (no model) | ❌             | Service layer added              |
+| review       | ✅ Complete | ✅          | ✅            | ✅             | Star ratings for books           |
+| cart         | ✅ Complete | ✅          | ✅            | ✅             | Shopping cart                    |
+| health       | ✅ Complete | N/A         | N/A           | N/A            | Simple health check              |

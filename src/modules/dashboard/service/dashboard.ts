@@ -1,8 +1,8 @@
 import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import type { TBookStatus } from "@/book/validation/book.js";
-import type { TFavoriteDocument } from "@/favorite/interface/favorite.js";
-import { Favorite } from "@/favorite/model/favorite.js";
+import type { TFavorite } from "@/favorite/interface/favorite.js";
+import Favorite from "@/favorite/model/favorite.js";
 import type { TOrder } from "@/order/interface/order.js";
 import Order from "@/order/model/order.js";
 import {
@@ -11,8 +11,8 @@ import {
   type TOrderStatus,
   type TPaymentStatus,
 } from "@/order/validation/order.js";
-import type { TUserDocument } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import type { TUser } from "@/user/interface/user.js";
+import User from "@/user/model/user.js";
 import { UserRole } from "@/user/validation/user.js";
 import { ObjectId } from "mongodb";
 
@@ -23,11 +23,11 @@ const getUserDashboardData = async (customerEmail: string) => {
     customer?._id ? { customerId: customer._id } : {},
   ).sort({ createdAt: -1 });
 
-  const wishlist: TFavoriteDocument | null = await Favorite.findOne({
+  const wishlist: TFavorite | null = await Favorite.findOne({
     customerEmail,
   });
 
-  const wishlistBookIds = wishlist?.bookIDs || [];
+  const wishlistBookIds = wishlist?.books || [];
 
   const wishlistBooksData: TBook[] =
     wishlistBookIds.length > 0
@@ -359,8 +359,8 @@ const getAdminDashboardData = async () => {
   const [allBooks, allOrders, allUsers, allWishlists] = await Promise.all([
     Book.find({}).sort({ createdAt: -1 }) as Promise<TBook[]>,
     Order.find({}).sort({ createdAt: -1 }) as Promise<TOrder[]>,
-    User.find({}).sort({ createdAt: -1 }) as Promise<TUserDocument[]>,
-    Favorite.find({}).sort({ createdAt: -1 }) as Promise<TFavoriteDocument[]>,
+    User.find({}).sort({ createdAt: -1 }) as Promise<TUser[]>,
+    Favorite.find({}).sort({ createdAt: -1 }) as Promise<TFavorite[]>,
   ]);
 
   const totalBooks = allBooks.length;
@@ -511,15 +511,13 @@ const getAdminDashboardData = async () => {
 
   const totalCompletedOrder = orderStatusCounts.DELIVERED || 0;
   const successRate =
-    totalOrders > 0
-      ? Math.round((totalCompletedOrder / totalOrders) * 100)
-      : 0;
+    totalOrders > 0 ? Math.round((totalCompletedOrder / totalOrders) * 100) : 0;
 
   const booksPerLibrarian =
     totalLibrarians > 0 ? Math.round(totalBooks / totalLibrarians) : 0;
 
   const totalWishlistItems = allWishlists.reduce(
-    (sum, wishlist) => sum + (wishlist.bookIDs.length || 0),
+    (sum, wishlist) => sum + (wishlist.books.length || 0),
     0,
   );
 

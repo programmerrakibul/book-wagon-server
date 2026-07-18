@@ -1,5 +1,6 @@
-import type { TUserDocument, TUserRole } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import type { TUser } from "@/user/interface/user.js";
+import User from "@/user/model/user.js";
+import type { TUserRole } from "@/user/validation/user.js";
 import type { NextFunction, Request, Response } from "express";
 import { ForbiddenError } from "http-errors-enhanced";
 
@@ -8,7 +9,7 @@ export const authorize = (...roles: TUserRole[]) => {
     try {
       const { _id } = req.user;
 
-      const user: TUserDocument | null = await User.findById(_id);
+      const user: TUser | null = await User.findById(_id);
 
       roles = roles.map((role) => role?.toLowerCase() as TUserRole);
 

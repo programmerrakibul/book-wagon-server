@@ -1,19 +1,28 @@
-import controllers from "@/user/controller/user.js";
 import { authorize } from "@/middlewares/authorize.js";
+import { validateId } from "@/middlewares/validate-id.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
+import controllers from "@/user/controller/user.js";
+import { UserRole } from "@/user/validation/user.js";
 import { Router } from "express";
 
-export const usersRouter: Router = Router();
+const ADMIN = UserRole.ADMIN;
 
-usersRouter.get("/", verifyTokenID, authorize("admin"), controllers.getUsers);
+const router: Router = Router();
 
-usersRouter.get("/role", verifyTokenID, controllers.getUserRole);
+router.get("/", verifyTokenID, authorize(ADMIN), controllers.getUsers);
 
-usersRouter.post("/", controllers.postUser);
+router.get("/profile", verifyTokenID, controllers.getUserProfile);
 
-usersRouter.put(
-  "/update-role",
+router.get("/role", verifyTokenID, controllers.getUserRole);
+
+router.post("/", controllers.postUser);
+
+router.patch(
+  "/role/:id",
+  validateId,
   verifyTokenID,
-  authorize("admin"),
+  authorize(ADMIN),
   controllers.updateUserRole,
 );
+
+export default router;

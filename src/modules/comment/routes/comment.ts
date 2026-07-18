@@ -3,13 +3,10 @@ import { validateId } from "@/middlewares/validate-id.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
 import { Router } from "express";
 
-export const commentsRouter: Router = Router();
+const router = Router();
 
-commentsRouter.get("/:id", validateId, controllers.getComments);
+router.get("/:id", validateId, controllers.getCommentsByBookId);
 
-commentsRouter.post(
-  "/:id",
-  validateId,
-  verifyTokenID,
-  controllers.postComment,
-);
+router.post("/", verifyTokenID, controllers.createComment);
+
+export default router;

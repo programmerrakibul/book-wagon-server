@@ -1,20 +1,18 @@
 import bookFormatRouter from "@/book-format/routes/book-format.js";
 import booksRouter from "@/book/routes/book.js";
-import { cartRouter } from "@/cart/routes/cart.js";
 import categoryRouter from "@/category/routes/category.js";
 import { checkoutRouter } from "@/checkout/routes/checkout.js";
-import { commentsRouter } from "@/comment/routes/comment.js";
+import commentsRouter from "@/comment/routes/comment.js";
 import { dbConnect } from "@/config/db.js";
 import { envConfig } from "@/config/env.js";
 import { dashboardRouter } from "@/dashboard/routes/dashboard.js";
-import { favoritesRouter } from "@/favorite/routes/favorite.js";
-import { healthCheck } from "@/health/controller/health.js";
+import favoritesRouter from "@/favorite/routes/favorite.js";
+import healthRouter from "@/health/routes/health.js";
 import { globalErrorHandler } from "@/middlewares/global-error-handler.js";
 import ordersRouter from "@/order/routes/order.js";
 import { paymentsRouter } from "@/payment/routes/payment.js";
-import { reviewsRouter } from "@/review/routes/review.js";
 import subCategoryRouter from "@/sub-category/routes/sub-category.js";
-import { usersRouter } from "@/user/routes/user.js";
+import usersRouter from "@/user/routes/user.js";
 import {
   sendErrorResponse,
   sendSuccessResponse,
@@ -54,8 +52,7 @@ const run = async () => {
       });
     });
 
-    app.get(`${API_PREFIX}/health-check`, healthCheck);
-
+    app.use(`${API_PREFIX}/health-check`, healthRouter);
     app.use(`${API_PREFIX}/users`, usersRouter);
     app.use(`${API_PREFIX}/books`, booksRouter);
     app.use(`${API_PREFIX}/orders`, ordersRouter);
@@ -63,8 +60,6 @@ const run = async () => {
     app.use(`${API_PREFIX}/payments`, paymentsRouter);
     app.use(`${API_PREFIX}/favorites`, favoritesRouter);
     app.use(`${API_PREFIX}/comments`, commentsRouter);
-    app.use(`${API_PREFIX}/reviews`, reviewsRouter);
-    app.use(`${API_PREFIX}/cart`, cartRouter);
     app.use(`${API_PREFIX}/dashboard`, dashboardRouter);
     app.use(`${API_PREFIX}/categories`, categoryRouter);
     app.use(`${API_PREFIX}/sub-categories`, subCategoryRouter);

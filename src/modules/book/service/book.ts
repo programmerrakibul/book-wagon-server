@@ -11,8 +11,8 @@ import {
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
 import Order from "@/order/model/order.js";
-import type { TUserRole } from "@/user/interface/user.js";
-import { User } from "@/user/model/user.js";
+import type { TUserRole } from "@/user/validation/user.js";
+import  User  from "@/user/model/user.js";
 import { UserRole } from "@/user/validation/user.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
 import {
@@ -106,7 +106,7 @@ const getBooks = async (queryPayload: unknown) => {
     if (user) {
       const { role, _id } = user;
 
-      if (roles.includes(role as Exclude<TUserRole, "user">)) {
+      if (roles.includes(role as Exclude<TUserRole, "USER">)) {
         delete query.status;
 
         if (role === UserRole.LIBRARIAN) query.librarianId = _id;
@@ -245,6 +245,17 @@ const deleteBookById = async (id: string) => {
     if (!book) {
       throw new NotFoundError("Book data not found!");
     }
+
+    const librarian = await User.findById(book.librarianId)
+      .select("books")
+      .session(session);
+
+    if (!librarian) {
+      throw new NotFoundError("Librarian not found!");
+    }
+
+    librarian.books.pull(id);
+    await librarian.save({ session });
 
     await Order.deleteMany({ bookId: id }).session(session);
 

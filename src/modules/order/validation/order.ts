@@ -42,18 +42,12 @@ export const createOrderSchema = z.object({
     .max(100, "Address cannot exceed 100 characters"),
 });
 
-export const updateOrderSchema = createOrderSchema
-  .extend({
-    status: z.enum(
-      Object.values(OrderStatus) as [TOrderStatus, ...TOrderStatus[]],
-      "Status must be one of pending, shipped, delivered, cancelled",
-    ),
-    paymentStatus: z.enum(
-      Object.values(PaymentStatus) as [TPaymentStatus, ...TPaymentStatus[]],
-      "Payment status must be one of paid, unpaid, pending, failed, refunded",
-    ),
-  })
-  .partial();
+export const updateOrderStatusSchema = z.object({
+  status: z.enum(
+    Object.values(OrderStatus) as [TOrderStatus, ...TOrderStatus[]],
+    "Status must be one of pending, shipped, delivered, cancelled",
+  ),
+});
 
 export const orderQuerySchema = z.object({
   ...paginationQuery,
@@ -62,7 +56,6 @@ export const orderQuerySchema = z.object({
 });
 
 export type TCreateOrder = z.infer<typeof createOrderSchema>;
-export type TUpdateOrder = z.infer<typeof updateOrderSchema>;
 export type TOrderQuery = z.infer<typeof orderQuerySchema>;
 export type TOrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 export type TPaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
