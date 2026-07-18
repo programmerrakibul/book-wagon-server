@@ -109,6 +109,7 @@ const schema = new Schema<TBook>(
       type: Boolean,
       required: true,
       default: true,
+      index: true,
     },
   },
 

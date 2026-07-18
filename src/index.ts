@@ -3,14 +3,14 @@ import booksRouter from "@/book/routes/book.js";
 import categoryRouter from "@/category/routes/category.js";
 import { checkoutRouter } from "@/checkout/routes/checkout.js";
 import commentsRouter from "@/comment/routes/comment.js";
-import { dbConnect } from "@/config/db.js";
+import connectDB from "@/config/db.js";
 import { envConfig } from "@/config/env.js";
-import { dashboardRouter } from "@/dashboard/routes/dashboard.js";
+import dashboardRouter from "@/dashboard/routes/dashboard.js";
 import favoritesRouter from "@/favorite/routes/favorite.js";
 import healthRouter from "@/health/routes/health.js";
 import { globalErrorHandler } from "@/middlewares/global-error-handler.js";
 import ordersRouter from "@/order/routes/order.js";
-import { paymentsRouter } from "@/payment/routes/payment.js";
+import paymentsRouter from "@/payment/routes/payment.js";
 import subCategoryRouter from "@/sub-category/routes/sub-category.js";
 import usersRouter from "@/user/routes/user.js";
 import {
@@ -44,7 +44,7 @@ app.use(json());
 
 const run = async () => {
   try {
-    await dbConnect();
+    await connectDB();
 
     app.get("/", (_req: Request, res: Response) => {
       return sendSuccessResponse(res, status.OK, {

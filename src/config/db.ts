@@ -13,7 +13,7 @@ const opt: ConnectOptions = {
   socketTimeoutMS: 45000,
 };
 
-export const dbConnect = async () => {
+const connectDB = async () => {
   try {
     await connect(envConfig.MONGODB_URI, opt);
     console.log("✅ Database connected successfully!");
@@ -21,3 +21,5 @@ export const dbConnect = async () => {
     throw err;
   }
 };
+
+export default connectDB;

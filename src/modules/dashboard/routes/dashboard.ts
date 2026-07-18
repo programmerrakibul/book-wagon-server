@@ -4,24 +4,22 @@ import { verifyTokenID } from "@/middlewares/verify-token.js";
 import { UserRole } from "@/user/validation/user.js";
 import { Router } from "express";
 
-export const dashboardRouter: Router = Router();
+const router: Router = Router();
 
-dashboardRouter.use(verifyTokenID);
+router.use(verifyTokenID);
 
-dashboardRouter.get(
-  "/user",
-  authorize(UserRole.USER),
-  controllers.getUserDashboardData,
-);
+router.get("/user", authorize(UserRole.USER), controllers.getUserDashboardData);
 
-dashboardRouter.get(
+router.get(
   "/librarian",
   authorize(UserRole.LIBRARIAN),
   controllers.getLibrarianDashboardData,
 );
 
-dashboardRouter.get(
+router.get(
   "/admin",
   authorize(UserRole.ADMIN),
   controllers.getAdminDashboardData,
 );
+
+export default router;

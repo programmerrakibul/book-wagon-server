@@ -1,14 +1,14 @@
+import type { TBook } from "@/book/interface/book.js";
+import Book from "@/book/model/book.js";
 import { envConfig } from "@/config/env.js";
-import { stripe } from "@/config/stripe.js";
+import stripe from "@/config/stripe.js";
+import type { TOrder } from "@/order/interface/order.js";
+import Order from "@/order/model/order.js";
 import {
   PaymentStatus,
   type TPaymentStatus,
 } from "@/order/validation/order.js";
 import { Payment } from "@/payment/model/payment.js";
-import type { TOrder } from "@/order/interface/order.js";
-import Order from "@/order/model/order.js";
-import type { TBook } from "@/book/interface/book.js";
-import Book from "@/book/model/book.js";
 import { BadRequestError, NotFoundError } from "http-errors-enhanced";
 
 const createCheckout = async (orderID: string, customerEmail: string) => {

@@ -8,6 +8,7 @@ const schema = new mongoose.Schema<TBookFormat>(
       required: true,
       trim: true,
       unique: true,
+      index: true,
     },
 
     photoUrl: {

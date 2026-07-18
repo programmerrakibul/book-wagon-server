@@ -11,8 +11,8 @@ import {
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
 import Order from "@/order/model/order.js";
+import User from "@/user/model/user.js";
 import type { TUserRole } from "@/user/validation/user.js";
-import  User  from "@/user/model/user.js";
 import { UserRole } from "@/user/validation/user.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
 import {
@@ -169,7 +169,8 @@ const getBooks = async (queryPayload: unknown) => {
 const getBookById = async (id: string) => {
   const book: TBook | null = await Book.findById(id)
     .populate(bookPopulateOptions)
-    .lean();
+    .lean()
+    .exec();
 
   if (!book) {
     throw new NotFoundError("Book data not found!");
@@ -240,7 +241,9 @@ const deleteBookById = async (id: string) => {
   session.startTransaction();
 
   try {
-    const book: TBook | null = await Book.findById(id).session(session);
+    const book: TBook | null = await Book.findById(id)
+      .select("librarianId")
+      .session(session);
 
     if (!book) {
       throw new NotFoundError("Book data not found!");
