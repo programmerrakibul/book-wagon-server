@@ -18,7 +18,7 @@ router.get("/:id", validateId, controllers.getOrderById);
 router.patch(
   "/:id/status",
   validateId,
-  authorize(UserRole.ADMIN),
+  authorize(UserRole.USER, UserRole.ADMIN),
   controllers.updateOrderStatus,
 );
 

@@ -42,10 +42,6 @@ const getCommentsByBookId = async (id: string, queryPayload: unknown) => {
       path: "userId",
       select: "name email photoUrl",
     },
-    {
-      path: "bookId",
-      select: "name author description photoUrl",
-    },
   ];
 
   const options = {

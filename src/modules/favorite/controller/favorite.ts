@@ -12,11 +12,11 @@ const getFavoriteBooks = async (req: Request, res: Response) => {
   });
 };
 
-const addToFavorite = async (req: Request<{ id: string }>, res: Response) => {
-  await services.addToFavorite(req.params.id, req.user._id);
+const toggleFavorite = async (req: Request<{ id: string }>, res: Response) => {
+  const result = await services.toggleFavorite(req.params.id, req.user._id);
 
   sendSuccessResponse(res, status.CREATED, {
-    message: "Book added to favorites successfully!",
+    message: result,
   });
 };
 
@@ -32,22 +32,10 @@ const checkInFavorites = async (
   });
 };
 
-const removeFromFavorites = async (
-  req: Request<{ id: string }>,
-  res: Response,
-) => {
-  await services.removeFromFavorites(req.params.id, req.user._id);
-
-  sendSuccessResponse(res, status.OK, {
-    message: "Book successfully removed from favorites!",
-  });
-};
-
 const controllers = {
   getFavoriteBooks,
-  addToFavorite,
+  toggleFavorite,
   checkInFavorites,
-  removeFromFavorites,
 };
 
 export default controllers;

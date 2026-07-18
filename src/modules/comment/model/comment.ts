@@ -8,7 +8,6 @@ const schema = new Schema<TComment>(
       type: Types.ObjectId,
       required: true,
       ref: "Book",
-      unique: true,
       index: true,
     },
 

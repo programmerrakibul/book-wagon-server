@@ -12,7 +12,7 @@ import { BadRequestError, NotFoundError } from "http-errors-enhanced";
 const createCheckout = async (orderID: string, customerEmail: string) => {
   const clientUrl = envConfig.CLIENT_URL;
 
-  const order = await Order.findOne({ orderID })
+  const order = await Order.findById(orderID)
     .select("bookId totalPrice")
     .lean()
     .exec();
@@ -58,7 +58,7 @@ const createCheckout = async (orderID: string, customerEmail: string) => {
     cancel_url: `${clientUrl}/dashboard/my-orders`,
   });
 
-  return session.url;
+  return { url: session.url };
 };
 
 const retrieveCheckout = async (sessionId: string) => {

@@ -19,7 +19,7 @@ const getCommentsByBookId = async (
 
   sendSuccessResponse(res, status.OK, {
     message: "Comments data retrieved successfully!",
-    data: result,
+    ...result,
   });
 };
 

@@ -75,10 +75,7 @@ const getUserRole = async (id: Types.ObjectId) => {
 const upsertUser = async (payload: unknown) => {
   const { email, ...userData } = parseOrThrow(createUserSchema, payload);
 
-  const user = await User.findOne({ email })
-    .select("lastLoggedIn")
-    .lean()
-    .exec();
+  const user = await User.findOne({ email }).select("lastLoggedIn");
 
   if (user) {
     user.lastLoggedIn = new Date();

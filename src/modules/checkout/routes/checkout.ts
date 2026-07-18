@@ -1,4 +1,5 @@
 import controllers from "@/checkout/controller/checkout.js";
+import { validateId } from "@/middlewares/validate-id.js";
 import { verifyTokenID } from "@/middlewares/verify-token.js";
 import { Router } from "express";
 
@@ -8,4 +9,4 @@ checkoutRouter.use(verifyTokenID);
 
 checkoutRouter.get("/retrieve/:id", controllers.retrieveCheckout);
 
-checkoutRouter.post("/:orderID", controllers.createCheckout);
+checkoutRouter.post("/:id", validateId, controllers.createCheckout);

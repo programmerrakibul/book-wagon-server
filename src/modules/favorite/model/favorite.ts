@@ -8,20 +8,17 @@ const schema = new Schema<TFavorite>(
       type: Types.ObjectId,
       required: true,
       trim: true,
-      unique: true,
       lowercase: true,
       index: true,
+      ref: "User",
     },
 
-    books: [
-      {
-        type: Types.ObjectId,
-        ref: "Book",
-        required: true,
-        unique: true,
-        index: true,
-      },
-    ],
+    bookId: {
+      type: Types.ObjectId,
+      ref: "Book",
+      required: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
