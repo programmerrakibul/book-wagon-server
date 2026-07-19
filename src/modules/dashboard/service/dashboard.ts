@@ -15,38 +15,61 @@ import type { TUser } from "@/user/interface/user.js";
 import User from "@/user/model/user.js";
 import { UserRole } from "@/user/validation/user.js";
 import { ObjectId } from "mongodb";
+import type { Types } from "mongoose";
 
-const getUserDashboardData = async (customerEmail: string) => {
-  const customer = await User.findOne({ email: customerEmail }).select("_id");
+const getUserDashboardData = async (id: Types.ObjectId) => {
+  const [
+    orders,
+    totalCompletedOrder,
+    purchasedBooks,
+    totalBooksPurchased,
+    favorites,
+    totalFavorites,
+  ] = await Promise.all([
+    Order.find({
+      customerId: id,
+    }).sort({ createdAt: -1 }),
 
-  const orders: TOrder[] = await Order.find(
-    customer?._id ? { customerId: customer._id } : {},
-  ).sort({ createdAt: -1 });
+    Order.countDocuments({
+      customerId: id,
+      status: OrderStatus.DELIVERED,
+    }),
 
-  const wishlist: TFavorite | null = await Favorite.findOne({
-    customerEmail,
-  });
+    Order.find({
+      customerId: id,
+      status: PaymentStatus.PAID,
+    })
+      .sort({ createdAt: -1 })
+      .select("bookId totalPrice")
+      .lean()
+      .exec(),
 
-  const wishlistBookIds = wishlist?.books || [];
+    Order.countDocuments({
+      customerId: id,
+      status: PaymentStatus.PAID,
+    }),
 
-  const wishlistBooksData: TBook[] =
-    wishlistBookIds.length > 0
-      ? await Book.find({ _id: { $in: wishlistBookIds } }).limit(5)
-      : [];
+    Favorite.find({
+      userId: id,
+    })
+      .select("bookId")
+      .limit(8)
+      .sort({ createdAt: -1 })
+      .populate([
+        {
+          path: "bookId",
+          select: "name author photoUrl price discount discountedPrice",
+        },
+      ]),
 
-  const totalCompletedOrder = orders.filter(
-    (order) => order.status === OrderStatus.DELIVERED,
-  ).length;
-
-  const purchasedBooks = orders.filter(
-    (order) => order.paymentStatus === PaymentStatus.PAID,
-  );
-
-  const totalBooksPurchased = purchasedBooks.length;
+    Favorite.countDocuments({
+      userId: id,
+    }),
+  ]);
 
   const orderBookIds = purchasedBooks.map((order) => order.bookId);
 
-  const orderBooks: TBook[] =
+  const orderBooks =
     orderBookIds.length > 0
       ? await Book.find({ _id: { $in: orderBookIds } })
       : [];
@@ -57,11 +80,9 @@ const getUserDashboardData = async (customerEmail: string) => {
     bookPriceMap[book._id.toString()] = book.price;
   });
 
-  const totalSpent = orders.reduce((sum, order) => {
-    if (order.paymentStatus === PaymentStatus.PAID) {
-      const price = bookPriceMap[order.bookId.toString()] || 0;
-      sum += price;
-    }
+  const totalSpent = purchasedBooks.reduce((sum, order) => {
+    sum += order.totalPrice;
+
     return sum;
   }, 0);
 
@@ -127,18 +148,10 @@ const getUserDashboardData = async (customerEmail: string) => {
     ? new Date(firstOrder.createdAt).getFullYear()
     : new Date().getFullYear();
 
-  const formattedWishlist = wishlistBooksData.map((book) => ({
-    title: book.name,
-    author: book.author,
-    price: `$ ${book.price}`,
-    image: book.photoUrl,
-    bookId: book._id.toString(),
-  }));
-
   return {
     stats: {
       totalOrders: orders.length,
-      wishlistItems: wishlistBookIds.length,
+      wishlistItems: totalFavorites,
       booksPurchased: totalBooksPurchased,
       totalCompletedOrder,
       totalSpent,
@@ -153,7 +166,7 @@ const getUserDashboardData = async (customerEmail: string) => {
       memberSince,
     },
     recentOrders,
-    wishlist: formattedWishlist,
+    wishlist: favorites.map((favorite) => favorite.bookId),
     chartData,
     statusDistribution,
   };
@@ -517,7 +530,7 @@ const getAdminDashboardData = async () => {
     totalLibrarians > 0 ? Math.round(totalBooks / totalLibrarians) : 0;
 
   const totalWishlistItems = allWishlists.reduce(
-    (sum, wishlist) => sum + (wishlist.books.length || 0),
+    (sum, wishlist) => sum + (wishlist.bookId.length || 0),
     0,
   );
 

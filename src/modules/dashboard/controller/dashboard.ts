@@ -4,8 +4,7 @@ import type { Request, Response } from "express";
 import status from "http-status";
 
 const getUserDashboardData = async (req: Request, res: Response) => {
-  const { email: customerEmail } = req.user;
-  const result = await services.getUserDashboardData(customerEmail);
+  const result = await services.getUserDashboardData(req.user._id);
 
   sendSuccessResponse(res, status.OK, {
     message: "Dashboard data retrieved successfully!",
