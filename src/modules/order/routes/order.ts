@@ -13,6 +13,8 @@ router.get("/", controllers.getOrders);
 
 router.post("/", controllers.createOrder);
 
+router.post("/checkout/:id", validateId, controllers.createCheckout);
+
 router.get("/:id", validateId, controllers.getOrderById);
 
 router.patch(

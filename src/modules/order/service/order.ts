@@ -1,6 +1,8 @@
 import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import { BookStatus } from "@/book/validation/book.js";
+import { envConfig } from "@/config/env.js";
+import stripe from "@/config/stripe.js";
 import type { TOrder } from "@/order/interface/order.js";
 import Order from "@/order/model/order.js";
 import {
@@ -216,12 +218,62 @@ const deleteOrderById = async (id: string) => {
   }
 };
 
+const createCheckout = async (orderId: string) => {
+  const CLIENT_URL = envConfig.CLIENT_URL;
+  const order = await Order.findById(orderId)
+    .select("bookId totalPrice")
+    .lean()
+    .exec();
+
+  if (!order) {
+    throw new NotFoundError("Order data not found!");
+  }
+
+  const { bookId, totalPrice } = order;
+
+  const book = await Book.findById(bookId).select("name").lean().exec();
+
+  if (!book) {
+    throw new NotFoundError("Book data not found!");
+  }
+
+  const unit_amount = double(totalPrice * 100);
+
+  const session = await stripe.checkout.sessions.create({
+    ui_mode: "custom",
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: book.name,
+            metadata: {
+              orderId,
+            },
+          },
+          unit_amount,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    return_url: `${CLIENT_URL}/dashboard/my-orders?session_id={CHECKOUT_SESSION_ID}`,
+  });
+
+  console.log(session);
+
+  return {
+    clientSecret: session.client_secret,
+  };
+};
+
 const services = {
   createOrder,
   getOrders,
   getOrderById,
   updateOrderStatus,
   deleteOrderById,
+  createCheckout,
 };
 
 export default services;
