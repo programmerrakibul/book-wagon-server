@@ -85,6 +85,10 @@ const createOrder = async (payload: unknown, customerId: Types.ObjectId) => {
     await customer.save({ session });
 
     await session.commitTransaction();
+
+    return {
+      _id: order?._id,
+    };
   } catch (error: unknown) {
     await session.abortTransaction();
 
@@ -260,7 +264,15 @@ const createCheckout = async (orderId: string, customerEmail: string) => {
 
   const { bookId, price } = order;
 
-  const book = await Book.findById(bookId).select("name").lean().exec();
+  const book = await Book.findById(bookId).select("name stock").lean().exec();
+
+  if (!book) {
+    throw new NotFoundError("Book data not found! Please try another book.");
+  }
+
+  if (book.stock < order.quantity) {
+    throw new BadRequestError("Book is out of stock! Please try another book.");
+  }
 
   if (!book) {
     throw new NotFoundError("Book data not found!");
@@ -287,12 +299,17 @@ const createCheckout = async (orderId: string, customerEmail: string) => {
       },
     ],
 
+    payment_intent_data: {
+      receipt_email: customerEmail,
+    },
+
     customer_email: customerEmail,
     metadata: {
       orderId,
       bookId: book._id.toString(),
     },
 
+    payment_method_types: ["card"],
     mode: "payment",
     return_url: `${CLIENT_URL}/dashboard/my-orders?session_id={CHECKOUT_SESSION_ID}`,
   });

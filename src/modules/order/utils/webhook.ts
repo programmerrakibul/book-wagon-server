@@ -22,7 +22,8 @@ export const successPayment = async (data: Stripe.Checkout.Session) => {
     order.transactionId = data.payment_intent
       ? (data.payment_intent as string)
       : "";
-    book.stock -= order.quantity;
+
+    if (book.stock >= order.quantity) book.stock -= order.quantity;
 
     await order.save({ session });
     await book.save({ session });

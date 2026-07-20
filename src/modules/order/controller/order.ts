@@ -24,10 +24,11 @@ const getOrderById = async (req: Request<{ id: string }>, res: Response) => {
 
 const createOrder = async (req: Request, res: Response) => {
   const { _id } = req.user;
-  await services.createOrder(req.body, _id);
+  const result = await services.createOrder(req.body, _id);
 
   sendSuccessResponse(res, status.CREATED, {
     message: "Order created successfully!",
+    data: result,
   });
 };
 
