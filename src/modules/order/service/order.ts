@@ -10,6 +10,7 @@ import {
   createOrderSchema,
   orderQuerySchema,
   OrderStatus,
+  PaymentStatus,
   updateOrderStatusSchema,
   type TOrderStatus,
 } from "@/order/validation/order.js";
@@ -155,6 +156,32 @@ const getOrderById = async (id: string) => {
   }
 
   return order;
+};
+
+const getInvoices = async (
+  customerId: Types.ObjectId,
+  queryPayload: unknown,
+) => {
+  const { limit = 10, page = 1 } = parseOrThrow(orderQuerySchema, queryPayload);
+  const query = { customerId, paymentStatus: PaymentStatus.PAID };
+
+  const opt: PaginateOptions = {
+    sort: { createdAt: -1 },
+    limit,
+    page,
+    select: "bookId transactionId createdAt totalPrice",
+    populate: [
+      {
+        path: "bookId",
+        select: "name -_id",
+      },
+    ],
+  };
+
+  const result = await Order.paginate(query, opt);
+  const totalSpent = result.docs.reduce((acc, cur) => acc + cur.totalPrice, 0);
+
+  return { ...getPaginatedData(result), totalSpent: double(totalSpent) };
 };
 
 const updateOrderStatus = async (id: string, payload: unknown) => {
@@ -315,6 +342,7 @@ const services = {
   deleteOrderById,
   createCheckout,
   orderWebhook,
+  getInvoices,
 };
 
 export default services;

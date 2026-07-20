@@ -7,13 +7,18 @@ import express from "express";
 
 const router = express.Router();
 
-
-router.use("/webhook", express.raw({ type: "application/json" }), controllers.orderWebhook);
+router.use(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  controllers.orderWebhook,
+);
 
 router.use(verifyTokenID);
 router.use(express.json());
 
 router.get("/", controllers.getOrders);
+
+router.get("/invoices", controllers.getInvoices);
 
 router.post("/", controllers.createOrder);
 

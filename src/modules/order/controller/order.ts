@@ -68,6 +68,15 @@ const orderWebhook = async (req: Request, res: Response) => {
   });
 };
 
+const getInvoices = async (req: Request, res: Response) => {
+  const result = await services.getInvoices(req.user._id, req.query);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "Invoices fetched successfully!",
+    ...result,
+  });
+};
+
 const controllers = {
   getOrders,
   createOrder,
@@ -76,6 +85,7 @@ const controllers = {
   deleteOrderById,
   createCheckout,
   orderWebhook,
+  getInvoices,
 };
 
 export default controllers;
