@@ -52,11 +52,19 @@ const deleteOrderById = async (req: Request<{ id: string }>, res: Response) => {
 };
 
 const createCheckout = async (req: Request<{ id: string }>, res: Response) => {
-  const result = await services.createCheckout(req.params.id);
+  const result = await services.createCheckout(req.params.id, req.user.email);
 
   sendSuccessResponse(res, status.OK, {
     message: "Checkout created successfully!",
     data: result,
+  });
+};
+
+const orderWebhook = async (req: Request, res: Response) => {
+  await services.orderWebhook(req.headers["stripe-signature"], req.body);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "Order webhook created successfully!",
   });
 };
 
@@ -67,6 +75,7 @@ const controllers = {
   updateOrderStatus,
   deleteOrderById,
   createCheckout,
+  orderWebhook,
 };
 
 export default controllers;

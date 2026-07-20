@@ -5,6 +5,7 @@ import { envConfig } from "@/config/env.js";
 import stripe from "@/config/stripe.js";
 import type { TOrder } from "@/order/interface/order.js";
 import Order from "@/order/model/order.js";
+import { successPayment } from "@/order/utils/webhook.js";
 import {
   createOrderSchema,
   orderQuerySchema,
@@ -23,6 +24,7 @@ import type {
   Types,
 } from "mongoose";
 import mongoose from "mongoose";
+import type Stripe from "stripe";
 
 const createOrder = async (payload: unknown, customerId: Types.ObjectId) => {
   const parsedData = parseOrThrow(createOrderSchema, payload);
@@ -218,10 +220,10 @@ const deleteOrderById = async (id: string) => {
   }
 };
 
-const createCheckout = async (orderId: string) => {
+const createCheckout = async (orderId: string, customerEmail: string) => {
   const CLIENT_URL = envConfig.CLIENT_URL;
   const order = await Order.findById(orderId)
-    .select("bookId totalPrice")
+    .select("bookId quantity price")
     .lean()
     .exec();
 
@@ -229,7 +231,7 @@ const createCheckout = async (orderId: string) => {
     throw new NotFoundError("Order data not found!");
   }
 
-  const { bookId, totalPrice } = order;
+  const { bookId, price } = order;
 
   const book = await Book.findById(bookId).select("name").lean().exec();
 
@@ -237,7 +239,7 @@ const createCheckout = async (orderId: string) => {
     throw new NotFoundError("Book data not found!");
   }
 
-  const unit_amount = double(totalPrice * 100);
+  const unit_amount = double(price * 100);
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: "custom",
@@ -248,23 +250,61 @@ const createCheckout = async (orderId: string) => {
           product_data: {
             name: book.name,
             metadata: {
+              bookId: book._id.toString(),
               orderId,
             },
           },
           unit_amount,
         },
-        quantity: 1,
+        quantity: order.quantity,
       },
     ],
+
+    customer_email: customerEmail,
+    metadata: {
+      orderId,
+      bookId: book._id.toString(),
+    },
+
     mode: "payment",
     return_url: `${CLIENT_URL}/dashboard/my-orders?session_id={CHECKOUT_SESSION_ID}`,
   });
 
-  console.log(session);
-
   return {
     clientSecret: session.client_secret,
   };
+};
+
+const orderWebhook = async (
+  signature: string | string[] | undefined,
+  payload: string,
+) => {
+  let event: Stripe.Event | null = null;
+
+  if (!signature) {
+    throw new BadRequestError("Missing Stripe signature!");
+  }
+
+  event = stripe.webhooks.constructEvent(
+    payload,
+    signature,
+    envConfig.WEBHOOK_SECRET,
+  );
+
+  if (!event) {
+    throw new BadRequestError("Invalid Stripe signature!");
+  }
+
+  switch (event.type) {
+    case "checkout.session.completed":
+      await successPayment(event.data.object);
+      break;
+    case "checkout.session.async_payment_succeeded":
+      await successPayment(event.data.object);
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
 };
 
 const services = {
@@ -274,6 +314,7 @@ const services = {
   updateOrderStatus,
   deleteOrderById,
   createCheckout,
+  orderWebhook,
 };
 
 export default services;

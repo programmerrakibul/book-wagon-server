@@ -17,7 +17,7 @@ import {
 } from "@/utils/sendResponse.js";
 import cors from "cors";
 import type { Request, Response } from "express";
-import express, { json } from "express";
+import express from "express";
 import status from "http-status";
 
 import dns from "node:dns";
@@ -38,11 +38,14 @@ app.use(
     ],
   }),
 );
-app.use(json());
 
 const run = async () => {
   try {
     await connectDB();
+
+    app.use(`${API_PREFIX}/orders`, ordersRouter);
+
+    app.use(express.json());
 
     app.get("/", (_req: Request, res: Response) => {
       return sendSuccessResponse(res, status.OK, {
@@ -53,7 +56,6 @@ const run = async () => {
     app.use(`${API_PREFIX}/health-check`, healthRouter);
     app.use(`${API_PREFIX}/users`, usersRouter);
     app.use(`${API_PREFIX}/books`, booksRouter);
-    app.use(`${API_PREFIX}/orders`, ordersRouter);
     app.use(`${API_PREFIX}/favorites`, favoritesRouter);
     app.use(`${API_PREFIX}/comments`, commentsRouter);
     app.use(`${API_PREFIX}/dashboard`, dashboardRouter);

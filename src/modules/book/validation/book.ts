@@ -38,7 +38,7 @@ const baseBookSchema = z.object({
   photoUrl: z
     .url("Please provide a valid URL!")
     .trim()
-    .lowercase()
+    .toLowerCase()
     .min(1, "Photo URL is required!"),
 
   categoryId: z

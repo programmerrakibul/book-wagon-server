@@ -37,6 +37,14 @@ const schema = new Schema<TOrder>(
       index: true,
     },
 
+    transactionId: {
+      type: String,
+      required: false,
+      trim: true,
+      index: true,
+      default: "",
+    },
+
     price: {
       type: Number,
       required: true,

@@ -18,7 +18,7 @@ export const verifyTokenID = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.headers.authorization?.substring(7);
+    const token = req.headers["authorization"]?.substring(7);
 
     console.log(`Validating token...`);
 

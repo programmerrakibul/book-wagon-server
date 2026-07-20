@@ -11,8 +11,6 @@ export const authorize = (...roles: TUserRole[]) => {
 
       const user: TUser | null = await User.findById(_id);
 
-      roles = roles.map((role) => role?.toLowerCase() as TUserRole);
-
       if (!roles.includes(user?.role as TUserRole)) {
         throw new ForbiddenError("Forbidden access!");
       }

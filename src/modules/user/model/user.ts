@@ -35,6 +35,7 @@ const userSchema = new Schema(
       enum: Object.values(UserRole),
       default: UserRole.USER,
       index: true,
+      uppercase: true,
     },
 
     books: [
@@ -67,8 +68,6 @@ const userSchema = new Schema(
     versionKey: false,
   },
 );
-
-
 
 userSchema.statics.toggleRole = async function (
   query: string | Schema.Types.ObjectId,
