@@ -3,6 +3,7 @@ import User from "@/user/model/user.js";
 import {
   createUserSchema,
   updateUserRoleSchema,
+  updateUserSchema,
   userQuerySchema,
 } from "@/user/validation/user.js";
 import { getPaginatedData } from "@/utils/getPaginatedData.js";
@@ -89,6 +90,20 @@ const upsertUser = async (payload: unknown) => {
   return { isNewUser: true };
 };
 
+const updateUserProfile = async (id: Types.ObjectId, payload: unknown) => {
+  const { name, photoUrl } = parseOrThrow(updateUserSchema, payload);
+
+  const user = await User.findById(id).select("name photoUrl");
+
+  if (!user) {
+    throw new NotFoundError("User not found!");
+  }
+
+  user.name = name || user.name;
+  user.photoUrl = photoUrl || user.photoUrl;
+  await user.save();
+};
+
 const updateUserRole = async (userId: string, payload: unknown) => {
   const { role } = parseOrThrow(updateUserRoleSchema, payload);
 
@@ -107,6 +122,7 @@ const services = {
   getUserProfile,
   getUserRole,
   upsertUser,
+  updateUserProfile,
   updateUserRole,
 };
 

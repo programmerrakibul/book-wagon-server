@@ -41,6 +41,14 @@ const postUser = async (req: Request, res: Response) => {
   sendSuccessResponse(res, statusCode, { message });
 };
 
+const updateUserProfile = async (req: Request, res: Response) => {
+  await services.updateUserProfile(req.user._id, req.body);
+
+  sendSuccessResponse(res, status.OK, {
+    message: "User data updated successfully!",
+  });
+};
+
 const updateUserRole = async (req: Request<{ id: string }>, res: Response) => {
   await services.updateUserRole(req.params.id, req.body);
 
@@ -54,6 +62,7 @@ const controllers = {
   getUserProfile,
   getUserRole,
   postUser,
+  updateUserProfile,
   updateUserRole,
 };
 

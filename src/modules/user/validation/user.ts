@@ -27,6 +27,12 @@ export const createUserSchema = z.object({
     .transform((url) => url.toLowerCase()),
 });
 
+export const updateUserSchema = createUserSchema
+  .omit({
+    email: true,
+  })
+  .partial();
+
 export const updateUserRoleSchema = z.object({
   role: z.enum(
     Object.values(UserRole) as [TUserRole, ...TUserRole[]],
