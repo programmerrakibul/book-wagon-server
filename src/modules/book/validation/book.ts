@@ -53,11 +53,19 @@ const baseBookSchema = z.object({
   subcategoryId: z
     .string("Please provide a valid sub-category ID!")
     .trim()
-    .refine((val) => {
-      return validateObjectId(val);
-    }, "Please provide a valid MongoDB ID!")
-    .transform((val) => transformToObjectId(val))
-    .optional(),
+    .transform((val) => {
+      if (val.trim().length === 0) return undefined;
+
+      return val;
+    })
+    .optional()
+    .transform((val) => {
+      if (val !== undefined && validateObjectId(val)) {
+        return transformToObjectId(val);
+      }
+
+      return undefined;
+    }),
 
   publicationYear: z.coerce
     .number<number>("Please provide a valid publication year!")
