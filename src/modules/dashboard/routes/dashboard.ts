@@ -4,7 +4,7 @@ import { verifyTokenID } from "@/middlewares/verify-token.js";
 import { UserRole } from "@/user/validation/user.js";
 import { Router } from "express";
 
-const router: Router = Router();
+const router = Router();
 
 router.use(verifyTokenID);
 

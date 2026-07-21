@@ -13,8 +13,7 @@ const getUserDashboardData = async (req: Request, res: Response) => {
 };
 
 const getLibrarianDashboardData = async (req: Request, res: Response) => {
-  const { email: librarianEmail } = req.user;
-  const result = await services.getLibrarianDashboardData(librarianEmail);
+  const result = await services.getLibrarianDashboardData(req.user._id);
 
   sendSuccessResponse(res, status.OK, {
     message: "Dashboard data retrieved successfully!",

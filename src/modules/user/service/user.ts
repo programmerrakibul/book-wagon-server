@@ -107,7 +107,7 @@ const updateUserProfile = async (id: Types.ObjectId, payload: unknown) => {
 const updateUserRole = async (userId: string, payload: unknown) => {
   const { role } = parseOrThrow(updateUserRoleSchema, payload);
 
-  const user = await User.findById(userId).select("role").lean().exec();
+  const user = await User.findById(userId).select("role");
 
   if (!user) {
     throw new NotFoundError("User not found!");

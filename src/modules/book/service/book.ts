@@ -111,8 +111,6 @@ const getBooks = async (queryPayload: unknown) => {
 
         if (role === UserRole.LIBRARIAN) query.librarianId = _id;
         if (role === UserRole.ADMIN) delete query.isActive;
-
-        console.log(role);
       }
     }
   }
