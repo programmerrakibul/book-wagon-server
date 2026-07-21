@@ -63,8 +63,8 @@ const getUserProfile = async (id: Types.ObjectId) => {
   return user;
 };
 
-const getUserRole = async (id: Types.ObjectId) => {
-  const user = await User.findById(id).select("role").lean().exec();
+const getUserRole = async (email: string) => {
+  const user = await User.findOne({ email }).select("role").lean().exec();
 
   if (!user) {
     throw new NotFoundError("This user does not exist!");

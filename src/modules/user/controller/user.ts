@@ -21,8 +21,8 @@ const getUserProfile = async (req: Request, res: Response) => {
   });
 };
 
-const getUserRole = async (req: Request, res: Response) => {
-  const result = await services.getUserRole(req.user._id);
+const getUserRole = async (req: Request<{ email: string }>, res: Response) => {
+  const result = await services.getUserRole(req.params.email);
 
   sendSuccessResponse(res, status.OK, {
     message: "User role retrieved successfully!",

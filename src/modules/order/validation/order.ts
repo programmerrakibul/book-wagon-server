@@ -53,6 +53,9 @@ export const orderQuerySchema = z.object({
   ...paginationQuery,
   ...searchQuery,
   ...sortQuery,
+  isLibrarian: z.coerce
+    .boolean<Boolean>("Please provide a valid status!")
+    .optional(),
 });
 
 export type TCreateOrder = z.infer<typeof createOrderSchema>;

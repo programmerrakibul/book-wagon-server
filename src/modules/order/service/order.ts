@@ -118,12 +118,22 @@ const getOrders = async (queryPayload: unknown, id: Types.ObjectId) => {
     createdAt: -1,
   };
 
+  const query: Record<string, Types.ObjectId> = {
+    customerId: id,
+  };
+
   const {
     limit = 10,
     page = 1,
     sortBy,
     sortOrder,
+    isLibrarian,
   } = parseOrThrow(orderQuerySchema, queryPayload);
+
+  if (isLibrarian) {
+    query.librarianId = id;
+    delete query.customerId;
+  }
 
   if (sortBy && sortOrder) {
     const order = sortOrder === "desc" ? -1 : 1;
@@ -139,12 +149,7 @@ const getOrders = async (queryPayload: unknown, id: Types.ObjectId) => {
     populate: populateOptions,
   };
 
-  const result: PaginateResult<TOrder> = await Order.paginate(
-    {
-      $or: [{ customerId: id }, { librarianId: id }],
-    },
-    opt,
-  );
+  const result: PaginateResult<TOrder> = await Order.paginate(query, opt);
 
   return getPaginatedData(result);
 };

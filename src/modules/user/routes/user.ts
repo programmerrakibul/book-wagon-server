@@ -15,7 +15,7 @@ router.get("/profile", verifyTokenID, controllers.getUserProfile);
 
 router.patch("/profile", verifyTokenID, controllers.updateUserProfile);
 
-router.get("/role", verifyTokenID, controllers.getUserRole);
+router.get("/role/:email", controllers.getUserRole);
 
 router.post("/", controllers.postUser);
 
