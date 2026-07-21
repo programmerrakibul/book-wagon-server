@@ -191,23 +191,48 @@ const getInvoices = async (
 const updateOrderStatus = async (id: string, payload: unknown) => {
   const { status } = parseOrThrow(updateOrderStatusSchema, payload);
 
-  const order: TOrder | null = await Order.findById(id).select("status");
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (!order) {
-    throw new NotFoundError("Order data not found!");
+  try {
+    const order = await Order.findById(id)
+      .select("status bookId")
+      .session(session);
+
+    if (!order) {
+      throw new NotFoundError("Order data not found!");
+    }
+
+    if (
+      [OrderStatus.CANCELLED, OrderStatus.DELIVERED].includes(
+        order.status as Extract<TOrderStatus, "CANCELLED" | "DELIVERED">,
+      )
+    ) {
+      throw new BadRequestError("Order is already cancelled or delivered!");
+    }
+
+    if (OrderStatus.CANCELLED === status) {
+      const book = await Book.findById(order.bookId)
+        .select("stock")
+        .session(session);
+
+      if (book) {
+        book.stock += order.quantity;
+        await book.save({ session });
+      }
+    }
+
+    order.status = status;
+
+    await order.save({ session });
+
+    await session.commitTransaction();
+  } catch (error: unknown) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    await session.endSession();
   }
-
-  if (
-    [OrderStatus.CANCELLED, OrderStatus.DELIVERED].includes(
-      order.status as Extract<TOrderStatus, "CANCELLED" | "DELIVERED">,
-    )
-  ) {
-    throw new BadRequestError("Order is already cancelled or delivered!");
-  }
-
-  order.status = status;
-
-  await order.save();
 };
 
 const deleteOrderById = async (id: string) => {
@@ -271,7 +296,7 @@ const createCheckout = async (orderId: string, customerEmail: string) => {
   }
 
   if (book.stock < order.quantity) {
-    throw new BadRequestError("Book is out of stock! Please try another book.");
+    throw new BadRequestError(`Book ${book.name} is out of stock!`);
   }
 
   if (!book) {
