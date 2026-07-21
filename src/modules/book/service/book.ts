@@ -1,3 +1,4 @@
+import BookFormat from "@/book-format/model/book-format.js";
 import type { TBook } from "@/book/interface/book.js";
 import Book from "@/book/model/book.js";
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/book/validation/book.js";
 import Category from "@/category/model/category.js";
 import Order from "@/order/model/order.js";
+import SubCategory from "@/sub-category/model/sub-category.js";
 import User from "@/user/model/user.js";
 import type { TUserRole } from "@/user/validation/user.js";
 import { UserRole } from "@/user/validation/user.js";
@@ -52,10 +54,43 @@ const createBook = async (
   librarianId: TBook["librarianId"],
 ) => {
   const parsedData = parseOrThrow(createBookSchema, payload);
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
+    const category = await Category.exists(parsedData.categoryId).session(
+      session,
+    );
+
+    if (!category) {
+      throw new NotFoundError(
+        "This category does not exist! Please try another!",
+      );
+    }
+
+    if (parsedData.subcategoryId) {
+      const subcategory = await SubCategory.exists(
+        parsedData.subcategoryId,
+      ).session(session);
+
+      if (!subcategory) {
+        throw new NotFoundError(
+          "This subcategory does not exist! Please try another!",
+        );
+      }
+    }
+
+    const format = await BookFormat.exists(parsedData.formatId).session(
+      session,
+    );
+
+    if (!format) {
+      throw new NotFoundError(
+        "This format does not exist! Please try another!",
+      );
+    }
+
     const [book] = await Book.create([{ ...parsedData, librarianId }], {
       session,
     });
