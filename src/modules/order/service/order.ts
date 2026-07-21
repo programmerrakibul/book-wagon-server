@@ -201,7 +201,7 @@ const updateOrderStatus = async (id: string, payload: unknown) => {
 
   try {
     const order = await Order.findById(id)
-      .select("status bookId")
+      .select("status bookId quantity")
       .session(session);
 
     if (!order) {
